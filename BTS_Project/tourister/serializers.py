@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-from .models import Profile
+from .models import Profile,RateReview
 
 class SignupSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(write_only=True, required=True)
@@ -12,6 +12,7 @@ class SignupSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
 
     def create(self, validated_data):
         phone_number = validated_data.pop('phone_number')
@@ -24,3 +25,9 @@ class SignupSerializer(serializers.ModelSerializer):
 
         Profile.objects.create(user=user, phone_number=phone_number)
         return user
+
+class RateReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RateReview
+        fields = ['id', 'user', 'rating', 'review']
+        read_only_fields = ['user']

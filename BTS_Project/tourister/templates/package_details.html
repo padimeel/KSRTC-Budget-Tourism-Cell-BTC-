@@ -1,0 +1,349 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BTS</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+<link rel="stylesheet" href="{% static 'CSS/package_details.css' %}">
+
+  </head>
+
+  <body class="bg-white text-gray-800">
+    {% include 'components/navbar.html' %}
+    <div class="container mx-auto md:px-4 lg:px-4">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+
+        <!-- ============ LEFT COLUMN ============ -->
+        <div class="md:col-span-8">
+          <h3 class="font-bold text-3xl text-[#E11D48] py-2 mt-3">Shining Kerala</h3>
+
+          <img
+            src="{% static 'images/munnar.jpg' %}"
+            alt="Munnar"
+            class="thumb_img w-full object-cover mt-4 rounded-xl shadow"
+          />
+
+          <!-- Sticky Buttons -->
+          <div class="sticky top-15 bg-white flex gap-3 py-3 z-10">
+            <a href="#overview" class="no-underline">
+              <div
+                class="rounded-full mt-3 px-4 py-2 text-gray-700 hover:bg-gradient-to-r from-[#E11D48] to-[#FBBF24] hover:text-white font-medium transition"
+              >
+                Overview
+              </div>
+            </a>
+            <a href="#Hotels" class="no-underline">
+              <div
+                class="rounded-full mt-3 px-4 py-2 text-gray-700 hover:bg-gradient-to-r from-[#E11D48] to-[#FBBF24] hover:text-white font-medium transition"
+              >
+                Hotels
+              </div>
+            </a>
+            <a href="#day_wise_itinerary" class="no-underline">
+              <div
+                class="rounded-full mt-3 px-4 py-2 text-gray-700 hover:bg-gradient-to-r from-[#E11D48] to-[#FBBF24] hover:text-white font-medium transition"
+              >
+                Day wise Itinerary
+              </div>
+            </a>
+          </div>
+
+          <!-- Package Overview -->
+          <div id="overview" class="mt-3 rounded-md overflow-hidden border border-gray-200">
+            <div class="bg-[#E11D48] text-white font-bold px-4 py-3">
+              Package Overview
+            </div>
+            <div class="p-4 text-[15px] leading-relaxed">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut
+              repellat eius magnam, expedita animi dolores sunt dignissimos
+              quia placeat provident! Impedit tenetur totam assumenda adipisci?
+              Numquam recusandae corporis perferendis quo.
+            </div>
+          </div>
+
+          <!-- Hotel Details -->
+          <div id="Hotels" class="mt-4 rounded-md overflow-hidden border border-gray-200">
+            <div class="bg-[#E11D48] text-white font-bold px-4 py-3">
+              Hotel Details
+            </div>
+
+            <div class="p-4 space-y-5">
+              <!-- Hotel 1 -->
+              <div class="border border-gray-200 rounded-md p-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  <div class="md:col-span-4">
+                    <img
+                      src="{% static 'images/hotel01.jpg' %}"
+                      alt="Hotel Image"
+                      class="w-full rounded-md"
+                    />
+                  </div>
+                  <div class="md:col-span-8">
+                    <h5 class="font-bold text-lg">The Grand Paradise Resort</h5>
+                    <h6 class="text-gray-500 mb-2">
+                      Location: Kanyakumari, Tamil Nadu
+                    </h6>
+                    <p class="text-[15px]">
+                      Experience luxury and comfort with ocean-view rooms and
+                      world-class facilities.
+                    </p>
+                    <a
+                      href="#"
+                      class="inline-block mt-3 text-white font-bold px-4 py-2 rounded-lg border-0 bg-gradient-to-r from-[#E11D48] to-[#FBBF24]"
+                      >Book Now</a
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hotel 2 -->
+              <div class="border border-gray-200 rounded-md p-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  <div class="md:col-span-4">
+                    <img
+                      src="{% static 'images/hotel02.jpg' %}"
+                      alt="Hotel Image"
+                      class="w-full rounded-md"
+                    />
+                  </div>
+                  <div class="md:col-span-8">
+                    <h5 class="font-bold text-lg">Sunrise Beach Hotel</h5>
+                    <h6 class="text-gray-500 mb-2">
+                      Location: Rameswaram, Tamil Nadu
+                    </h6>
+                    <p class="text-[15px]">
+                      Relax by the sea and enjoy modern amenities with scenic
+                      beach views and fine dining.
+                    </p>
+                    <a
+                      href="#"
+                      class="inline-block mt-3 text-white font-bold px-4 py-2 rounded-lg border-0 bg-gradient-to-r from-[#E11D48] to-[#FBBF24]"
+                      >Book Now</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Day Wise Itinerary -->
+          <div id="day_wise_itinerary" class="mt-4 rounded-md overflow-hidden border border-gray-200">
+            <div class="bg-[#E11D48] text-white font-bold px-4 py-3">
+              Day Wise Itinerary
+            </div>
+            <div class="p-4 space-y-6">
+              <!-- Day 1 -->
+              <div class="border border-gray-200 rounded-md p-5 relative">
+                <div
+                  class="absolute -top-4 -left-4 flex items-center justify-center w-11 h-11 bg-[#E11D48] text-white font-bold rounded-full"
+                >
+                  1
+                </div>
+                <div class="ml-2">
+                  <h5 class="font-bold text-lg mt-2">Arrival at Kanyakumari</h5>
+                  <p>
+                    Arrive at Kanyakumari and check into your hotel. Enjoy the
+                    sunset view where the three seas meet.
+                  </p>
+                  <p class="text-gray-500 mb-0">
+                    Overnight stay at hotel in Kanyakumari.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Day 2 -->
+              <div class="border border-gray-200 rounded-md p-5 relative">
+                <div
+                  class="absolute -top-4 -left-4 flex items-center justify-center w-11 h-11 bg-[#E11D48] text-white font-bold rounded-full"
+                >
+                  2
+                </div>
+                <div class="ml-2">
+                  <h5 class="font-bold text-lg mt-2">Kanyakumari Sightseeing</h5>
+                  <p>
+                    Visit Vivekananda Rock, Thiruvalluvar Statue, and
+                    Kanyakumari Temple. Enjoy evening shopping.
+                  </p>
+                  <p class="text-gray-500 mb-0">Meals: Breakfast included.</p>
+                </div>
+              </div>
+
+              <!-- Day 3 -->
+              <div class="border border-gray-200 rounded-md p-5 relative">
+                <div
+                  class="absolute -top-4 -left-4 flex items-center justify-center w-11 h-11 bg-[#E11D48] text-white font-bold rounded-full"
+                >
+                  3
+                </div>
+                <div class="ml-2">
+                  <h5 class="font-bold text-lg mt-2">Departure</h5>
+                  <p>
+                    Check out from the hotel and proceed to Trivandrum for your
+                    return journey.
+                  </p>
+                  <p class="text-gray-500 mb-0">End of Tour.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ RIGHT COLUMN ============ -->
+        <div class="md:col-span-4 mt-6 space-y-8">
+
+          <!-- Price Card -->
+          <div class="rounded-md overflow-hidden border border-gray-200 mt-5">
+            <div class="bg-[#E11D48] text-white py-5 text-center">
+              <div class="text-sm">Starting From</div>
+              <div class="text-3xl font-bold">₹25,000 <span class="text-sm font-normal">Per Person</span></div>
+            </div>
+            <div class="bg-white p-5 flex justify-center">
+              <a
+                href="#"
+                class="text-white font-bold uppercase px-6 py-2 rounded-full bg-gradient-to-r from-[#E11D48] to-[#FBBF24] w-3/4 text-center"
+              >
+                Book Now
+              </a>
+            </div>
+          </div>
+
+          <!-- Bus Card -->
+          <div class="rounded-md overflow-hidden border border-gray-200 p-5 text-center">
+            <h5 class="text-[#E11D48] font-bold text-lg mb-2">
+              KSRTC BUS – AC Sleeper
+            </h5>
+            <p class="text-gray-700 font-semibold">Bus No: KL 15 A 2245</p>
+            <p class="font-semibold">
+              Available Seats: <span class="text-[#E11D48]">30 left</span>
+            </p>
+            <p class="text-gray-500 mb-4">
+              10 November 2025 • Trivandrum → Munnar
+            </p>
+
+            <!-- Route Timeline -->
+            <div class="bg-white rounded-xl p-4 text-left space-y-5">
+
+              <!-- Stop 1 -->
+              <div class="flex items-start">
+                <div class="text-center mr-3">
+                  <div class="w-9 h-9 bg-[#E11D48] text-white flex items-center justify-center rounded-full">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div class="border-l-2 border-gray-400 h-12 mx-auto"></div>
+                </div>
+                <div>
+                  <h6 class="font-bold">Trivandrum (Start Point)</h6>
+                  <p class="text-gray-500 text-sm mb-1">
+                    Arrival: 09:15 AM • Departure: 09:30 AM
+                  </p>
+                  <p class="text-gray-600 text-sm">
+                    Starting from Trivandrum Central Bus Stand
+                  </p>
+                </div>
+              </div>
+
+              <!-- Stop 2 -->
+              <div class="flex items-start">
+                <div class="text-center mr-3">
+                  <div class="w-9 h-9 bg-[#E11D48] text-white flex items-center justify-center rounded-full">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div class="border-l-2 border-gray-400 h-12 mx-auto"></div>
+                </div>
+                <div>
+                  <h6 class="font-bold">Kollam</h6>
+                  <p class="text-gray-500 text-sm mb-1">
+                    Arrival: 10:45 AM • Departure: 11:00 AM
+                  </p>
+                  <p class="text-gray-600 text-sm">
+                    Short halt near Kollam Junction
+                  </p>
+                </div>
+              </div>
+
+              <!-- Stop 3 -->
+              <div class="flex items-start">
+                <div class="text-center mr-3">
+                  <div class="w-9 h-9 bg-[#E11D48] text-white flex items-center justify-center rounded-full">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div class="border-l-2 border-gray-400 h-12 mx-auto"></div>
+                </div>
+                <div>
+                  <h6 class="font-bold">Kottayam</h6>
+                  <p class="text-gray-500 text-sm mb-1">
+                    Arrival: 01:30 PM • Departure: 01:45 PM
+                  </p>
+                  <p class="text-gray-600 text-sm">
+                    Lunch break stop at Kottayam bus terminal
+                  </p>
+                </div>
+              </div>
+
+              <!-- Stop 4 -->
+              <div class="flex items-start">
+                <div class="text-center mr-3">
+                  <div class="w-9 h-9 bg-gray-800 text-white flex items-center justify-center rounded-full">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                  </div>
+                </div>
+                <div>
+                  <h6 class="font-bold">Munnar (End Point)</h6>
+                  <p class="text-gray-500 text-sm mb-1">Arrival: 05:30 PM</p>
+                  <p class="text-gray-600 text-sm">
+                    Final destination – Tea Garden City
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Package Info -->
+          <div class="rounded-md border border-gray-200 p-5">
+            <h6 class="font-bold mt-2">
+              <i class="fa-regular fa-clock"></i> Duration :
+              <span class="text-gray-500 font-normal">2 Night / 3 Days</span>
+            </h6>
+
+            <h6 class="font-bold mt-2">
+              <i class="fa-solid fa-location-dot"></i> Places :
+              <span class="text-gray-500 font-normal">Thiruvandrum | Kochi | Guruvayur</span>
+            </h6>
+
+            <h6 class="font-bold mt-2">
+              <i class="fa-regular fa-calendar"></i> Date :
+              <span class="text-gray-500 font-normal">10/11/2025 to 13/11/2025</span>
+            </h6>
+
+            <hr class="mt-5 border border-gray-200" />
+
+            <div class="flex justify-center mt-[-20px]">
+              <div
+                class="bg-white px-4 py-1 rounded-full border text-center font-semibold text-gray-500 relative -top-0"
+              >
+                Packages Include
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-8 text-2xl text-gray-500 mt-[15px]">
+              <i class="fa-solid fa-bus-simple"></i>
+              <i class="fa-solid fa-plate-wheat"></i>
+              <i class="fa-solid fa-binoculars"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include 'components/footer.html' %}
+  </body>
+</html>

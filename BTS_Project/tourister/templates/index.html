@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KSRTC BTC — Explore Kerala</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+    {% include 'components/navbar.html' %}
+
+  <!-- HERO -->
+  <section class="relative">
+    <img
+      src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&s=b62b70b9a5c2b6b3d6542ad8e85f0a8e"
+      alt="Kerala hills and backwater"
+      class="w-full h-[68vh] object-cover brightness-90"
+    >
+    <!-- dark gradient overlay for legibility -->
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50"></div>
+
+    <div class="absolute inset-0 flex items-center justify-center px-6">
+      <div class="max-w-5xl w-full text-center">
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight drop-shadow-lg">
+          Discover Kerala — Hills, Backwaters & Beaches
+        </h2>
+        <p class="mt-4 text-white/90 max-w-2xl mx-auto text-lg md:text-xl">
+          Handpicked budget-friendly tours by KSRTC Budget Tourism Cell. Comfortable buses, controlled costs, unforgettable memories.
+        </p>
+
+        <!-- search pill -->
+        <div class="mt-8 mx-auto w-full max-w-2xl flex items-center rounded-full overflow-hidden pill-shadow">
+          <div class="flex-1 bg-white px-4 py-3">
+            <input class="w-full text-gray-700 placeholder-gray-400 bg-transparent outline-none" placeholder="Enter your dream destination (e.g., Munnar, Alleppey)" />
+          </div>
+          <button class="px-6 py-3 bg-gradient-to-r from-rose-600 via-rose-500 to-amber-400 text-white font-semibold">Search</button>
+        </div>
+
+        <!-- quick pill categories under search
+        <div class="mt-4 flex flex-wrap gap-3 justify-center text-sm">
+          <span class="px-3 py-2 bg-white/90 rounded-full text-rose-600 font-semibold">Backwaters</span>
+          <span class="px-3 py-2 bg-white/80 rounded-full text-gray-700">Hill Stations</span>
+          <span class="px-3 py-2 bg-white/80 rounded-full text-gray-700">Beaches</span>
+          <span class="px-3 py-2 bg-white/80 rounded-full text-gray-700">Wildlife</span>
+        </div> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES (like small rounded badges) -->
+  <!-- <section class="max-w-7xl mx-auto px-6 mt-10">
+    <div class="bg-white rounded-2xl p-6 shadow-md glass">
+      <div class="flex items-center justify-between md:gap-6">
+        <h3 class="text-xl font-bold text-rose-700">Explore by Category</h3>
+        <p class="text-sm text-gray-600 hidden md:block">Quick picks to help you choose the perfect trip</p>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-4">
+        categories emphasised as circular icons
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" class="w-7" alt="easy-book">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Easy Book</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/711/711769.png" class="w-7" alt="honeymoon">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Honeymoon</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/3069/3069769.png" class="w-7" alt="pilgrimage">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Pilgrimage</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/168/168366.png" class="w-7" alt="luxury">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Luxury</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/921/921490.png" class="w-7" alt="adventure">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Adventure</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-7" alt="family">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Family</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" class="w-7" alt="weekend">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Weekend</p>
+        </div>
+
+        <div class="flex flex-col items-center gap-2 p-3">
+          <div class="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center border border-rose-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/854/854866.png" class="w-7" alt="beaches">
+          </div>
+          <p class="text-sm font-medium text-gray-700">Beaches</p>
+        </div>
+      </div>
+    </div>
+  </section> -->
+
+   <!-- Explore by Theme (Glass Style with Hover Animation) -->
+<section class="max-w-7xl mx-auto px-6 mt-14">
+  <h3 class="text-2xl md:text-3xl font-extrabold text-rose-700 text-center">
+    Explore Holidays By Theme
+  </h3>
+  <p class="text-gray-600 text-center mt-2">
+    Find your perfect getaway, tailored to your interests.
+  </p>
+
+  <div class="mt-8 flex flex-wrap items-center justify-center gap-8">
+    <!-- Card -->
+    <div class="group flex flex-col items-center w-44 transition-all duration-300 hover:scale-105">
+      <div
+        class="w-36 h-36 rounded-full backdrop-blur-lg bg-white/30 flex items-center justify-center border border-rose-100 shadow-sm group-hover:shadow-lg group-hover:shadow-rose-300 transition-all duration-300">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+          class="w-12 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+          alt="family">
+      </div>
+      <p class="mt-3 font-semibold text-gray-800 group-hover:text-rose-700 transition-colors duration-300">
+        Family Retreat
+      </p>
+      <p class="text-sm text-gray-500 group-hover:text-rose-500 transition-colors duration-300">Explore Now</p>
+    </div>
+
+    <div class="group flex flex-col items-center w-44 transition-all duration-300 hover:scale-105">
+      <div
+        class="w-36 h-36 rounded-full backdrop-blur-lg bg-white/30 flex items-center justify-center border border-rose-100 shadow-sm group-hover:shadow-lg group-hover:shadow-rose-300 transition-all duration-300">
+        <img src="https://cdn-icons-png.flaticon.com/512/168/168366.png"
+          class="w-12 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+          alt="luxury">
+      </div>
+      <p class="mt-3 font-semibold text-gray-800 group-hover:text-rose-700 transition-colors duration-300">
+        Luxury
+      </p>
+      <p class="text-sm text-gray-500 group-hover:text-rose-500 transition-colors duration-300">Explore Now</p>
+    </div>
+
+    <div class="group flex flex-col items-center w-44 transition-all duration-300 hover:scale-105">
+      <div
+        class="w-36 h-36 rounded-full backdrop-blur-lg bg-white/30 flex items-center justify-center border border-rose-100 shadow-sm group-hover:shadow-lg group-hover:shadow-rose-300 transition-all duration-300">
+        <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
+          class="w-12 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+          alt="weekend">
+      </div>
+      <p class="mt-3 font-semibold text-gray-800 group-hover:text-rose-700 transition-colors duration-300">
+        Weekend
+      </p>
+      <p class="text-sm text-gray-500 group-hover:text-rose-500 transition-colors duration-300">Explore Now</p>
+    </div>
+
+    <div class="group flex flex-col items-center w-44 transition-all duration-300 hover:scale-105">
+      <div
+        class="w-36 h-36 rounded-full backdrop-blur-lg bg-white/30 flex items-center justify-center border border-rose-100 shadow-sm group-hover:shadow-lg group-hover:shadow-rose-300 transition-all duration-300">
+        <img src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+          class="w-12 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+          alt="honeymoon">
+      </div>
+      <p class="mt-3 font-semibold text-gray-800 group-hover:text-rose-700 transition-colors duration-300">
+        Honeymoon
+      </p>
+      <p class="text-sm text-gray-500 group-hover:text-rose-500 transition-colors duration-300">Explore Now</p>
+    </div>
+
+    <div class="group flex flex-col items-center w-44 transition-all duration-300 hover:scale-105">
+      <div
+        class="w-36 h-36 rounded-full backdrop-blur-lg bg-white/30 flex items-center justify-center border border-rose-100 shadow-sm group-hover:shadow-lg group-hover:shadow-rose-300 transition-all duration-300">
+        <img src="https://cdn-icons-png.flaticon.com/512/921/921490.png"
+          class="w-12 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+          alt="adventure">
+      </div>
+      <p class="mt-3 font-semibold text-gray-800 group-hover:text-rose-700 transition-colors duration-300">
+        Adventure
+      </p>
+      <p class="text-sm text-gray-500 group-hover:text-rose-500 transition-colors duration-300">Explore Now</p>
+    </div>
+  </div>
+</section>
+
+
+  <!-- HANDPICKED HOLIDAY PACKAGES -->
+<section class="max-w-7xl mx-auto px-6 mt-16">
+  <!-- Title -->
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h3 class="text-3xl font-extrabold text-rose-700">Handpicked Holiday Packages</h3>
+      <p class="text-gray-600 mt-1">Indulge in unforgettable experiences across Kerala.</p>
+    </div>
+  </div>
+
+  <!-- Packages Grid -->
+  <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+    
+    <!-- Card Template -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Munnar_hillstation_kerala.jpg" alt="Munnar" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-black">
+        <h4 class="text-xl font-semibold">Munnar</h4>
+        <p class="text-gray-800 text-sm mt-1">From ₹9,999 – Tea gardens & cool hills</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+    <!-- Alleppey -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Alleppey_Houseboat.jpg" alt="Alleppey" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Alleppey (Houseboat)</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹11,999 – Scenic backwaters & canals</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+    <!-- Kovalam -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Kovalam_Beach_Arabian_Sea.jpg" alt="Kovalam" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Kovalam</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹6,999 – Sunny beaches & lighthouse</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+    <!-- Wayanad -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Kerala_wayanad.jpg" alt="Wayanad" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Wayanad</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹7,999 – Waterfalls & wildlife</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+        <!-- Thekkady -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Thekkady_boating.jpg" alt="Thekkady" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Thekkady</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹8,499 – Spice gardens & wildlife safari</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+    <!-- Vagamon -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Vagamon_Meadows.jpg" alt="Vagamon" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Vagamon</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹7,499 – Misty meadows & paragliding</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+    <!-- Bekal -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Bekal_Fort_Kasargod.jpg" alt="Bekal" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Bekal</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹8,999 – Forts & serene beaches</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+    <!-- Athirappilly -->
+    <article class="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Athirappilly_Waterfalls_in_Thrissur%2C_Kerala.jpg" alt="Athirappilly" class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+      <div class="absolute bottom-0 p-5 text-white">
+        <h4 class="text-xl font-semibold">Athirappilly</h4>
+        <p class="text-gray-200 text-sm mt-1">From ₹9,499 – Majestic waterfalls & jungle trails</p>
+        <button class="mt-3 bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-full text-sm font-medium transition duration-300 inline-flex items-center gap-2">
+          Explore
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </article>
+
+
+  </div>
+</section>
+{% include 'components/footer.html' %}
+
+</body>
+</html>
