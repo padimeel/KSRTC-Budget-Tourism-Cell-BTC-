@@ -261,6 +261,9 @@ class Package_list(TemplateView):
 class My_Booking(TemplateView):
     template_name="my_booking.html"
     
+class Package_Booking_Frontend(TemplateView):
+    template_name="packagebooking.html"
+    
     
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]

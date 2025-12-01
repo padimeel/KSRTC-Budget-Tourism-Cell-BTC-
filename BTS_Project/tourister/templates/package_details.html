@@ -94,119 +94,9 @@
         </div>
       </section>
 
-     <!-- Booking Popup -->
-<div
-  id="bookingPopup"
-  class="fixed inset-0 bg-opacity-50 hidden flex justify-center items-center z-50"
->
-  <!-- Popup Box -->
-  <div
-    class="bg-white w-11/12 max-w-lg rounded-lg shadow-xl p-6 transform scale-95 opacity-0 transition-all duration-300"
-    id="popupBox"
-  >
+     
+<!-- Booking Popup -->
 
-    <!-- Booking Form -->
-    <form id="bookingForm" class="space-y-6">
-<div class="flex gap-26">
-      <h2 class="text-xl font-semibold text-gray-800 pb-2">
-        Booking Details
-      </h2>
-
-  <h6 id="package_number"></h6>
-      <button
-      id="closePopup"
-      class="absolute top-3 right-5 text-gray-600 hover:text-gray-900 text-xl"
-    >
-      <i class="fas fa-times"></i>
-    </button>
-</div>
-      <!-- Adults & Children -->
-      <div class="grid grid-cols-2 gap-5">
-
-        <!-- Adults -->
-        <div>
-          <label class="block text-sm font-medium mb-1">Number of Adults</label>
-
-          <div class="flex items-center border border-gray-400 rounded-lg overflow-hidden h-10">
-            <button type="button" onclick="changeCount('adults', -1)"
-              class="w-10 bg-gray-200 hover:bg-gray-300 text-lg font-bold">–</button>
-
-            <input type="number" id="adults" value="1" min="1"
-              class="w-full text-center text-sm outline-none" readonly>
-
-            <button type="button" onclick="changeCount('adults', 1)"
-              class="w-10 bg-gray-200 hover:bg-gray-300 text-lg font-bold">+</button>
-          </div>
-        </div>
-
-        <!-- Children -->
-        <div>
-          <label class="block text-sm font-medium mb-1">Number of Children</label>
-
-          <div class="flex items-center border border-gray-400 rounded-lg overflow-hidden h-10">
-            <button type="button" onclick="changeCount('children', -1)"
-              class="w-10 bg-gray-200 hover:bg-gray-300 text-lg font-bold">–</button>
-
-            <input type="number" id="children" value="0" min="0"
-              class="w-full text-center text-sm outline-none" readonly>
-
-            <button type="button" onclick="changeCount('children', 1)"
-              class="w-10 bg-gray-200 hover:bg-gray-300 text-lg font-bold">+</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Phone -->
-       <div class="flex gap-5">
-      <div class="flex-1">
-        <label class="block text-sm font-medium mb-1">Phone Number</label>
-        <input type="text" id="phone_number"
-          class="border border-gray-400 w-full px-3 h-10 rounded text-sm"
-          required>
-      </div>
-
-      <!-- Boarding Point -->
-      <div class="flex-1 min-w-0">
-  <label class="block text-sm font-medium mb-1">Boarding Point</label>
-  <select 
-    id="boardingDropdown"
-    class="border border-gray-400 w-full px-3 h-10 rounded text-sm truncate"
-  >
-    <option value="">-- Select Boarding Point --</option>
-    <option value="Nagercoil">Nagercoil</option>
-    <option value="Kanyakumari">Kanyakumari</option>
-    <option value="Marthandam">Marthandam</option>
-    <option value="Tirunelveli">Tirunelveli</option>
-  </select>
-</div>
-
-</div>
-     <!-- <div>
-  <h3 id="total_price" class="text-lg font-semibold text-gray-800 float-right"></h3>
-</div> -->
-
-      <!-- Confirm button -->
-      
- <div class="flex"><!-- Display total price -->
-<h3 id="Booking_price" class="text-lg font-semibold text-gray-800 float-right text-center">
-  &#8377; 
-</h3>
-
-<button 
-  type="submit" 
-  id="confirmBtn" 
-  class="absolute w-50 text-white py-1 rounded-lg bg-gradient-to-r from-rose-600 to-amber-400 transition-all shadow hover:opacity-90 text-md right-6 font-bold">
-  Confirm Booking
-</button>
-</div>
-
-
-
-    </form>
-    
-
-  </div>
-</div>
 
 
       <!-- Itinerary -->
@@ -222,142 +112,75 @@
         </div>
       </section>
 
-      <!-- Inclusions & Exclusions -->
-      <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-        <!-- Inclusions -->
-        <div class="bg-white p-6 rounded-xl shadow">
-          <h3
-            class="text-xl font-bold text-white bg-rose-600 px-4 py-3 rounded-t-lg overflow-hidden shadow -mx-6 -mt-6 mb-6"
-          >
-            Inclusions
-          </h3>
-          <ul class="list-disc pl-6 text-gray-700 space-y-2">
-            <li>AC Volvo Bus Travel</li>
-            <li>Hotel Accommodation</li>
-            <li>Breakfast & Dinner</li>
-            <li>Safari Tickets</li>
-          </ul>
-        </div>
-
-        <!-- Exclusions -->
-        <div class="bg-white p-6 rounded-xl shadow">
-          <h3
-            class="text-xl font-bold text-white bg-rose-600 px-4 py-3 rounded-t-lg overflow-hidden shadow -mx-6 -mt-6 mb-6"
-          >
-            Exclusions
-          </h3>
-          <ul class="list-disc pl-6 text-gray-700 space-y-2">
-            <li>Lunch</li>
-            <li>Personal expenses</li>
-            <li>Extra sightseeing</li>
-          </ul>
-        </div>
-      </section>
-    </main>
+    
+    </main> 
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const packageId = urlParams.get("id");
 
-      console.log("Package ID:", packageId);
+<script>
+    // 1️⃣ Get package_id from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const packageId = urlParams.get("id");
 
-      // 2️⃣ API Call
-      axios
+    console.log("Package ID:", packageId);
+
+    // 2️⃣ Fetch Package Details
+    axios
         .get(`http://127.0.0.1:8000/admin_site/packages/${packageId}/`)
         .then((response) => {
-          const data = response.data;
+            const data = response.data;
 
-          // Images
-          document.getElementById("mainImage").src = data.image1;
-          document.getElementById("image1").src = data.image1;
-          document.getElementById("image2").src = data.image2;
-          document.getElementById("image3").src = data.image3;
+            // Images
+            document.getElementById("mainImage").src = data.image1;
+            document.getElementById("image1").src = data.image1;
+            document.getElementById("image2").src = data.image2;
+            document.getElementById("image3").src = data.image3;
 
-          // Details
-          document.getElementById("packageName").innerText = data.package_name;
-          document.getElementById("overview").innerText = data.package_overview;
-          document.getElementById("duration").innerText = data.duration;
-          document.getElementById(
-            "price"
-          ).innerHTML = `₹ ${data.price} <span class="text-sm italic font-normal text-black">Per Person</span>`;
-document.getElementById("Booking_price").innerHTML = `&#8377; ${data.price}`;
-document.getElementById("package_number").innerHTML = `Package Number: ${data.id}`;
+            // Package details
+            document.getElementById("packageName").innerText = data.package_name;
+            document.getElementById("overview").innerText = data.package_overview;
+            document.getElementById("duration").innerText = data.duration;
 
+            document.getElementById("price").innerHTML =
+                `₹ ${data.price} <span class='text-sm italic font-normal text-black'>Per Person</span>`;
 
+            // If Booking price element exists
+            const bookingPrice = document.getElementById("Booking_price");
+            if (bookingPrice) {
+                bookingPrice.innerHTML = `&#8377; ${data.price}`;
+            }
 
-          // Itinerary
-          const itineraryDiv = document.getElementById("itineraryContainer");
-          itineraryDiv.innerHTML = "";
+            // Itinerary
+            const itineraryDiv = document.getElementById("itineraryContainer");
+            itineraryDiv.innerHTML = "";
 
-          data.itineraries.forEach((item) => {
-            const dayHtml = `
-          <div class="flex items-start gap-4 border p-3 border-gray-300 rounded-md">
-            <div class="h-10 w-10 flex items-center justify-center rounded-full bg-rose-600 text-white font-bold shadow">
-              ${item.day_number}
-            </div>
-            <div>
-              <h4 class="font-semibold text-rose-600">${item.title}</h4>
-              <p>${item.description}</p>
-            </div>
-          </div>
-        `;
-            itineraryDiv.innerHTML += dayHtml;
-          });
+            data.itineraries.forEach((item) => {
+                itineraryDiv.innerHTML += `
+                    <div class="flex items-start gap-4 border p-3 border-gray-300 rounded-md">
+                        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-rose-600 text-white font-bold shadow">
+                            ${item.day_number}
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-rose-600">${item.title}</h4>
+                            <p>${item.description}</p>
+                        </div>
+                    </div>
+                `;
+            });
         })
-        .catch((error) =>
-          console.error("Error fetching package details:", error)
-        );
+        .catch((error) => {
+            console.error("Error fetching package details:", error);
+        });
 
-      // Open popup
-      const openBtn = document.getElementById("bookBtn");
-      const closeBtn = document.getElementById("closePopup");
-      const popup = document.getElementById("bookingPopup");
-      const popupBox = popup.querySelector("div");
+    // 3️⃣ BOOK NOW Button Redirect
+document.getElementById("bookBtn").addEventListener("click", function () {
+    window.location.href = `/tourister/package_booking_frontend/?package_id=${packageId}`;
 
-      // Function to open popup with animation
-      openBtn.addEventListener("click", () => {
-        popup.classList.remove("hidden");
-        setTimeout(() => {
-          popupBox.classList.remove("scale-90", "opacity-0");
-          popupBox.classList.add("scale-100", "opacity-100");
-        }, 10);
-      });
-
-      // Function to close popup with animation
-      closeBtn.addEventListener("click", () => {
-        popupBox.classList.remove("scale-100", "opacity-100");
-        popupBox.classList.add("scale-90", "opacity-0");
-        setTimeout(() => {
-          popup.classList.add("hidden");
-        }, 300); // match transition duration
-      });
-
-      // Optional: close when clicking outside the box
-      popup.addEventListener("click", (e) => {
-        if (e.target === popup) closeBtn.click();
-      });
-
-const adults = document.getElementById("adults");
-const children = document.getElementById("children");
-
-// Increase / decrease adults & children
-function changeCount(id, change) {
-  const input = document.getElementById(id);
-  let value = parseInt(input.value);
-
-  value += change;
-
-  if (id === "adults" && value < 1) value = 1;   // Adults minimum = 1
-  if (id === "children" && value < 0) value = 0; // Children minimum = 0
-
-  input.value = value;
-  calculateTotal();
-}
+});
 
 
+</script>
 
-    </script>
 
     {% include 'components/footer.html' %}
   </body>
