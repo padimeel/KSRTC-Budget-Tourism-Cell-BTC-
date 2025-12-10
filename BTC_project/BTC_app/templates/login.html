@@ -1,0 +1,58 @@
+<!-- BTC_app/templates/login.html -->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>KSRTC BTC - Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS (cdn) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="{% static 'css/auth.css' %}"> -->
+  <link rel="stylesheet" href="login.css">
+
+</head>
+<body>
+  <div class="container my-5">
+    <div class="row shadow rounded overflow-hidden">
+      <div class="sume col-md-6 p-5 text-center bg-danger">
+        <div style="margin-top:40px;">
+          
+          
+<img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" alt="User Icon" style="width:120px; height:auto; margin-right:30px;">
+
+  <h1 class="text-white"  >KSRTC Budget Tourism </h1>
+
+          
+<p class="text-center text-sm text-white">Explore Kerala with comfort and affordability. Book your dream trip with KSRTC BTC.</p>        </div>
+      </div>
+
+      <!-- Right panel (form) -->
+      <div class="col-md-6 p-5 bg-white">
+        <h2 class="text-danger fw-bold">Welcome Back</h2>
+        <p class="text-muted">Sign in to manage your bookings and tours.</p>
+
+        <form id="loginForm" class="mt-4">
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" id="username" class="form-control form-control-lg" placeholder="Enter username" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" id="password" class="form-control form-control-lg" placeholder="Enter password" required>
+          </div>
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-danger btn-lg">LOGIN</button>
+          </div>
+        </form>
+
+        <p class="mt-3 text-center">Don't have an account? <a href="/register/">Sign up</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional Bootstrap & JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/auth.js' %}"></script>
+</body>
+</html>

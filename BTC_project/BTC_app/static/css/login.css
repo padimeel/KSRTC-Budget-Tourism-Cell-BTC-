@@ -1,0 +1,64 @@
+.bg-ksrtc {
+  background: linear-gradient(180deg, #9b0b22 0%, #7a081b 100%); /* Darker red shades */
+  color: white;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  min-height: 480px; /* slightly smaller height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+}
+
+.bg-ksrtc h1 {
+  font-size: 1.8rem; /* smaller title */
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.bg-ksrtc p {
+  font-size: 0.9rem; /* smaller paragraph text */
+  line-height: 1.4;
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+img[alt="User Icon"] {
+  width: 80px !important; /* smaller user icon */
+  height: auto !important;
+  margin-bottom: 15px;
+}
+
+.btn-danger {
+  background: #b70e32; /* darker red button */
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(183, 14, 50, 0.12);
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #c1c1c1;
+}
+
+.sume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  color: #b70e32;
+  font-weight: bold;
+}
+
+.h2 {
+  color: #9b0b22;
+}
+
+.login-container {
+  width: 480px;
+  height: 280px;
+  padding: 20px;
+}
