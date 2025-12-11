@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Package</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-red-50 to-red-100 min-h-screen p-6 flex justify-center items-start">
+
+    <div class="w-full max-w-4xl bg-white shadow-2xl rounded-2xl p-8 border border-red-200">
+        <h2 class="text-4xl font-bold text-center mb-8 text-red-700">KSRTC – Add New Package</h2>
+
+        <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Package Name -->
+            <div class="col-span-2">
+                <label class="font-semibold text-red-900">Package Name</label>
+                <input type="text" class="form-control mt-1 rounded-xl" placeholder="Enter package name">
+            </div>
+
+            <!-- From Location -->
+            <div>
+                <label class="font-semibold text-red-900">From Location</label>
+                <input type="text" class="form-control mt-1 rounded-xl" placeholder="Starting point">
+            </div>
+
+            <!-- To Location -->
+            <div>
+                <label class="font-semibold text-red-900">To Location</label>
+                <input type="text" class="form-control mt-1 rounded-xl" placeholder="Destination">
+            </div>
+
+            <!-- Duration Days -->
+            <div>
+                <label class="font-semibold text-red-900">Duration (Days)</label>
+                <input type="number" class="form-control mt-1 rounded-xl" placeholder="Days">
+            </div>
+
+            <!-- Duration Nights -->
+            <div>
+                <label class="font-semibold text-red-900">Duration (Nights)</label>
+                <input type="number" class="form-control mt-1 rounded-xl" placeholder="Nights">
+            </div>
+
+            <!-- Price -->
+            <div class="col-span-2">
+                <label class="font-semibold text-red-900">Price / Person (INR)</label>
+                <input type="number" class="form-control mt-1 rounded-xl" placeholder="Enter price">
+            </div>
+
+            <!-- Tourist Places -->
+            <div class="col-span-2">
+                <label class="font-semibold text-red-900">Tourist Places</label>
+                <textarea class="form-control mt-1 rounded-xl" rows="3" placeholder="List tourist places..."></textarea>
+            </div>
+
+            <!-- Start Date -->
+            <div>
+                <label class="font-semibold text-red-900">Start Date</label>
+                <input type="date" class="form-control mt-1 rounded-xl">
+            </div>
+
+            <!-- End Date -->
+            <div>
+                <label class="font-semibold text-red-900">End Date</label>
+                <input type="date" class="form-control mt-1 rounded-xl">
+            </div>
+
+            <!-- Description -->
+            <div class="col-span-2">
+                <label class="font-semibold text-red-900">Description</label>
+                <textarea class="form-control mt-1 rounded-xl" rows="4" placeholder="Write detailed description..."></textarea>
+            </div>
+
+            <!-- Upload Image -->
+            <div class="col-span-2">
+                <label class="font-semibold text-red-900">Upload Image</label>
+                <input type="file" class="form-control mt-1 rounded-xl">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-span-2 text-center mt-6">
+                <button type="submit" class="px-6 py-3 rounded-xl text-lg shadow-lg text-white bg-gradient-to-r from-red-500 to-orange-500 hover:opacity-90 transition">Save Package</button>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>
