@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import SignupSerializer, RateReviewSerializer, BookingSerializer
 from admin_panel.serializers import PackageSerializer
-from rest_framework.renderers import TemplateHTMLRenderer,JSONRenderer
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from django.views.generic import TemplateView
 from .models import RateReview, Package_Booking
 from admin_panel.models import Package_Details
@@ -19,13 +19,13 @@ from django.conf import settings
 print("SMTP HOST:", settings.EMAIL_HOST)
 print("SMTP USER:", settings.EMAIL_HOST_USER)
 
+
 class Signup(APIView):
     permission_classes = [permissions.AllowAny]
-    renderer_classes = [JSONRenderer,TemplateHTMLRenderer]
+    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
     template_name = "signup.html"
 
     def get(self, request):
-        # This will render your signup.html in browser
         return Response({})
 
     def post(self, request):
@@ -86,6 +86,9 @@ KSRTC Budget Tourism Team
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# ---------------------------------------------------------
+# LOGIN
+# ---------------------------------------------------------
 class Login(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -101,13 +104,9 @@ class Login(APIView):
         password = request.data.get("password")
 
         if not username or not password:
-            return Response(
-                {"error": "Username and password are required"},
-                status=400
-            )
+            return Response({"error": "Username and password are required"}, status=400)
 
         user = authenticate(username=username, password=password)
-
         if user is None:
             return Response({"error": "Invalid username or password"}, status=401)
 
@@ -122,41 +121,38 @@ class Login(APIView):
         }, status=200)
 
 
-
+# ---------------------------------------------------------
+# INDEX PAGE
+# ---------------------------------------------------------
 class Index(APIView):
     permission_classes = [permissions.AllowAny]
-    renderer_classes = [TemplateHTMLRenderer,JSONRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'index.html'
 
     def get(self, request):
-
         if request.accepted_renderer.format == 'html':
             return Response({})
 
-        
         package_list = Package_Details.objects.all()[:8]
         package_serializer = PackageSerializer(package_list, many=True)
 
-
-        
         review_list = RateReview.objects.all()
         review_serializer = RateReviewSerializer(review_list, many=True)
 
-        
-        data = {
+        return Response({
             "packages": package_serializer.data,
             "reviews": review_serializer.data
-        }
-
-        return Response(data, status=status.HTTP_200_OK)
-        
+        }, status=200)
 
 
+# ---------------------------------------------------------
+# PACKAGE LIST
+# ---------------------------------------------------------
 class Packagelist(APIView):
     permission_classes = [permissions.AllowAny]
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'packagelist.html'
-    
+
     def get(self, request, pk=None):
 
         if request.accepted_renderer.format == 'html':
@@ -164,9 +160,9 @@ class Packagelist(APIView):
 
         if pk:
             try:
-                package = PackageDetails.objects.get(id=pk)   
-            except PackageDetails.DoesNotExist:
-                return Response({"message": "Package not found"}, status=status.HTTP_404_NOT_FOUND)
+                package = Package_Details.objects.get(id=pk)
+            except Package_Details.DoesNotExist:
+                return Response({"message": "Package not found"}, status=404)
 
             serializer = PackageSerializer(package)
             return Response(serializer.data)
@@ -175,8 +171,7 @@ class Packagelist(APIView):
         date = request.GET.get('date', '')
         price = request.GET.get('price', '')
 
-        
-        packages = PackageDetails.objects.all()
+        packages = Package_Details.objects.all()
 
         if destination:
             packages = packages.filter(places__icontains=destination)
@@ -192,10 +187,10 @@ class Packagelist(APIView):
                 else:
                     packages = packages.filter(price__lte=price)
             except ValueError:
-                pass  
+                pass
 
         serializer = PackageSerializer(packages, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=200)
 
 class PackageDetails(APIView):
     permission_classes = [permissions.AllowAny]
@@ -217,10 +212,10 @@ class PackageDetails(APIView):
         serializer = PackageSerializer(package)
         return Response({"package": serializer.data})
 
-        
-    
 
-       
+# ---------------------------------------------------------
+# STATIC PAGES
+# ---------------------------------------------------------
 class Navbar(TemplateView):
     template_name = "navbar.html"
 
@@ -233,22 +228,20 @@ class Payment(TemplateView):
 class Payment_Success(TemplateView):
     template_name = "payment_success.html"
 
-    
+
+# ---------------------------------------------------------
+# MY BOOKING (AUTH REQUIRED)
+# ---------------------------------------------------------
 class MyBooking(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = "mybooking.html"
 
     def get(self, request, pk=None):
 
-        # if request.user.role != "Tourister":
-        #     return Response({"error": "Access denied. Only tourists can view bookings."}, status=403)
-
-        # HTML page load
         if request.accepted_renderer.format == 'html' and pk is None:
             return Response({})
 
-        # Tourist bookings only
         if pk is None:
             bookings = Package_Booking.objects.filter(user=request.user)
             serializer = BookingSerializer(bookings, many=True)
@@ -262,9 +255,6 @@ class MyBooking(APIView):
         serializer = BookingSerializer(booking)
         return Response(serializer.data)
 
-
-
-        
     def patch(self, request, pk):
         try:
             booking = Package_Booking.objects.get(pk=pk)
@@ -277,7 +267,7 @@ class MyBooking(APIView):
             return Response(serializer.data)
 
         return Response(serializer.errors, status=400)
-    
+
     def delete(self, request, pk):
         try:
             booking = Package_Booking.objects.get(pk=pk)
@@ -286,22 +276,20 @@ class MyBooking(APIView):
 
         booking.delete()
         return Response({"message": "Booking deleted successfully"}, status=200)
-    
+
     def post(self, request):
         serializer = RateReviewSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()  
-            return Response(
-                {"message": "Rate Review created successfully", "data": serializer.data},
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response({"message": "Rate Review created successfully", "data": serializer.data}, status=201)
+        return Response(serializer.errors, status=400)
 
-        
-        
-        
+
+# ---------------------------------------------------------
+# PACKAGE BOOKING (AUTH REQUIRED)
+# ---------------------------------------------------------
 class PackageBooking(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = "packagebooking.html"
 
@@ -312,29 +300,26 @@ class PackageBooking(APIView):
 
         if not pk:
             return Response({"message": "Package ID required"}, status=400)
-        
+
         try:
             package = Package_Details.objects.get(id=pk)
         except Package_Details.DoesNotExist:
             return Response({"message": "Package not found"}, status=404)
 
         serializer = PackageSerializer(package)
-       
         return Response(serializer.data)
-
 
     def post(self, request):
         serializer = BookingSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             booking = serializer.save()
-            
             return Response({"message": "Booking Successful", "booking": serializer.data}, status=201)
         return Response(serializer.errors, status=400)
 
 
-
-    
-
+# ---------------------------------------------------------
+# LOGOUT
+# ---------------------------------------------------------
 class Logout(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
