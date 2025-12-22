@@ -146,3 +146,69 @@ class RouteAPI(APIView):
 
         route.delete()
         return Response({"message": "Deleted successfully"}, status=204)
+# # my view
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework.permissions import IsAuthenticated
+# from .models import DepotManager, PackageAllocation
+# from .serializers import PackageSerializer
+
+# class PackageDetailsView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         user = request.user
+
+#         # depot manager find cheyyuka
+#         depot_manager = DepotManager.objects.get(user=user)
+
+#         # allocated packages fetch cheyyuka
+#         allocations = PackageAllocation.objects.filter(
+#             depot_manager=depot_manager
+#         )
+
+#         packages = [alloc.package for alloc in allocations]
+
+#         serializer = PackageSerializer(packages, many=True)
+#         return Response(serializer.data)
+# from rest_framework.permissions import AllowAny
+
+# class PackageDetailsView(ListAPIView):
+#     queryset = Package.objects.all()
+#     serializer_class = PackageSerializer
+#     permission_classes = [AllowAny]  # ← allow public access
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import DepotManager, PackageAllocation
+from .serializers import PackageSerializer
+
+class PackageDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        try:
+            depot_manager = DepotManager.objects.get(user=user)
+        except DepotManager.DoesNotExist:
+            return Response({"error": "Depot manager not found"}, status=404)
+
+        allocations = PackageAllocation.objects.filter(depot_manager=depot_manager)
+        packages = [alloc.package for alloc in allocations]
+
+        serializer = PackageSerializer(packages, many=True)
+        return Response(serializer.data)
+    # Msg 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Message
+from .serializers import MessageSerializer
+
+class MessageListView(APIView):
+
+    def get(self, request):
+        messages = Message.objects.all()
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

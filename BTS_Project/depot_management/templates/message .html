@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages - KSRTC BTC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ksrtcRedDark: '#8B0000',   // Main dark red
+            ksrtcRed: '#DC2626',       // Alerts / Delete
+            ksrtcOrange: '#F97316',    // Action buttons
+            ksrtcGray: '#f7f7f7',      // Background
+            ksrtcYellow: '#FFD700'     // Optional highlight
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-ksrtcGray min-h-screen flex flex-col items-center p-6">
+
+  <!-- Header -->
+  <header class="w-full max-w-4xl mb-6">
+    <div class="bg-ksrtcRedDark text-white py-4 px-6 rounded-lg shadow-md flex justify-between items-center">
+      <h1 class="text-2xl font-bold">KSRTC BTC - Messages</h1>
+      <span class="bg-ksrtcOrange text-white font-semibold px-3 py-1 rounded-full">Inbox</span>
+    </div>
+  </header>
+
+  <!-- Messages List -->
+  <main class="w-full max-w-4xl space-y-4">
+    <ul id="message-list" class="space-y-4">
+      <!-- Messages will be appended here by JS -->
+    </ul>
+  </main>
+
+  <!-- Loader -->
+  <div id="loader" class="text-center text-ksrtcRedDark mt-6 font-semibold">Loading messages...</div>
+
+  <!-- Action Buttons -->
+  <div class="w-full max-w-4xl mt-6 flex justify-end gap-4">
+    <button class="bg-ksrtcOrange hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded shadow transition">
+      Reply All
+    </button>
+    <button class="bg-ksrtcRed hover:bg-red-700 text-white font-semibold px-4 py-2 rounded shadow transition">
+      Delete All
+    </button>
+  </div>
+
+  <script src="{% static 'js/messages.js' %}"></script>
+</body>
+</html>

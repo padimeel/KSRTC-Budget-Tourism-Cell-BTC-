@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import BusDetails, BusRoute
-
+from .models import Message
 class BusRouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusRoute
@@ -23,3 +23,17 @@ class BusDetailsSerializer(serializers.ModelSerializer):
             'bus_type',
             'routes'
         ]
+# memoryview
+from rest_framework import serializers
+from .models import Package
+
+class PackageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Package
+        fields = "__all__"
+
+# msg
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
