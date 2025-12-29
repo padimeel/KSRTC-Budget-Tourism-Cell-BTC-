@@ -47,31 +47,27 @@
         <label class="text-sm font-semibold">Travel Date</label>
         <input id="dateInput" type="date"
                class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 
-                      focus:ring-2 focus:ring-orange-400 outline-none [color-scheme:light]">
+                      focus:ring-2 focus:ring-orange-400 outline-none">
       </div>
 
       <!-- Price Level -->
       <div class="w-full">
         <label class="text-sm font-semibold">Price Level</label>
         <select id="priceInput"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 
-                       focus:ring-2 focus:ring-orange-400 cursor-pointer">
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700">
           <option value="">Select Price</option>
-          <option value="10000">Below &#8377;10,000</option>
-          <option value="20000">Below &#8377;20,000</option>
-          <option value="30000">Below &#8377;30,000</option>
-          <option value="40000">Below &#8377;40,000</option>
-          <option value="50000">Below &#8377;50,000</option>
-          <option value="50001">Above &#8377;50,000</option>
+          <option value="10000">Below ₹10,000</option>
+          <option value="20000">Below ₹20,000</option>
+          <option value="30000">Below ₹30,000</option>
+          <option value="40000">Below ₹40,000</option>
+          <option value="50000">Below ₹50,000</option>
         </select>
       </div>
 
       <!-- Search Button -->
       <button onclick="validateForm()"
         class="w-full md:w-auto px-6 py-2 mt-5 rounded-full text-white font-semibold
-               bg-gradient-to-r from-orange-500 via-red-500 to-orange-500
-               hover:from-red-600 hover:via-orange-600 hover:to-red-600
-               transition-transform duration-300 hover:scale-105">
+               bg-gradient-to-r from-orange-500 via-red-500 to-orange-500">
         Search
       </button>
 
@@ -85,9 +81,7 @@
   <h3 class="text-2xl sm:text-3xl font-extrabold text-rose-700 text-center">
     Handpicked Holiday Packages
   </h3>
-  <p class="text-gray-600 mt-1 text-center">Indulge in unforgettable experiences across Kerala.</p>
 
-  <!-- Packages Grid -->
   <div id="packageContainer"
        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
   </div>
@@ -99,81 +93,62 @@
 
 <script>
 const container = document.getElementById("packageContainer");
-const destinationInput = document.getElementById("destinationInput");
-const dateInput = document.getElementById("dateInput");
-const priceInput = document.getElementById("priceInput");
 
-// Load packages with optional filters
-async function loadPackages(filters = {}) {
-  try {
-    const res = await axios.get("http://127.0.0.1:8000/admin_site/packages/", {
-      params: filters  // send filters as query parameters
-    });
-    const data = res.data;
-    container.innerHTML = "";
+window.onload = function () {
+  loadPackages();
+};
 
-    data.forEach(pkg => {
-      container.innerHTML += `
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div class="relative">
-            <img src="${pkg.image1}" class="w-full h-40 sm:h-44 object-cover">
-            <h2 class="absolute bottom-3 left-3 text-white text-lg font-semibold drop-shadow-lg">
-              ${pkg.package_name}
-            </h2>
-          </div>
+// 🔹 SEARCH FILTER FUNCTION
+function validateForm() {
+  const destination = document.getElementById("destinationInput").value;
+  const date = document.getElementById("dateInput").value;
+  const price = document.getElementById("priceInput").value;
 
-          <div class="px-4 py-3">
-            <span class="inline-block bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
-              ${pkg.duration}
-            </span>
+  const filters = {};
+  if (destination) filters.destination = destination;
+  if (date) filters.date = date;
+  if (price) filters.price = price;
 
-            <p class="text-gray-600 text-sm mt-2 font-bold">
-              ${pkg.places}
-            </p>
-
-            <div class="flex items-center justify-between mt-3">
-              <h2 class="text-red-600 font-bold text-lg">₹${pkg.price}</h2>
-
-              <button onclick="viewPackage(${pkg.id})"
-                class="px-4 py-1.5 rounded-full text-white text-xs font-semibold
-                       bg-gradient-to-r from-orange-500 via-red-500 to-orange-500
-                       hover:scale-105 transition-all">
-                Explore
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-
-  } catch (error) {
-    console.error("Error fetching package data:", error);
-  }
-}
-
-// Initial load (all packages)
-loadPackages();
-
-// Navigate to package details
-function viewPackage(id) {
-  window.location.href = "{% url 'tourister:Packagedetails'%}?id=" + id;
-}
-
-// Search button click or input changes
-function searchPackages() {
-  const filters = {
-    destination: destinationInput.value,
-    date: dateInput.value,
-    price: priceInput.value
-  };
   loadPackages(filters);
 }
 
-// Bind search function
-document.querySelector("button[onclick='validateForm()']").addEventListener("click", searchPackages);
-destinationInput.addEventListener("input", searchPackages);
-dateInput.addEventListener("change", searchPackages);
-priceInput.addEventListener("change", searchPackages);
+// 🔹 LOAD PACKAGES
+async function loadPackages(filters = {}) {
+  try {
+    const res = await axios.get(
+      "http://127.0.0.1:8000/tourister/packagelist/",
+      { params: filters }
+    );
+
+    container.innerHTML = "";
+
+    res.data.forEach(pkg => {
+      container.innerHTML += `
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <img src="${pkg.image1}" class="w-full h-40 object-cover">
+
+          <div class="p-4">
+            <h2 class="font-bold">${pkg.package_name}</h2>
+            <p class="text-sm text-gray-600">${pkg.places}</p>
+            <p class="text-red-600 font-bold mt-1">₹${pkg.price}</p>
+
+            <button onclick="viewPackage(${pkg.id})"
+              class="mt-3 px-4 py-1 rounded-full text-white text-sm
+                     bg-gradient-to-r from-orange-500 to-red-500">
+              Explore
+            </button>
+          </div>
+        </div>`;
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function viewPackage(id) {
+  window.location.href = "{% url 'tourister:Packagedetails' %}?id=" + id;
+}
 
 </script>
 

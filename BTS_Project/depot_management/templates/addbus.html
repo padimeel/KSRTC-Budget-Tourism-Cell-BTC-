@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bus & Route Details | KSRTC BTC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    {% include "components/depotnavbar.html" %}
+
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <main class="max-w-[95%] mx-auto p-6">
+        <div class="mb-8 mt-20">
+            <button onclick="history.back()" class="text-slate-500 hover:text-slate-800 font-bold text-sm mb-4 transition-all">
+                <i class="fas fa-arrow-left mr-2"></i> BACK TO MY PACKAGE
+            </button>
+            <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter">
+                Assign Bus <span class="text-yellow-600">Details</span>
+            </h2>
+            <p class="text-slate-500 italic">Enter vehicle information and travel itinerary for Package ID: #{{ package_id }}</p>
+        </div>
+
+        <form id="busForm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <div class="lg:col-span-5 bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-slate-900 shadow-lg">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Basic Bus Info</h3>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Bus Name</label>
+                            <input type="text" value="KSRTC BUS" disabled class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-bold text-slate-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Bus Number *</label>
+                            <input type="text" id="bus_number" required placeholder="e.g. KA-01-F-1234" class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Main Route Name *</label>
+                            <input type="text" id="route_name" required placeholder="e.g. Bangalore to Mysore" class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Bus Type *</label>
+                            <select id="bus_type" required class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold">
+                                <option value="AC">AC Bus</option>
+                                <option value="NON-AC">Non-AC Bus</option>
+                                <option value="SLEEPER">Sleeper Bus</option>
+                                <option value="SEMI-SLEEPER">Semi Sleeper Bus</option>
+                                <option value="VOLVO" selected>Volvo Bus</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-700 uppercase tracking-widest mb-2">Total Capacity (Seats) *</label>
+                            <input type="number" id="total_seats" required placeholder="40" class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-yellow-500 shadow-lg">
+                                <i class="fas fa-map-location-dot"></i>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Travel Itinerary</h3>
+                        </div>
+                        <button type="button" onclick="addRouteField()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-yellow-500 hover:text-slate-900 transition-all">
+                            <i class="fas fa-plus mr-2"></i> Add Route
+                        </button>
+                    </div>
+
+                    <div id="routeContainer" class="space-y-4">
+                        <div class="route-item bg-slate-50 p-6 rounded-2xl border border-slate-100 relative animate-fade-in">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase">Location</label>
+                                    <input type="text" name="location" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase">Arrival</label>
+                                    <input type="time" name="arrival_time" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] font-black text-slate-400 uppercase">Departure</label>
+                                    <input type="time" name="departure_time" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                                </div>
+                                <div class="md:col-span-3">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase">Short Description (Optional)</label>
+                                    <textarea name="description" rows="1" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-4 py-10">
+                <button type="button" onclick="history.back()" class="px-8 py-4 rounded-2xl font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-all">Cancel</button>
+                <button type="submit" id="submitBtn" class="bg-yellow-500 px-10 py-4 rounded-2xl font-black text-slate-900 uppercase tracking-widest shadow-xl shadow-yellow-200 hover:bg-slate-900 hover:text-yellow-500 transition-all">
+                    <span id="btnText">Save Bus Details</span>
+                    <i id="btnSpinner" class="fas fa-spinner fa-spin hidden ml-2"></i>
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const getCsrfToken = () => document.getElementById('csrf_token').value;
+
+        function addRouteField() {
+            const container = document.getElementById('routeContainer');
+            const div = document.createElement('div');
+            div.className = "route-item bg-slate-50 p-6 rounded-2xl border border-slate-100 relative animate-fade-in mt-4";
+            div.innerHTML = `
+                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white rounded-full text-[10px] shadow-lg flex items-center justify-center hover:bg-rose-700 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Location</label>
+                        <input type="text" name="location" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Arrival</label>
+                        <input type="time" name="arrival_time" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Departure</label>
+                        <input type="time" name="departure_time" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Short Description (Optional)</label>
+                        <textarea name="description" rows="1" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1"></textarea>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+        }
+
+        document.getElementById('busForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            submitBtn.disabled = true;
+            btnText.innerText = "Saving...";
+            btnSpinner.classList.remove('hidden');
+
+            const busData = {
+                package: "{{ package_id }}",
+                bus_number: document.getElementById('bus_number').value.trim().toUpperCase(),
+                route_name: document.getElementById('route_name').value.trim(),
+                bus_type: document.getElementById('bus_type').value,
+                total_seats: parseInt(document.getElementById('total_seats').value),
+                user: "{{ request.user.id }}"
+            };
+
+            try {
+                const busResponse = await axios.post('http://127.0.0.1:8000/depot/bus/', busData, {
+                    headers: { 'X-CSRFToken': getCsrfToken() }
+                });
+
+                const busId = busResponse.data.id;
+                const routeItems = document.querySelectorAll('.route-item');
+                const routePromises = Array.from(routeItems).map(item => {
+                    const departureVal = item.querySelector('[name="departure_time"]').value;
+                    return axios.post('http://127.0.0.1:8000/depot/route/', {
+                        bus: busId,
+                        location: item.querySelector('[name="location"]').value.trim(),
+                        arrival_time: item.querySelector('[name="arrival_time"]').value,
+                        departure_time: departureVal || null,
+                        description: item.querySelector('[name="description"]').value.trim()
+                    }, {
+                        headers: { 'X-CSRFToken': getCsrfToken() }
+                    });
+                });
+
+                await Promise.all(routePromises);
+                alert('Success!');
+                window.location.href = '/depot/assignpackage/';
+
+            } catch (error) {
+                console.error(error);
+                alert("Already Assign the Bus in this Package");
+            } finally {
+                submitBtn.disabled = false;
+                btnText.innerText = "Save Bus Details";
+                btnSpinner.classList.add('hidden');
+            }
+        });
+    </script>
+
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+    </style>
+</body>
+</html>

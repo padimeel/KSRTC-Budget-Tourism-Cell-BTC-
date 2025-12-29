@@ -1,177 +1,155 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KSRTC BTC - Login</title>
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-  <!-- AXIOS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KSRTC BTC - Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body class="bg-gradient-to-br from-rose-50 to-amber-50">
-  
+<body class="bg-gradient-to-br from-rose-50 to-amber-50 min-h-screen flex items-center justify-center p-4 font-sans">
 
-  <div class="min-h-screen flex items-center justify-center px-4">
-    <div class="container max-w-4xl">
-
-      <div class="grid grid-cols-1 md:grid-cols-2 shadow-xl rounded-2xl overflow-hidden bg-white">
-
-        <!-- LEFT SIDE -->
-        <div class="bg-gradient-to-b from-rose-600 to-rose-800 text-white flex flex-col justify-center items-center p-10 md:p-12">
-
-          <img 
-            src="https://cdn-icons-png.flaticon.com/512/747/747376.png" 
-            alt="User Icon" 
-            class="w-24 mb-5"
-          />
-
-          <h1 class="text-2xl md:text-3xl font-bold text-center">
-            KSRTC Budget Tourism
-          </h1>
-
-          <p class="text-center text-sm mt-3 max-w-sm leading-relaxed">
-            Explore Kerala with comfort and affordability. 
-            Book your dream trip with KSRTC BTC.
-          </p>
-
-        </div>
-
-        <!-- RIGHT SIDE -->
-        <div class="p-10 md:p-12">
-
-          <h2 class="font-bold text-rose-700 text-3xl font-bold">Welcome Back</h2>
-          <p class="text-gray-500 mt-1">
-             Sign in to book and manage your KSRTC tours.
-          </p>
-
-          <form id="loginForm" class="mt-8 space-y-5">
-
-            <div>
-              <label class="block text-sm font-medium mb-1">Username</label>
-              <input 
-                type="text"
-                id="username"
-                class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-[#b70e32] outline-none"
-                placeholder="Enter username"
-                required
-              />
-              <p id="usernameMsg" class="text-sm mt-1"></p>
+    <div class="max-w-4xl w-full flex flex-col md:flex-row bg-white rounded-3xl shadow-2xl overflow-hidden border border-rose-100">
+        
+        <div class="md:w-1/2 bg-rose-600 p-8 md:p-10 flex flex-col justify-between text-white relative overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-40 h-40 bg-rose-500 rounded-full opacity-40"></div>
+            
+            <div class="relative z-10">
+                <div class="text-xl font-black tracking-tighter italic flex items-center gap-2">
+                    <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-rose-600 shadow-md">
+                        <i class="fas fa-bus-alt"></i>
+                    </div>
+                    <span class="uppercase">KSRTC <span class="text-rose-200">BTC</span></span>
+                </div>
+                
+                <h2 class="text-3xl font-extrabold mt-8 leading-tight uppercase tracking-tighter">
+                    Explore Kerala <br><span class="text-rose-200 text-2xl font-bold italic">With Comfort</span>
+                </h2>
+                
+                <p class="text-rose-50 mt-4 text-xs leading-relaxed opacity-90 font-medium max-w-xs">
+                    Access your budget tourism dashboard to manage packages and travel schedules efficiently.
+                </p>
+                
+                <div class="mt-8 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-full bg-rose-500/30 flex items-center justify-center border border-rose-400">
+                            <i class="fas fa-check text-white text-[8px]"></i>
+                        </div>
+                        <span class="text-[11px] font-bold tracking-wide">Explore the package</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-full bg-rose-500/30 flex items-center justify-center border border-rose-400">
+                            <i class="fas fa-check text-white text-[8px]"></i>
+                        </div>
+                        <span class="text-[11px] font-bold tracking-wide">Book the package</span>
+                    </div>
+                </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium mb-1">Password</label>
-              <input 
-                type="password"
-                id="password"
-                class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-[#b70e32] outline-none"
-                placeholder="Enter password"
-                required
-              />
-              <p id="passwordMsg" class="text-sm mt-1"></p>
+            <div class="relative z-10 text-[9px] text-rose-200 font-bold uppercase tracking-[0.4em] mt-6">
+                &copy; 2025 KSRTC Budget Tourism
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 p-8 md:p-10 bg-white flex flex-col justify-center">
+            <div class="mb-6">
+                <div class="inline-block px-2.5 py-0.5 bg-rose-100 text-rose-600 rounded-full text-[9px] font-black uppercase tracking-widest mb-3">
+                    Authorized Only
+                </div>
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight">Sign In</h3>
+                <p class="text-slate-400 text-xs mt-1 font-semibold italic">Enter your credentials below</p>
             </div>
 
-            <button
-              type="submit"
-              class="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-lg text-lg font-semibold transition"
-            >
-              SIGN IN
-            </button>
-          </form>
+            <form id="loginForm" class="space-y-4">
+                {% csrf_token %}
+                
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-user text-xs"></i>
+                        </span>
+                        <input type="text" id="username" name="username" required
+                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-sm font-bold"
+                            placeholder="username">
+                    </div>
+                </div>
 
-          <p class="mt-6 text-center text-gray-600">
-            Don't have an account?
-            <a href="{% url 'tourister:signup' %}" class="text-[#b70e32] font-semibold hover:underline">
-    Sign up
-</a>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-lock text-xs"></i>
+                        </span>
+                        <input type="password" id="password" name="password" required
+                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-sm font-bold"
+                            placeholder="••••••••">
+                    </div>
+                </div>
 
-          </p>
-
+                <button type="submit" id="loginBtn"
+                    class="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-3.5 rounded-xl shadow-lg shadow-rose-100 transition-all flex items-center justify-center gap-3 active:scale-[0.98] group mt-2">
+                    <span class="tracking-widest uppercase text-xs italic">Verify & Sign In</span>
+                    <i class="fas fa-arrow-right-long group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 pt-5 border-t border-slate-50 text-center">
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-tight">
+                    Not create the account?
+                </p>
+                <a href="{% url 'tourister:signup' %}" class="inline-flex items-center gap-2 mt-2 text-rose-600 font-black text-[11px] uppercase tracking-widest hover:text-rose-700 transition-all group">
+                    <span>Create New Account</span>
+                    <div class="w-5 h-5 rounded bg-rose-50 flex items-center justify-center group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-user-plus text-[9px]"></i>
+                    </div>
+                </a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
 
-<script>
-const form = document.getElementById("loginForm");
+        const form = document.getElementById("loginForm");
+        const btn = document.getElementById("loginBtn");
 
-function showError(id, msg) {
-  const el = document.getElementById(id);
-  el.innerText = msg;
-  el.style.color = "red";
-}
-
-// Clear messages when typing
-document.querySelectorAll("input").forEach(input => {
-  input.addEventListener("input", () => {
-    const msg = document.getElementById(input.id + "Msg");
-    if (msg) msg.innerText = "";
-  });
-});
-
-function validateLogin() {
-  let isValid = true;
-
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if (username.length < 3) {
-    showError("usernameMsg", "Username must be at least 3 characters");
-    isValid = false;
-  }
-
-  if (password.length < 6) {
-    showError("passwordMsg", "Password must be at least 6 characters");
-    isValid = false;
-  }
-
-  return isValid;
-}
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  if (!validateLogin()) return;
-
-  const data = {
-    username: document.getElementById("username").value,
-    password: document.getElementById("password").value,
-  };
-
-  try {
-    const res = await axios.post(
-      "http://127.0.0.1:8000/tourister/login/",
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      }
-    );
-
-    alert("Login Successful!");
-
-    localStorage.setItem("access", res.data.access);
-    localStorage.setItem("refresh", res.data.refresh);
-
-    window.location.href = "{% url 'tourister:index' %}";
-
-  } catch (err) {
-    if (err.response?.data) {
-     
-      const messages = Object.values(err.response.data).flat().join("\n");
-      alert("Login Failed:\n" + messages);
-    } else {
-      alert("Something went wrong. Please try again.");
-    }
-  }
-});
-</script>
-
-
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
+            
+            try {
+                const res = await axios.post("http://127.0.0.1:8000/tourister/login/", 
+                    { 
+                        username: document.getElementById("username").value.trim(), 
+                        password: document.getElementById("password").value.trim() 
+                    },
+                    { headers: { "X-CSRFToken": getCookie("csrftoken") } }
+                );
+                localStorage.setItem("access", res.data.access);
+                window.location.href = "{% url 'tourister:index' %}";
+            } catch (error) {
+                alert("Login Failed: Please check your username and password.");
+                btn.disabled = false;
+                btn.innerHTML = '<span class="tracking-widest uppercase text-xs italic">Verify & Sign In</span> <i class="fas fa-arrow-right-long"></i>';
+            }
+        });
+    </script>
 </body>
 </html>

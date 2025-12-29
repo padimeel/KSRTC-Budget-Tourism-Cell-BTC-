@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KSRTC Depot Manager - Golden Theme</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
+    </style>
+  </head>
+  <body class="bg-slate-50">
+    <nav class="bg-slate-900 border-b-4 border-yellow-500 fixed w-full z-50 top-0 shadow-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20">
+          
+          <div class="flex items-center">
+            <div class="flex-shrink-0 flex items-center gap-3 group">
+              <div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:rotate-6 transition-transform">
+                <i class="fas fa-bus-alt text-slate-900 text-2xl"></i>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-2xl font-black tracking-tighter text-white uppercase leading-none">
+                  KSRTC <span class="text-yellow-500">DEPOT</span>
+                </span>
+                <span class="text-[10px] text-yellow-500 font-bold tracking-[0.2em] uppercase opacity-80">Manager Portal</span>
+              </div>
+            </div>
+
+            <div class="hidden lg:ml-12 lg:flex lg:space-x-4">
+              <a href="{% url 'depot:assignpackage' %}" class="bg-yellow-500 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                <i class="fas fa-chart-pie"></i> My Packages
+              </a>
+              {% comment %} <a href="#" class="text-slate-300 hover:bg-slate-800 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-box-open"></i> 
+              </a>
+              <a href="#" class="text-slate-300 hover:bg-slate-800 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-list-check"></i> Bookings
+              </a>
+              <a href="#" class="text-slate-300 hover:bg-slate-800 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                <i class="fas fa-file-invoice"></i> Reports
+              </a> {% endcomment %}
+            </div>
+          </div>
+
+          <div class="hidden md:flex items-center gap-4">
+            <div class="flex flex-col text-right border-r border-slate-700 pr-4">
+              <span class="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">Station Chief</span>
+              <span class="text-sm font-bold text-white">{{ request.user.username }}</span>
+            </div>
+            
+            <a href="{% url 'depot:login' %}" class="h-11 px-4 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-yellow-500 hover:bg-yellow-500 hover:text-slate-900 transition-all text-xs font-bold gap-2">
+                <i class="fas fa-sign-in-alt text-base"></i>
+                <span>LOGIN</span>
+            </a>
+
+            <div class="relative group">
+               <button class="h-11 w-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-yellow-500 hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-inner">
+                <i class="fas fa-user-gear text-lg"></i>
+              </button>
+              <div class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl border border-slate-100 hidden group-hover:block animate-slide-down overflow-hidden">
+                 <div class="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Account Management</p>
+                 </div>
+                 <a href="{% url 'depot:depotlogout' %}" class="flex items-center gap-3 px-4 py-4 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors">
+                    <i class="fas fa-power-off text-base"></i> 
+                    <span>Logout System</span>
+                 </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center lg:hidden">
+            <button id="mobileMenuBtn" class="p-2 rounded-xl bg-slate-800 text-yellow-500 border border-slate-700">
+              <i class="fas fa-bars-staggered text-2xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="mobileMenu" class="hidden lg:hidden bg-slate-900 border-t border-slate-800 p-4 space-y-2">
+        <a href="{% url 'depot:assignpackage' %}" class="bg-yellow-500 text-slate-900 block px-4 py-3 rounded-xl font-bold flex items-center gap-3">
+            <i class="fas fa-chart-pie"></i> My Packages
+        </a>
+        <hr class="border-slate-800 my-2">
+        <a href="{% url 'depot:login' %}" class="text-yellow-500 hover:bg-slate-800 block px-4 py-3 rounded-xl font-bold flex items-center gap-3">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="{% url 'depot:depotlogout' %}" class="text-red-400 hover:bg-red-950/30 block px-4 py-3 rounded-xl font-bold flex items-center gap-3 transition-colors">
+          <i class="fas fa-power-off"></i> Logout
+        </a>
+      </div>
+    </nav>
+
+    <script>
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+        const icon = mobileMenuBtn.querySelector('i');
+        icon.classList.toggle('fa-bars-staggered');
+        icon.classList.toggle('fa-xmark');
+      });
+    </script>
+  </body>
+</html>

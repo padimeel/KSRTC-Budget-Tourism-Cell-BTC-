@@ -3,96 +3,108 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from django.contrib.auth import authenticate,login, logout
+from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 
 from .serializers import BusDetailsSerializer, BusRouteSerializer
 from .models import BusDetails, BusRoute
+from admin_panel.models import Package_Details
 
 
 # ---------------------- LOGIN API ----------------------
 
 class Login(APIView):
     permission_classes = [permissions.AllowAny]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "depotlogin.html"
+
+    def get(self, request, pk=None):
+        if request.accepted_renderer.format == 'html':
+            return Response({})
 
     def post(self, request):
         username = request.data.get('username')
-        depot_name = request.data.get('depot_name')
         password = request.data.get('password')
-
+        
         user = authenticate(username=username, password=password)
+        
+        if user is not None:
+            login(request, user) 
+            
+            return Response({
+                "message": "Login successful",
+                "username": user.username,
+                "depot_name": getattr(user, 'depot_name', '')
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if user is None:
-            return Response({'error': 'Invalid username or password'},
-                            status=status.HTTP_401_UNAUTHORIZED)
-
-        # if depot profile doesn't exist → handle safely
-        if not hasattr(user, 'depotprofile'):
-            return Response({'error': 'Depot profile not found'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        # Check depot name
-        if user.depotprofile.depot_name != depot_name:
-            return Response({'error': 'Depot name mismatch'},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        # JWT token
-        refresh = RefreshToken.for_user(user)
-
-        return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-            'username': user.username,
-            'email': user.email,
-            'role': user.depotprofile.role,
-            'depot_name': user.depotprofile.depot_name
-        }, status=status.HTTP_200_OK)
-
-
+class DepotLogout(APIView):
+    
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    def get(self, request):
+        logout(request)
+        return redirect('depot:login')  
+    
+    
 class BusAPI(APIView):
-    permission_classes = [permissions.AllowAny]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
 
     def get(self, request, pk=None):
         if pk:
             try:
                 bus = BusDetails.objects.get(id=pk)
+                serializer = BusDetailsSerializer(bus)
+                return Response(serializer.data)
             except BusDetails.DoesNotExist:
-                return Response({"error": "Bus not found"}, status=404)
-            serializer = BusDetailsSerializer(bus)
-            return Response(serializer.data)
+                return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
 
         buses = BusDetails.objects.all()
         serializer = BusDetailsSerializer(buses, many=True)
         return Response(serializer.data)
 
-
     def post(self, request):
+        package_id = request.data.get('package')
+        
+        # 1. ஏற்கனவே இந்த Package-க்கு பஸ் இருக்கிறதா எனச் சரிபார்க்கும் முக்கியமான பகுதி
+        if BusDetails.objects.filter(package_id=package_id).exists():
+            return Response(
+                {"error": "This package already has a bus assigned. You cannot assign another one."}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         serializer = BusDetailsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
         try:
             bus = BusDetails.objects.get(id=pk)
         except BusDetails.DoesNotExist:
-            return Response({"error": "Bus not found"}, status=404)
+            return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = BusDetailsSerializer(bus, data=request.data)
+        # 2. Update செய்யும்போது partial=True கொடுத்தால் சில ஃபீல்டுகளை மட்டும் மாற்ற வசதியாக இருக்கும்
+        serializer = BusDetailsSerializer(bus, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         try:
             bus = BusDetails.objects.get(id=pk)
+            bus.delete()
+            return Response({"message": "Deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
         except BusDetails.DoesNotExist:
-            return Response({"error": "Bus not found"}, status=404)
-
-        bus.delete()
-        return Response({"message": "Deleted successfully"}, status=204)
+            return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class RouteAPI(APIView):
     permission_classes = [permissions.AllowAny]
@@ -146,3 +158,100 @@ class RouteAPI(APIView):
 
         route.delete()
         return Response({"message": "Deleted successfully"}, status=204)
+    
+class AssignPackage(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "assignpackage.html"
+
+    def get(self, request, pk=None):
+        # Depot Manager-க்கு ஒதுக்கப்பட்ட பேக்கேஜ்களைப் பெறுதல்
+        packages = Package_Details.objects.filter(assigned_depot_manager=request.user).order_by('-id')
+        
+        if request.accepted_renderer.format == 'html':
+            return Response({'packages': packages})
+
+        data = []
+        for pkg in packages:
+            # BusDetails மாடலில் 'package' Foreign Key அல்லது OneToOne ஆக இருந்தால் 
+            # அதன் related_name-ஐ இங்கே பயன்படுத்தவும் (பொதுவாக busdetails_set அல்லது busdetails)
+            bus_obj = BusDetails.objects.filter(package=pkg).first()
+            
+            data.append({
+                "id": pkg.id,
+                "package_name": pkg.package_name,
+                "duration": pkg.duration,
+                "price": pkg.price,
+                "start_date": pkg.start_date.isoformat() if pkg.start_date else None,
+                "end_date": pkg.end_date.isoformat() if pkg.end_date else None,
+                "places": pkg.places,
+                "has_bus": True if bus_obj else False,
+                "bus_number": bus_obj.bus_number if bus_obj else None
+            })
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class DepotDashboard(APIView):
+    
+    
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "depotdashboard.html"
+
+    def get(self, request, pk=None):
+        if request.accepted_renderer.format == 'html':
+            return Response({})
+        
+class AddBus(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "addbus.html"
+    def get(self, request, pk=None, *args, **kwargs):
+        if request.accepted_renderer.format == 'html':
+            return Response({'package_id': pk})
+        return Response({"error": "HTML only"}, status=400)
+
+    def post(self, request, pk=None, *args, **kwargs):
+        # போஸ்ட் ரிக்வஸ்ட்டுக்கும் இதேபோல் சேர்க்கவும்
+        pass
+
+
+class UpdateBus(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "updatebus.html"
+    
+    def get(self, request, pk):
+        # முதலில் டேட்டாவைக் காண்பிக்க பஸ் ஆப்ஜெக்ட்டைப் பெறுதல்
+        bus = get_object_or_404(BusDetails, id=pk)
+        return Response({'bus': bus})
+
+    def put(self, request, pk):
+        try:
+            # 1. பஸ் விவரங்களை அப்டேட் செய்தல்
+            bus = BusDetails.objects.get(id=pk)
+            bus_serializer = BusDetailsSerializer(bus, data=request.data, partial=True)
+            
+            if bus_serializer.is_valid():
+                bus_serializer.save()
+                
+                # 2. பஸ்ஸோடு இணைக்கப்பட்ட ரூட் விவரங்களை அப்டேட் செய்தல்
+                # BusDetails மாடலில் route என்பது ஒரு Foreign Key ஆக இருந்தால்:
+                if hasattr(bus, 'route') and bus.route:
+                    route_serializer = BusRouteSerializer(bus.route, data=request.data, partial=True)
+                    if route_serializer.is_valid():
+                        route_serializer.save()
+                
+                return Response({
+                    "message": "Bus and Route details updated successfully",
+                    "data": bus_serializer.data
+                }, status=status.HTTP_200_OK)
+            
+            return Response(bus_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except BusDetails.DoesNotExist:
+            return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

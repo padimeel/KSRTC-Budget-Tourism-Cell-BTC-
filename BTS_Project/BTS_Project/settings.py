@@ -141,13 +141,14 @@ import os
 MEDIA_URL = '/Media/'   # URL prefix for accessing media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'Media')  # where files will be stored
 
+
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    )
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
 
 
@@ -155,10 +156,13 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3000),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+AUTH_USER_MODEL = 'tourister.User'
+
+CORS_ALLOW_ORIGINS = ["http://127.0.0.1:8000/"]

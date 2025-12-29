@@ -1,9 +1,7 @@
-from django.contrib.auth.models import User
 from django.db import models
-from admin_panel.models import Package_Details
+from django.conf import settings
 
 class BusDetails(models.Model):
-
     BUS_TYPE_CHOICES = [
         ('AC', 'AC Bus'),
         ('NON-AC', 'Non-AC Bus'),
@@ -12,10 +10,19 @@ class BusDetails(models.Model):
         ('VOLVO', 'Volvo Bus'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="buses", null=True)
-    package = models.ForeignKey(Package_Details, on_delete=models.CASCADE, related_name="buses", null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name="buses",
+        null=True
+    )
     
-    
+
+    package = models.OneToOneField(
+        'admin_panel.Package_Details',
+        on_delete=models.CASCADE,
+        related_name="bus" 
+    )
 
     bus_name = models.CharField(max_length=100, default="KSRTC BUS", editable=False)
     bus_number = models.CharField(max_length=50)
@@ -26,10 +33,13 @@ class BusDetails(models.Model):
     def __str__(self):
         return f"{self.bus_name} - {self.bus_number}"
 
-
 class BusRoute(models.Model):
-    bus = models.ForeignKey(BusDetails, on_delete=models.CASCADE, related_name="routes", null=True)
-    
+    bus = models.ForeignKey(
+        BusDetails, 
+        on_delete=models.CASCADE, 
+        related_name="routes", 
+        null=True
+    )
     location = models.CharField(max_length=100)
     arrival_time = models.TimeField()
     departure_time = models.TimeField(null=True, blank=True)

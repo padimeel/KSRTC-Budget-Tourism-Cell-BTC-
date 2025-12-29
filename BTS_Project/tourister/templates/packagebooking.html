@@ -1,176 +1,157 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Booking Form</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Booking Form - KSRTC BTC</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Font Awesome for icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
-  </head>
-  <body>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+</head>
+<body class="bg-gray-50 font-sans">
     {% include 'components/navbar.html' %}
 
-    <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-gray-800">Booking Details</h2>
-        <h6
-          id="package_number_header"
-          class="text-sm font-semibold text-rose-600"
-        ></h6>
-      </div>
+    <div class="max-w-lg mx-auto bg-white p-8 rounded-[2.5rem] shadow-xl shadow-rose-500/5 border border-slate-100 mt-10 mb-20">
+        <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic border-b border-slate-50 pb-4 mb-6">
+            Confirm <span class="text-rose-600">Journey</span>
+        </h2>
 
-      <!-- Package & Bus Details -->
-      <div class="mb-4 space-y-1">
-        <p>
-          <span class="font-semibold">Package:</span>
-          <span id="package_name" class="text-rose-600"></span>
-        </p>
-      </div>
-
-      <!-- Booking Form -->
-      <form id="bookingForm" class="space-y-5">
-        <!-- Adults / Children -->
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Adults -->
-          <div>
-            <label class="block text-sm font-medium mb-1"
-              >Number of Adults</label
-            >
-            <input
-              type="number"
-              id="adults"
-              value=""
-              min=""
-              class="w-full border border-gray-400 px-3 h-10 rounded text-sm text-center bg-gray-100"
-            />
-          </div>
-
-          <!-- Children -->
-          <div>
-            <label class="block text-sm font-medium mb-1"
-              >Number of Children</label
-            >
-            <input
-              type="number"
-              id="children"
-              value=""
-              min=""
-              class="w-full border border-gray-400 px-3 h-10 rounded text-sm text-center bg-gray-100"
-            />
-          </div>
+        <div class="mb-8 p-5 bg-gradient-to-br from-rose-50 to-white rounded-3xl border border-rose-100/50">
+            <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Selected Package</p>
+            <h4 id="package_name" class="text-xl font-black text-slate-800">Loading...</h4>
+            <div class="flex items-center mt-3 gap-4">
+                <div class="bg-white px-3 py-1 rounded-full border border-rose-100">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Available Seats:</span>
+                    <span id="available_seats" class="text-xs font-black text-rose-600 ml-1">--</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Phone & Boarding Point -->
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Phone -->
-          <div>
-            <label class="block text-sm font-medium mb-1">Phone Number</label>
-            <input
-              type="text"
-              id="phone_number"
-              class="border border-gray-400 w-full px-3 h-10 rounded text-sm"
-              required
-            />
-          </div>
+        <form id="bookingForm" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Adults</label>
+                    <input type="number" id="adults" min="1" value="1" required class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20" />
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Children (50% Off)</label>
+                    <input type="number" id="children" min="0" value="0" class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20" />
+                </div>
+            </div>
 
-          <!-- Boarding -->
-          <div>
-            <label class="block text-sm font-medium mb-1">Boarding Point</label>
-           <select id="boardingDropdown" class="border w-full h-10 rounded text-sm">
-  <option value="">-- Select Bus --</option>
-</select>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Boarding Point</label>
+                <select id="boardingDropdown" class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20 appearance-none" required>
+                    <option value="">-- Loading Routes --</option>
+                </select>
+            </div>
 
-          </div>
-        </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Phone Number</label>
+                <input type="text" id="phone_number" placeholder="Enter 10 digit number" required class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20" />
+            </div>
 
-
-        <!-- Confirm Button -->
-        <div class="flex justify-end pt-3">
-          <button
-            type="submit"
-            id="confirmBtn"
-            class="px-5 py-2 rounded-lg text-white font-bold bg-gradient-to-r from-rose-600 to-amber-400 shadow hover:opacity-90 transition"
-          >
-            Confirm Booking
-          </button>
-        </div>
-      </form>
+            <div class="bg-slate-900 p-6 rounded-[2rem] flex justify-between items-center shadow-lg shadow-slate-200">
+                <div>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Total Amount</p>
+                    <p class="text-3xl font-black text-white tracking-tighter italic">₹<span id="est_price">0</span></p>
+                </div>
+                <button type="submit" id="confirmBtn" class="bg-rose-600 hover:bg-rose-500 text-white font-black py-4 px-8 rounded-2xl transition-all shadow-lg shadow-rose-500/20 uppercase tracking-widest text-[10px] active:scale-95">
+                    Confirm
+                </button>
+            </div>
+        </form>
     </div>
 
- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-  const packageId = new URLSearchParams(window.location.search).get("package_id");
-  const packageNameSpan = document.getElementById("package_name");
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const packageId = urlParams.get("package_id");
+        const accessToken = localStorage.getItem("access");
+        let packagePrice = 0;
 
-  if (packageId) {
-    // Fetch package details from API using path parameter
-    axios
-      .get(`http://127.0.0.1:8000/tourister/packagebooking/${packageId}/`, {
-        headers: { Accept: "application/json" },
-      })
-      .then((response) => {
-        const packageData = response.data.package || response.data;
+        async function loadData() {
+            if (!accessToken) { window.location.href = "{% url 'tourister:login' %}"; return; }
+            if (!packageId) { alert("Invalid Package"); return; }
+            
+            try {
+                // 1. Load Package & Bus Info
+                const res = await axios.get(`?package_id=${packageId}`, {
+                    headers: { "Authorization": `Bearer ${accessToken}`, "Accept": "application/json" }
+                });
+                
+                const data = res.data;
+                packagePrice = data.price;
+                document.getElementById("package_name").innerText = data.package_name;
+                document.getElementById("available_seats").innerText = data.bus_seats;
+                
+                // 2. Load Routes for this Bus
+                const routeRes = await axios.get(`http://127.0.0.1:8000/depot/route/`);
+                const dropdown = document.getElementById("boardingDropdown");
+                dropdown.innerHTML = '<option value="">-- Choose Location --</option>';
+                
+                // பஸ் ஐடியை வைத்து ரூட்களை ஃபில்டர் செய்தல்
+                const filteredRoutes = routeRes.data.filter(r => r.bus === data.bus_id);
+                if(filteredRoutes.length > 0) {
+                    filteredRoutes.forEach(r => {
+                        dropdown.innerHTML += `<option value="${r.location}">${r.location}</option>`;
+                    });
+                } else {
+                    dropdown.innerHTML = '<option value="">Default (Depot)</option>';
+                }
 
-        // Display package name
-        packageNameSpan.innerText = packageData.package_name || packageData.title || "";
-
-        // Populate bus dropdown
-        const busDropdown = document.getElementById("boardingDropdown");
-        if (packageData.buses && packageData.buses.length > 0) {
-          packageData.buses.forEach((bus) => {
-            if (bus.routes && bus.routes.length > 0) {
-              bus.routes.forEach((route) => {
-                busDropdown.innerHTML += `<option value="${route.location}">${route.location}</option>`;
-              });
-            }
-          });
+                updatePrice();
+            } catch (err) { console.error("Error loading data:", err); }
         }
-      })
-      .catch((error) => {
-        console.error("Failed to fetch package:", error);
-        packageNameSpan.innerText = "Package not found";
-      });
-  } else {
-    packageNameSpan.innerText = "Package ID missing";
-  }
 
-  // Handle booking form submission
-  document.getElementById("bookingForm").addEventListener("submit", function (e) {
-    e.preventDefault();
+        function updatePrice() {
+            const a = parseInt(document.getElementById("adults").value) || 0;
+            const c = parseInt(document.getElementById("children").value) || 0;
+            const total = (a * packagePrice) + (c * packagePrice * 0.5);
+            document.getElementById("est_price").innerText = total.toLocaleString('en-IN');
+        }
 
-    const bookingData = {
-      package_id: Number(packageId),
-      adults: Number(document.getElementById("adults").value),
-      children: Number(document.getElementById("children").value),
-      phone_number: document.getElementById("phone_number").value,
-      boarding_point: document.getElementById("boardingDropdown").value,
-    };
+        document.getElementById("adults").addEventListener("input", updatePrice);
+        document.getElementById("children").addEventListener("input", updatePrice);
 
-    axios
-      .post("http://127.0.0.1:8000/tourister/packagebooking/", bookingData, {
-        headers: { Accept: "application/json" },
-      })
-      console.log(bookingData)
-      .then((response) => {
-        alert("Booking Successful!");
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error("Booking failed:", error.response ? error.response.data : error);
-        alert("Booking failed");
-      });
-  });
-</script>
-    {% include 'components/footer.html' %}
-  </body>
-<<<<<<< HEAD
+        document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("confirmBtn");
+            const boarding = document.getElementById("boardingDropdown").value;
+            
+            if(!boarding) { alert("Please select a boarding point"); return; }
+
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            const payload = {
+                package_id: parseInt(packageId),
+                adults: parseInt(document.getElementById("adults").value),
+                children: parseInt(document.getElementById("children").value),
+                phone_number: document.getElementById("phone_number").value,
+                boarding_point: boarding
+            };
+
+            try {
+                await axios.post("", payload, {
+                    headers: { 
+                        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        "Authorization": `Bearer ${accessToken}` 
+                    }
+                });
+                alert("Journey Confirmed Successfully!");
+                window.location.href = "{% url 'tourister:mybooking' %}";
+            } catch (err) {
+                const errorMsg = err.response?.data?.error || "Seats Full or Booking Failed";
+                alert(errorMsg);
+                btn.disabled = false;
+                btn.innerText = "Confirm";
+            }
+        });
+
+        loadData();
+    </script>
+</body>
 </html>
-=======
-</html>
->>>>>>> sreeramDev

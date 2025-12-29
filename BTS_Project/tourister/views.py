@@ -1,25 +1,29 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status, permissions
-from django.contrib.auth import authenticate
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import SignupSerializer, RateReviewSerializer, BookingSerializer
-from admin_panel.serializers import PackageSerializer
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.db.models import F
+from django.db import transaction
+
 from .models import RateReview, Package_Booking
 from admin_panel.models import Package_Details
-from rest_framework.authtoken.models import Token
-from django.http import HttpResponseRedirect
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.conf import settings
+from .serializers import SignupSerializer, RateReviewSerializer, BookingSerializer
+from admin_panel.serializers import PackageSerializer
+
+User = get_user_model()
 
 
-print("SMTP HOST:", settings.EMAIL_HOST)
-print("SMTP USER:", settings.EMAIL_HOST_USER)
-
-
+# ------------------------------
+# SIGNUP
+# ------------------------------
 class Signup(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
@@ -30,65 +34,64 @@ class Signup(APIView):
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
-
         if serializer.is_valid():
             user = serializer.save()
+            return Response ({'Response':serializer.data})
 
-            username = user.username
-            email = user.email
-            phone_number = request.data.get("phone_number")
+            # Email notification
+#             username = user.username
+#             email = user.email
+#             phone_number = request.data.get("phone_number", "")
 
-            subject = "Your KSRTC Budget Tourism Account is Successfully Created"
+#             subject = "Your KSRTC Budget Tourism Account is Successfully Created"
+#             text_message = f"""
+# Hi {username},
 
-            text_message = f"""
-Hi {username},
+# Your KSRTC Budget Tourism account has been created successfully.
 
-Your KSRTC Budget Tourism account has been created successfully.
+# Username: {username}
+# Phone: {phone_number}
+# Email: {email}
 
-Username: {username}
-Phone: {phone_number}
-Email: {email}
+# Regards,
+# KSRTC Budget Tourism Team
+# """
+#             html_message = f"""
+# <html><body>
+# <h2>KSRTC Budget Tourism</h2>
+# <p>Hi <strong>{username}</strong>,</p>
+# <p>Your account has been created successfully.</p>
 
-Regards,
-KSRTC Budget Tourism Team
-"""
+# <div>
+#     <p><strong>Username:</strong> {username}</p>
+#     <p><strong>Phone Number:</strong> {phone_number}</p>
+#     <p><strong>Email:</strong> {email}</p>
+# </div>
 
-            html_message = f"""
-            <html><body>
-            <h2>KSRTC Budget Tourism</h2>
-            <p>Hi <strong>{username}</strong>,</p>
-            <p>Your account has been created successfully.</p>
+# <p>Regards,<br>KSRTC Budget Tourism Team</p>
+# </body></html>
+# """
 
-            <div>
-                <p><strong>Username:</strong> {username}</p>
-                <p><strong>Phone Number:</strong> {phone_number}</p>
-                <p><strong>Email:</strong> {email}</p>
-            </div>
+#             send_mail(
+#                 subject,
+#                 text_message,
+#                 settings.DEFAULT_FROM_EMAIL,
+#                 [email],
+#                 html_message=html_message,
+#                 fail_silently=False,
+#             )
 
-            <p>Regards,<br>KSRTC Budget Tourism Team</p>
-            </body></html>
-            """
-
-            send_mail(
-                subject,
-                text_message,
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-
-            return Response(
-                {"message": "User created successfully & Email sent"},
-                status=status.HTTP_201_CREATED
-            )
+#             return Response(
+#                 {"message": "User created successfully & Email sent"},
+#                 status=status.HTTP_201_CREATED
+#             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ---------------------------------------------------------
+# ------------------------------
 # LOGIN
-# ---------------------------------------------------------
+# ------------------------------
 class Login(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -107,11 +110,11 @@ class Login(APIView):
             return Response({"error": "Username and password are required"}, status=400)
 
         user = authenticate(username=username, password=password)
+
         if user is None:
             return Response({"error": "Invalid username or password"}, status=401)
 
         refresh = RefreshToken.for_user(user)
-
         return Response({
             "refresh": str(refresh),
             "access": str(refresh.access_token),
@@ -121,55 +124,47 @@ class Login(APIView):
         }, status=200)
 
 
-# ---------------------------------------------------------
-# INDEX PAGE
-# ---------------------------------------------------------
+
 class Index(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = 'index.html'
 
     def get(self, request):
+        # 1. HTML கோரிக்கை வந்தால் வெறும் பக்கத்தை மட்டும் அனுப்பவும்
         if request.accepted_renderer.format == 'html':
             return Response({})
 
-        package_list = Package_Details.objects.all()[:8]
-        package_serializer = PackageSerializer(package_list, many=True)
+        # 2. JSON கோரிக்கை வந்தால் (Axios மூலம்) தரவுகளை அனுப்பவும்
+        # பேக்கேஜ்களை எடுக்கிறோம்
+        packages = Package_Details.objects.all().order_by('-id')[:8]
+        package_serializer = PackageSerializer(packages, many=True)
+        
+        # ரிவியூக்களை எடுக்கிறோம்
+        reviews = RateReview.objects.all().order_by('-id')
+        review_serializer = RateReviewSerializer(reviews, many=True)
 
-        review_list = RateReview.objects.all()
-        review_serializer = RateReviewSerializer(review_list, many=True)
-
+        # 3. ஒரே ரெஸ்பான்ஸில் இரண்டையும் சேர்த்து அனுப்ப வேண்டும்
         return Response({
             "packages": package_serializer.data,
             "reviews": review_serializer.data
         }, status=200)
 
 
-# ---------------------------------------------------------
-# PACKAGE LIST
-# ---------------------------------------------------------
+
 class Packagelist(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = 'packagelist.html'
+    template_name = "packagelist.html"
 
-    def get(self, request, pk=None):
-
-        if request.accepted_renderer.format == 'html':
+    def get(self, request):
+       
+        if request.accepted_renderer.format == "html":
             return Response({})
 
-        if pk:
-            try:
-                package = Package_Details.objects.get(id=pk)
-            except Package_Details.DoesNotExist:
-                return Response({"message": "Package not found"}, status=404)
-
-            serializer = PackageSerializer(package)
-            return Response(serializer.data)
-
-        destination = request.GET.get('destination', '')
-        date = request.GET.get('date', '')
-        price = request.GET.get('price', '')
+        destination = request.GET.get("destination", "")
+        date = request.GET.get("date", "")
+        price = request.GET.get("price", "")
 
         packages = Package_Details.objects.all()
 
@@ -177,7 +172,10 @@ class Packagelist(APIView):
             packages = packages.filter(places__icontains=destination)
 
         if date:
-            packages = packages.filter(start_date__lte=date, end_date__gte=date)
+            packages = packages.filter(
+                start_date__lte=date,
+                end_date__gte=date
+            )
 
         if price:
             try:
@@ -192,10 +190,14 @@ class Packagelist(APIView):
         serializer = PackageSerializer(packages, many=True)
         return Response(serializer.data, status=200)
 
+
+# ------------------------------
+# PACKAGE DETAILS
+# ------------------------------
 class PackageDetails(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = 'packagedetails.html'
+    template_name = "packagedetails.html"
 
     def get(self, request, pk=None):
         if request.accepted_renderer.format == 'html':
@@ -213,113 +215,175 @@ class PackageDetails(APIView):
         return Response({"package": serializer.data})
 
 
-# ---------------------------------------------------------
-# STATIC PAGES
-# ---------------------------------------------------------
+# ------------------------------
+# TEMPLATE PAGES
+# ------------------------------
 class Navbar(TemplateView):
     template_name = "navbar.html"
+
 
 class Footer(TemplateView):
     template_name = "footer.html"
 
+
 class Payment(TemplateView):
     template_name = "payment.html"
+
 
 class Payment_Success(TemplateView):
     template_name = "payment_success.html"
 
 
-# ---------------------------------------------------------
-# MY BOOKING (AUTH REQUIRED)
-# ---------------------------------------------------------
+# ------------------------------
+# MY BOOKINGS
+# ------------------------------
 class MyBooking(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = "mybooking.html"
 
+    def get_permissions(self):
+        if self.request.accepted_renderer.format == 'html':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
     def get(self, request, pk=None):
-
-        if request.accepted_renderer.format == 'html' and pk is None:
+        if request.accepted_renderer.format == "html":
             return Response({})
+            
+        bookings = Package_Booking.objects.filter(user=request.user).select_related('package', 'package__bus').order_by('-booking_date')
+        
+        data = []
+        for b in bookings:
+            # பிரண்ட்-எண்ட் எதிர்பார்க்கும் அதே ஸ்ட்ரக்சரில் தரவை அனுப்புதல்
+            data.append({
+                "id": b.id,
+                "adults": b.adults,
+                "children": b.children,
+                "boarding_point": b.boarding_point,
+                "total_price": b.total_price,
+                "booking_date": b.booking_date.isoformat(), # ஜாவாஸ்கிரிப்ட் டேட் பார்மெட்டிற்கு
+                "package": {
+                    "package_name": b.package.package_name if b.package else "N/A",
+                    "start_date": b.package.start_date if b.package else "-",
+                    "end_date": b.package.end_date if b.package else "-",
+                    "bus": {
+                        "bus_name": b.package.bus.bus_name if b.package and b.package.bus else "KSRTC BTC",
+                        "bus_number": b.package.bus.bus_number if b.package and b.package.bus else "KL-15-XXXX",
+                    }
+                }
+            })
+        return Response(data)
 
-        if pk is None:
-            bookings = Package_Booking.objects.filter(user=request.user)
-            serializer = BookingSerializer(bookings, many=True)
-            return Response(serializer.data)
-
-        try:
-            booking = Package_Booking.objects.get(pk=pk, user=request.user)
-        except Package_Booking.DoesNotExist:
-            return Response({"error": "Booking not found"}, status=404)
-
-        serializer = BookingSerializer(booking)
-        return Response(serializer.data)
-
-    def patch(self, request, pk):
-        try:
-            booking = Package_Booking.objects.get(pk=pk)
-        except Package_Booking.DoesNotExist:
-            return Response({"error": "Booking not found"}, status=404)
-
-        serializer = BookingSerializer(booking, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-
-        return Response(serializer.errors, status=400)
-
+    @transaction.atomic
     def delete(self, request, pk):
         try:
-            booking = Package_Booking.objects.get(pk=pk)
+        # புக்கிங்கை எடுக்கிறோம் (பயனருக்கு உரியதா என சரிபார்க்கிறோம்)
+            booking = Package_Booking.objects.select_related('package__bus').get(pk=pk, user=request.user)
+        
+        # ரத்து செய்யப்படும் பயணிகளின் எண்ணிக்கை
+            passengers_to_return = booking.adults + booking.children
+        
+        # அந்த பேருந்தின் சீட்களை அதிகரித்தல்
+            if booking.package and booking.package.bus:
+                bus = booking.package.bus
+            
+            # இதோ இங்கே தான் மாற்றம்: 
+            # F expression மூலம் டேட்டாபேஸில் நேரடியாக கூட்டுகிறோம்
+            # இது 'Race condition' வராமல் தடுக்கும்
+                bus.total_seats = F('total_seats') + passengers_to_return
+                bus.save(update_fields=['total_seats']) # குறிப்பிட்ட ஃபீல்டை மட்டும் சேமிக்கவும்
+            
+            # டேட்டாபேஸில் இருந்து புதிய மதிப்பை மீண்டும் இன்ஸ்டன்ஸிற்கு கொண்டு வர (Optional but good)
+                bus.refresh_from_db()
+
+        # புக்கிங்கை நீக்குதல்
+            booking.delete()
+        
+            return Response({"message": "Booking cancelled and seats restored."}, status=200)
+        
         except Package_Booking.DoesNotExist:
-            return Response({"error": "Booking not found"}, status=404)
+            return Response({"error": "Booking not found or not authorized"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
 
-        booking.delete()
-        return Response({"message": "Booking deleted successfully"}, status=200)
-
-    def post(self, request):
-        serializer = RateReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Rate Review created successfully", "data": serializer.data}, status=201)
-        return Response(serializer.errors, status=400)
-
-
-# ---------------------------------------------------------
-# PACKAGE BOOKING (AUTH REQUIRED)
-# ---------------------------------------------------------
+# ------------------------------
+# PACKAGE BOOKING
+# ------------------------------
 class PackageBooking(APIView):
-    permission_classes = [permissions.IsAuthenticated]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
     template_name = "packagebooking.html"
 
-    def get(self, request, pk=None):
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
+    def get(self, request):
+        package_id = request.GET.get('package_id')
+        
         if request.accepted_renderer.format == 'html':
-            return Response({})
-
-        if not pk:
-            return Response({"message": "Package ID required"}, status=400)
-
+            return Response({'package_id': package_id}, template_name=self.template_name)
+        
+        if not package_id:
+            return Response({"error": "Package ID missing"}, status=400)
+            
         try:
-            package = Package_Details.objects.get(id=pk)
+            # சீரியலைசரை மாற்றாமல் முழு விவரங்களையும் கையால் அனுப்பும் முறை
+            pkg = Package_Details.objects.select_related('bus').get(id=package_id)
+            data = {
+                "id": pkg.id,
+                "package_name": pkg.package_name,
+                "price": pkg.price,
+                "bus_id": pkg.bus.id if pkg.bus else None,
+                "bus_seats": pkg.bus.total_seats if pkg.bus else 0
+            }
+            return Response(data)
         except Package_Details.DoesNotExist:
-            return Response({"message": "Package not found"}, status=404)
+            return Response({"error": "Package not found"}, status=404)
 
-        serializer = PackageSerializer(package)
-        return Response(serializer.data)
+    @transaction.atomic
+    def post(self, request):
+    # Serializer-ஐ இனிஷியலைஸ் செய்கிறோம்
+        serializer = BookingSerializer(data=request.data, context={'request': request})
+    
+        if serializer.is_valid():
+        # சீட்களைக் குறைக்கும் லாஜிக் ஏற்கனவே Serializer-இன் create() மெத்தடில் உள்ளது.
+        # எனவே இங்கே மீண்டும் செய்யத் தேவையில்லை.
+            serializer.save() 
+        
+            return Response({
+            "message": "Booking Successful",
+            "details": serializer.data
+        }, status=201)
+    
+        return Response(serializer.errors, status=400)
+    
+    
+class RateReviewAPI(APIView):
+    authentication_classes = [JWTAuthentication]
+    
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
+
+    
 
     def post(self, request):
-        serializer = BookingSerializer(data=request.data, context={'request': request})
+        data = request.data.copy()
+        data['user_id'] = request.user.id 
+        
+        serializer = RateReviewSerializer(data=data)
         if serializer.is_valid():
-            booking = serializer.save()
-            return Response({"message": "Booking Successful", "booking": serializer.data}, status=201)
-        return Response(serializer.errors, status=400)
+            serializer.save()
+            return Response({"message": "Review submitted successfully!"}, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# ---------------------------------------------------------
+# ------------------------------
 # LOGOUT
-# ---------------------------------------------------------
+# ------------------------------
 class Logout(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -330,6 +394,4 @@ class Logout(APIView):
             token.blacklist()
             return Response({"message": "Logout successful"}, status=200)
         except Exception:
-
             return Response({"error": "Invalid refresh token"}, status=400)
-

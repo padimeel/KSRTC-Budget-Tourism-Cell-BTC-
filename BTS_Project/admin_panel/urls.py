@@ -1,19 +1,25 @@
 from django.urls import path
-from .views import PackageAPI, DayWiseItineraryAPI,DepotSignup,Navbar,DepotManagerList
+from .views import PackageAPI, DayWiseItineraryAPI,DepotSignup,DepotManagerList,UpdatePackage,AdminLogin,AdminLogout,BookingList
 
 app_name='admin_site'
 urlpatterns = [
-    path('packages/', PackageAPI.as_view()),          # GET all / POST
-    path('packages/<int:pk>/', PackageAPI.as_view()), # GET one / PUT / DELETE
+    path('packages/', PackageAPI.as_view(), name='packages'),          
+    path('packages/<int:pk>/', PackageAPI.as_view(), name='packages'), 
 
     path('itineraries/', DayWiseItineraryAPI.as_view()),          
     path('itineraries/<int:pk>/', DayWiseItineraryAPI.as_view()),
 
     path('depotsignup/', DepotSignup.as_view(), name='depotsignup'),
-    path('navbar/', Navbar.as_view(), name='navbar'),
-    path('managerlist/', DepotManagerList.as_view(), name='managerlist'),
-
     
+    path('managerlist/', DepotManagerList.as_view(), name='managerlist'),
+    path('managerlist/<int:pk>/', DepotManagerList.as_view(), name='managerlist'),
+    
+    path('updatepackage/<int:pk>/', UpdatePackage.as_view(), name='updatepackage'),
+
+    path('adminlogin/', AdminLogin.as_view(), name='adminlogin'),
+    path('adminlogout/', AdminLogout.as_view(), name='adminlogout'),
+    path('bookinglist/', BookingList.as_view(), name='bookinglist')
     
 ]
 
+9

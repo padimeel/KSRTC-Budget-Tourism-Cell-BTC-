@@ -9,6 +9,9 @@ class BusRouteSerializer(serializers.ModelSerializer):
 
 class BusDetailsSerializer(serializers.ModelSerializer):
     routes = BusRouteSerializer(many=True, read_only=True)
+    
+
+    bus_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = BusDetails
@@ -23,3 +26,8 @@ class BusDetailsSerializer(serializers.ModelSerializer):
             'bus_type',
             'routes'
         ]
+
+    def validate_package(self, value):
+        if BusDetails.objects.filter(package=value).exists():
+            raise serializers.ValidationError("This package already has a bus assigned.")
+        return value

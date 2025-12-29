@@ -1,15 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
-
-
-class DepotProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    depot_name = models.CharField(max_length=100)
-    role = models.CharField(max_length=20, default='Depot Manager', editable=False)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.depot_name} ({self.role})"
-
+from django.conf import settings
 
 class Package_Details(models.Model):
     package_name = models.CharField(max_length=200)
@@ -20,14 +10,13 @@ class Package_Details(models.Model):
     end_date = models.DateField()
     price = models.PositiveIntegerField()
 
-    
     image1 = models.ImageField(upload_to='tourist_places/', null=True, blank=True)
     image2 = models.ImageField(upload_to='tourist_places/', null=True, blank=True)
     image3 = models.ImageField(upload_to='tourist_places/', null=True, blank=True)
     image4 = models.ImageField(upload_to='tourist_places/', null=True, blank=True)
 
     assigned_depot_manager = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -41,8 +30,7 @@ class Package_Details(models.Model):
 class DayWiseItinerary(models.Model):
     package = models.ForeignKey(
         Package_Details,
-        related_name='itineraries',
-        null=True,
+        related_name="itineraries",
         on_delete=models.CASCADE
     )
     day_number = models.PositiveIntegerField()
@@ -50,4 +38,4 @@ class DayWiseItinerary(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return f"{self.package.package_name} - Day {self.day_number}: {self.title}"
+        return f"{self.package.package_name} - Day {self.day_number}"
