@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import User, RateReview, Package_Booking, Package_Details, BusDetails
+from .models import User, RateReview, Package_Booking, Package_Details,RoomBooking
 from django.db.models import F
 
 User = get_user_model()
@@ -24,8 +24,6 @@ class SignupSerializer(serializers.ModelSerializer):
             role="Tourister"
         )
         return user
-
-
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -62,7 +60,6 @@ class BookingSerializer(serializers.ModelSerializer):
         if total_passengers <= 0:
             raise serializers.ValidationError({"error": "At least one passenger is required."})
 
-        # சீட் இருக்கிறதா என்று மட்டும் இங்கே செக் செய்கிறோம் (கழிக்கவில்லை)
         if package.bus.total_seats < total_passengers:
             raise serializers.ValidationError({
                 "error": f"Not enough seats. Available: {package.bus.total_seats}"
@@ -84,17 +81,13 @@ class BookingSerializer(serializers.ModelSerializer):
         children = validated_data.get("children", 0)
         total_passengers = adults + children
 
-        # விலை கணக்கீடு
         validated_data["total_price"] = (
             adults * package.price + (children * package.price * 0.5)
         )
 
-        # இருக்கைகளைக் குறைத்தல் (இங்கே மட்டும் தான் இது நடக்க வேண்டும்)
         bus = package.bus
         bus.total_seats = F('total_seats') - total_passengers
         bus.save(update_fields=['total_seats'])
-        
-        # முக்கியம்: Views-இல் மீண்டும் சீட் குறைக்கப்படவில்லை என்பதை உறுதி செய்யவும்
 
         return Package_Booking.objects.create(
             user=user,
@@ -120,3 +113,19 @@ class RateReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"user_id": "User does not exist."})
         
         return RateReview.objects.create(user=user, **validated_data)
+    
+    
+class RoomBookingSerializer(serializers.ModelSerializer):
+    hotel_name = serializers.ReadOnlyField(source='room.hotel.hotel_name')
+    room_number = serializers.ReadOnlyField(source='room.room_number')
+    room_type = serializers.ReadOnlyField(source='room.room_type')
+    price_per_night = serializers.ReadOnlyField(source='room.price')
+
+    class Meta:
+        model = RoomBooking
+        fields = [
+            'id', 'hotel_name', 'room_number', 'room_type', 'price_per_night',
+            'guest_name', 'check_in_date', 'check_out_date', 
+            'phone_number', 'adults', 'children', 'total_price'
+        ]
+        read_only_fields = ['id', 'user', 'room']

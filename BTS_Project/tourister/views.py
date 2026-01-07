@@ -3,8 +3,10 @@ from django.contrib.auth import authenticate, get_user_model
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from django.shortcuts import get_object_or_404,render
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from rest_framework import permissions, status
+from rest_framework import permissions, status,renderers
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
@@ -12,11 +14,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.db.models import F
 from django.db import transaction
-
-from .models import RateReview, Package_Booking
+from .models import RateReview, Package_Booking,RoomBooking
+from hotel_management.models import Room
 from admin_panel.models import Package_Details
-from .serializers import SignupSerializer, RateReviewSerializer, BookingSerializer
+from .serializers import SignupSerializer, RateReviewSerializer, BookingSerializer,RoomBookingSerializer
 from admin_panel.serializers import PackageSerializer
+from hotel_management.serializers import RoomSerializer
 
 User = get_user_model()
 
@@ -81,10 +84,10 @@ class Signup(APIView):
 #                 fail_silently=False,
 #             )
 
-#             return Response(
-#                 {"message": "User created successfully & Email sent"},
-#                 status=status.HTTP_201_CREATED
-#             )
+        return Response(
+            {"message": "User created successfully"},
+                status=status.HTTP_201_CREATED
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -131,20 +134,14 @@ class Index(APIView):
     template_name = 'index.html'
 
     def get(self, request):
-        # 1. HTML கோரிக்கை வந்தால் வெறும் பக்கத்தை மட்டும் அனுப்பவும்
         if request.accepted_renderer.format == 'html':
             return Response({})
-
-        # 2. JSON கோரிக்கை வந்தால் (Axios மூலம்) தரவுகளை அனுப்பவும்
-        # பேக்கேஜ்களை எடுக்கிறோம்
         packages = Package_Details.objects.all().order_by('-id')[:8]
         package_serializer = PackageSerializer(packages, many=True)
         
-        # ரிவியூக்களை எடுக்கிறோம்
         reviews = RateReview.objects.all().order_by('-id')
         review_serializer = RateReviewSerializer(reviews, many=True)
 
-        # 3. ஒரே ரெஸ்பான்ஸில் இரண்டையும் சேர்த்து அனுப்ப வேண்டும்
         return Response({
             "packages": package_serializer.data,
             "reviews": review_serializer.data
@@ -191,9 +188,6 @@ class Packagelist(APIView):
         return Response(serializer.data, status=200)
 
 
-# ------------------------------
-# PACKAGE DETAILS
-# ------------------------------
 class PackageDetails(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -226,13 +220,6 @@ class Footer(TemplateView):
     template_name = "footer.html"
 
 
-class Payment(TemplateView):
-    template_name = "payment.html"
-
-
-class Payment_Success(TemplateView):
-    template_name = "payment_success.html"
-
 
 # ------------------------------
 # MY BOOKINGS
@@ -255,14 +242,14 @@ class MyBooking(APIView):
         
         data = []
         for b in bookings:
-            # பிரண்ட்-எண்ட் எதிர்பார்க்கும் அதே ஸ்ட்ரக்சரில் தரவை அனுப்புதல்
+        
             data.append({
                 "id": b.id,
                 "adults": b.adults,
                 "children": b.children,
                 "boarding_point": b.boarding_point,
                 "total_price": b.total_price,
-                "booking_date": b.booking_date.isoformat(), # ஜாவாஸ்கிரிப்ட் டேட் பார்மெட்டிற்கு
+                "booking_date": b.booking_date.isoformat(),
                 "package": {
                     "package_name": b.package.package_name if b.package else "N/A",
                     "start_date": b.package.start_date if b.package else "-",
@@ -278,26 +265,19 @@ class MyBooking(APIView):
     @transaction.atomic
     def delete(self, request, pk):
         try:
-        # புக்கிங்கை எடுக்கிறோம் (பயனருக்கு உரியதா என சரிபார்க்கிறோம்)
             booking = Package_Booking.objects.select_related('package__bus').get(pk=pk, user=request.user)
         
-        # ரத்து செய்யப்படும் பயணிகளின் எண்ணிக்கை
-            passengers_to_return = booking.adults + booking.children
         
-        # அந்த பேருந்தின் சீட்களை அதிகரித்தல்
+            passengers_to_return = booking.adults + booking.children
+    
             if booking.package and booking.package.bus:
                 bus = booking.package.bus
             
-            # இதோ இங்கே தான் மாற்றம்: 
-            # F expression மூலம் டேட்டாபேஸில் நேரடியாக கூட்டுகிறோம்
-            # இது 'Race condition' வராமல் தடுக்கும்
                 bus.total_seats = F('total_seats') + passengers_to_return
-                bus.save(update_fields=['total_seats']) # குறிப்பிட்ட ஃபீல்டை மட்டும் சேமிக்கவும்
+                bus.save(update_fields=['total_seats']) 
             
-            # டேட்டாபேஸில் இருந்து புதிய மதிப்பை மீண்டும் இன்ஸ்டன்ஸிற்கு கொண்டு வர (Optional but good)
                 bus.refresh_from_db()
 
-        # புக்கிங்கை நீக்குதல்
             booking.delete()
         
             return Response({"message": "Booking cancelled and seats restored."}, status=200)
@@ -329,7 +309,6 @@ class PackageBooking(APIView):
             return Response({"error": "Package ID missing"}, status=400)
             
         try:
-            # சீரியலைசரை மாற்றாமல் முழு விவரங்களையும் கையால் அனுப்பும் முறை
             pkg = Package_Details.objects.select_related('bus').get(id=package_id)
             data = {
                 "id": pkg.id,
@@ -344,12 +323,10 @@ class PackageBooking(APIView):
 
     @transaction.atomic
     def post(self, request):
-    # Serializer-ஐ இனிஷியலைஸ் செய்கிறோம்
+
         serializer = BookingSerializer(data=request.data, context={'request': request})
     
         if serializer.is_valid():
-        # சீட்களைக் குறைக்கும் லாஜிக் ஏற்கனவே Serializer-இன் create() மெத்தடில் உள்ளது.
-        # எனவே இங்கே மீண்டும் செய்யத் தேவையில்லை.
             serializer.save() 
         
             return Response({
@@ -380,10 +357,108 @@ class RateReviewAPI(APIView):
             return Response({"message": "Review submitted successfully!"}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    
+class Hotels(APIView):
+    permission_classes = [permissions.AllowAny]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = 'hotels.html'
 
-# ------------------------------
-# LOGOUT
-# ------------------------------
+    def get(self, request):
+        location_query = request.query_params.get('location', '').strip()
+        rooms = Room.objects.filter(is_available=True)
+
+        if location_query:
+            rooms = rooms.filter(hotel__address__icontains=location_query)
+
+        if request.accepted_renderer.format == 'json':
+            
+            serializer = RoomSerializer(rooms, many=True)
+            return Response(serializer.data)
+
+        return Response({
+            'rooms': rooms,
+            'current_location': location_query
+        })
+        
+        
+        
+class BookRoom(APIView):
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    renderer_classes = [renderers.TemplateHTMLRenderer, renderers.JSONRenderer]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
+    def get(self, request, room_id):
+        room = get_object_or_404(Room, id=room_id)
+        if request.accepted_renderer.format == 'html':
+            return Response({'room_id': room_id}, template_name='roombooking.html')
+        return Response({"hotel_name": room.hotel.hotel_name, "price": str(room.price)})
+
+    def post(self, request, room_id):
+        room = get_object_or_404(Room, id=room_id)
+        check_in = request.data.get('check_in_date')
+        check_out = request.data.get('check_out_date')
+
+        
+        is_booked = RoomBooking.objects.filter(
+            room=room,
+            check_out_date__gt=check_in,
+            check_in_date__lt=check_out  
+        ).exists()
+
+        if is_booked:
+            return Response(
+                {"error": "This room is already booked for the selected dates. Please choose different dates."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # -------------------------------------------------------
+
+        serializer = RoomBookingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, room=room)
+            return Response({"message": "Booking successful!"}, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, room_id):
+
+        booking = RoomBooking.objects.filter(id=room_id, user=request.user).first()
+    
+        if booking:
+            booking.delete()
+       
+            return Response(status=status.HTTP_204_NO_CONTENT)
+    
+        return Response({"error": "No booking found to delete"}, status=status.HTTP_404_NOT_FOUND)
+
+class HotelMyBooking(APIView):
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    renderer_classes = [renderers.TemplateHTMLRenderer, renderers.JSONRenderer]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        if request.accepted_renderer.format == 'html':
+            return Response({}, template_name='hotel_mybookings.html')
+        
+        
+        bookings = RoomBooking.objects.filter(user=request.user).order_by('-id')
+        data = [{
+            "id": b.id,
+            "hotel_name": b.room.hotel.hotel_name,
+            "room_no": b.room.room_number,
+            "room_type": b.room.room_type,
+            "check_in": b.check_in_date.strftime('%d %b %Y'),
+            "check_out": b.check_out_date.strftime('%d %b %Y'),
+            "total_price": str(b.total_price),
+        } for b in bookings]
+        return Response(data)
+
+
 class Logout(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

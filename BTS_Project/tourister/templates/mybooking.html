@@ -9,15 +9,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
         .card-fade-out { opacity: 0; transform: scale(0.95); transition: all 0.4s ease; }
-        /* ஸ்டார் ஆக்டிவ் ஆக இருக்கும்போது அதன் நிறம் */
         .star-active { color: #fbbf24 !important; } 
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
     {% include 'components/navbar.html' %}
 
-    <section class="py-10 px-6 text-center bg-white border-b border-gray-100">
-        <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase italic">My <span class="text-rose-600">Bookings</span></h2>
+    <section class="py-10 px-6 bg-white border-b border-gray-100 relative">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-center relative">
+            <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase italic text-center">
+                My <span class="text-rose-600">Bookings</span>
+            </h2>
+            
+            <div class="mt-4 md:mt-0 md:absolute md:right-0">
+                <a href="/tourister/hotelmybooking/" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all shadow-sm">
+                    <i class="fas fa-hotel"></i>
+                    My Hotels
+                </a>
+            </div>
+        </div>
     </section>
 
     <div class="container mx-auto px-4 md:px-12 py-8">
@@ -55,7 +65,7 @@
     <script>
         const bookingList = document.getElementById("bookingList");
         const apiUrl = "/tourister/mybooking/"; 
-        const reviewUrl = "/tourister/ratereview/"; // உங்கள் RateReview API URL
+        const reviewUrl = "/tourister/ratereview/"; 
 
         let selectedRating = 0;
 
@@ -73,7 +83,7 @@
                 bookingList.innerHTML = "";
 
                 if (bookings.length === 0) {
-                    bookingList.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold">No bookings found</div>`;
+                    bookingList.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200 text-slate-400 font-bold uppercase tracking-widest text-xs">No bus bookings found</div>`;
                     return;
                 }
 
@@ -92,8 +102,8 @@
                         <div class="flex-1 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
                             <div class="flex-1 text-center md:text-left">
                                 <div class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1">Package Details</div>
-                                <h3 class="text-2xl font-black text-slate-800">${pkgName}</h3>
-                                <div class="flex flex-wrap justify-center md:justify-start gap-4 text-xs font-bold text-slate-400 italic">
+                                <h3 class="text-2xl font-black text-slate-800 uppercase italic leading-tight mb-2">${pkgName}</h3>
+                                <div class="flex flex-wrap justify-center md:justify-start gap-4 text-[11px] font-bold text-slate-400 italic">
                                     <span><i class="far fa-calendar-alt mr-1"></i> ${pkg.start_date} to ${pkg.end_date}</span>
                                     <span><i class="fas fa-map-marker-alt mr-1"></i> ${booking.boarding_point}</span>
                                 </div>
@@ -101,24 +111,24 @@
 
                             <div class="flex-1 flex justify-around w-full border-y md:border-y-0 md:border-x border-slate-50 py-4">
                                 <div class="text-center">
-                                    <p class="text-[9px] font-black text-slate-400 uppercase">Bus Info</p>
-                                    <p class="text-xs font-black text-slate-700">${bus.bus_name}</p>
-                                    <p class="text-[10px] font-bold text-rose-500">${bus.bus_number}</p>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Bus Info</p>
+                                    <p class="text-xs font-black text-slate-700 uppercase">${bus.bus_name}</p>
+                                    <p class="text-[10px] font-bold text-rose-500 uppercase">${bus.bus_number}</p>
                                 </div>
                                 <div class="text-center">
-                                    <p class="text-[9px] font-black text-slate-400 uppercase">Travelers</p>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Travelers</p>
                                     <p class="text-xs font-black text-slate-700">${booking.adults} Adults</p>
                                     <p class="text-[10px] font-bold text-slate-500">${booking.children} Kids</p>
                                 </div>
                             </div>
 
                             <div class="text-center md:text-right min-w-[150px]">
-                                <p class="text-[9px] font-black text-slate-400 uppercase">Total Fare</p>
-                                <p class="text-2xl font-black text-rose-600">₹${booking.total_price}</p>
-                                <p class="text-[9px] font-bold text-slate-400 mb-4">Booked on ${bookingDate}</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Total Fare</p>
+                                <p class="text-2xl font-black text-rose-600 italic">₹${booking.total_price}</p>
+                                <p class="text-[9px] font-bold text-slate-400 mb-4 uppercase tracking-widest">Booked on ${bookingDate}</p>
                                 <div class="flex gap-2">
-                                    <button onclick="openReviewPopup('${pkgName}')" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase hover:bg-slate-700 transition">Review</button>
-                                    <button onclick="cancelBooking(${booking.id})" class="px-4 py-2 border-2 border-rose-50 text-rose-600 rounded-xl text-[10px] font-black uppercase hover:bg-rose-100 transition">Cancel</button>
+                                    <button onclick="openReviewPopup('${pkgName}')" class="flex-1 px-4 py-2 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition active:scale-95">Review</button>
+                                    <button onclick="cancelBooking(${booking.id})" class="flex-1 px-4 py-2 border-2 border-rose-50 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition active:scale-95">Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -126,7 +136,7 @@
                     bookingList.appendChild(card);
                 });
             } catch (error) {
-                bookingList.innerHTML = `<p class="text-center text-rose-500 py-10 font-bold">Error loading data.</p>`;
+                bookingList.innerHTML = `<p class="text-center text-rose-500 py-10 font-bold uppercase text-xs tracking-widest">Error loading data.</p>`;
             }
         }
 
@@ -141,19 +151,14 @@
             };
         });
 
-        // 3. Review Submission (Axios Post)
+        // 3. Review Submission
         async function submitReview() {
             const reviewText = document.getElementById("reviewText").value;
             const token = localStorage.getItem("access");
             const btn = document.getElementById("submitBtn");
 
-            if (selectedRating === 0) {
-                alert("Please select a star rating!");
-                return;
-            }
-
-            if (!reviewText.trim()) {
-                alert("Please write a short review!");
+            if (selectedRating === 0 || !reviewText.trim()) {
+                alert("Please fill both rating and review!");
                 return;
             }
 
@@ -172,12 +177,11 @@
                 });
 
                 if (response.status === 201 || response.status === 200) {
-                    alert("Thank you! Review submitted successfully.");
+                    alert("Review submitted!");
                     closeReviewPopup();
                 }
             } catch (error) {
-                console.error(error);
-                alert(error.response?.data?.detail || "Failed to post review. Please try again.");
+                alert(error.response?.data?.detail || "Failed to post review.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "Post Review";
@@ -192,7 +196,6 @@
 
         function closeReviewPopup() {
             document.getElementById('reviewPopup').classList.replace('flex', 'hidden');
-            // Reset fields
             selectedRating = 0;
             document.getElementById("reviewText").value = "";
             document.querySelectorAll('#starContainer i').forEach(s => {

@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from django.shortcuts import get_object_or_404,redirect
+from django.shortcuts import get_object_or_404,redirect,render
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.contrib.auth import authenticate, login, logout
@@ -13,7 +13,8 @@ from .models import Package_Details, DayWiseItinerary
 from .serializers import (
     PackageSerializer,
     DayWiseItinerarySerializer,
-    DepotSignupSerializer
+    DepotSignupSerializer,
+    HotelSignupSerializer
 )
 
 User = get_user_model()
@@ -67,10 +68,10 @@ class DepotSignup(APIView):
         return Response(serializer.errors, status=400)
     
     def get(self, request):
-        # Fetch the managers from the database
+
         managers = User.objects.filter(role="depot_manager")
         
-        # FIX 2: If the request is for HTML, pass the managers list to the template
+        
         if request.accepted_renderer.format == 'html':
             return Response({'managers': managers}, template_name=self.template_name)
         
@@ -87,12 +88,11 @@ class DepotManagerList(APIView):
     def get(self, request):
         managers = User.objects.filter(role="depot_manager")
         
-        # Handle HTML request (rendering the page)
+      
         if request.accepted_renderer.format == 'html':
             return Response({'managers': managers}, template_name=self.template_name)
         
-        # Handle JSON request (Axios call)
-        # ADDED: role and date_joined to match frontend expectations
+        
         data = [
             {
                 "id": m.id,
@@ -132,13 +132,13 @@ class PackageAPI(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        # Image upload-க்கு request.data-வை அப்படியே அனுப்பலாம்
+        
         serializer = PackageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=201)
         
-        print(serializer.errors) # பிழையை டெர்மினலில் பார்க்க
+        print(serializer.errors) 
         return Response(serializer.errors, status=400)
 
     def put(self, request, pk):
@@ -189,7 +189,7 @@ class DayWiseItineraryAPI(APIView):
 
     def put(self, request, pk):
         itinerary = get_object_or_404(DayWiseItinerary, id=pk)
-        # partial=True handles 400 errors when updating title/desc without the full object
+        
         serializer = DayWiseItinerarySerializer(itinerary, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -250,4 +250,54 @@ class BookingList(APIView):
                 }
             })
         return Response(data)
+    
+class HotelSignup(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "addhotel.html"
+
+    def get(self, request):
+        hotels = User.objects.filter(role="Hotel")
+        
+        if request.accepted_renderer.format == 'html':
+            return Response({'hotels': hotels}, template_name=self.template_name)
+        
+        data = [{"id": h.id, "username": h.username, "location": h.location} for h in hotels]
+        return Response(data)
+
+    def post(self, request):
+        serializer = HotelSignupSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            
+            if request.accepted_renderer.format == 'html':
+                return redirect('login') 
+                
+            return Response({"message": "Hotel Partner created successfully"}, status=status.HTTP_201_CREATED)
+        if request.accepted_renderer.format == 'html':
+            hotels = User.objects.filter(role="Hotel")
+            return Response({'hotels': hotels, 'errors': serializer.errors}, template_name=self.template_name)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class HotelList(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated] 
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = 'hotellist.html' 
+
+    def get(self, request, pk=None):
+        hotels = User.objects.filter(role='Hotel').order_by('-id')
+        
+        if request.accepted_renderer.format == 'json':
+            serializer = HotelSignupSerializer(hotels, many=True)
+            return Response(serializer.data)
+        
+        return Response({'hotels': hotels}, template_name=self.template_name)
+
+    def delete(self, request, pk):
+        hotel = get_object_or_404(User, pk=pk, role='Hotel')
+        hotel.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     

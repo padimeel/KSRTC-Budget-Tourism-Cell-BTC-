@@ -92,7 +92,7 @@
                 const dropdown = document.getElementById("boardingDropdown");
                 dropdown.innerHTML = '<option value="">-- Choose Location --</option>';
                 
-                // பஸ் ஐடியை வைத்து ரூட்களை ஃபில்டர் செய்தல்
+                
                 const filteredRoutes = routeRes.data.filter(r => r.bus === data.bus_id);
                 if(filteredRoutes.length > 0) {
                     filteredRoutes.forEach(r => {
@@ -135,7 +135,7 @@
             };
 
             try {
-                await axios.post("", payload, {
+                await axios.post("http://127.0.0.1:8000/tourister/packagebooking/", payload, {
                     headers: { 
                         "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
                         "Authorization": `Bearer ${accessToken}` 

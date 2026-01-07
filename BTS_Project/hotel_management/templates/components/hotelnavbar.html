@@ -1,0 +1,73 @@
+<nav class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-emerald-100 px-6 lg:px-10 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white rotate-3 shadow-lg shadow-emerald-200">
+                <i class="fas fa-bus-simple text-sm"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xl font-black text-emerald-900 leading-none" style="font-family: 'Playfair Display', serif;">
+                    KSRTC <span class="text-emerald-600">HOTELS</span>
+                </span>
+                <span class="text-[9px] uppercase tracking-[0.2em] font-bold text-emerald-500">Budget Tourism</span>
+            </div>
+        </div>
+
+        <div class="hidden lg:flex items-center space-x-6">
+            <a href="{% url 'hotel:home' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Home</a>
+            {% comment %} {% if request.user.is_authenticated %} {% endcomment %}
+                <a href="{% url 'hotel:roommanage' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Manage Rooms</a>
+                <a href="/hotel/bookings/" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Bookings</a>
+                <a href="{% url 'hotel:hotelinfo' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Hotel Details</a>
+            {% comment %} {% endif %} {% endcomment %}
+        </div>
+
+        <div class="flex items-center gap-3">
+            {% if request.user.is_authenticated %}
+                <button onclick="handleLogout()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-full transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm shadow-emerald-100 border border-emerald-500">
+                    <span>Logout</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            {% else %}
+                <a href="{% url 'hotel:hotellogin' %}" class="flex items-center gap-2 bg-emerald-600 text-white hover:bg-emerald-700 px-5 py-2 rounded-full font-bold text-xs transition-all border border-emerald-500 shadow-sm shadow-emerald-100">
+                    <i class="fas fa-user-check"></i>
+                    PARTNER LOGIN
+                </a>
+            {% endif %}
+
+            <button class="lg:hidden text-emerald-900 text-2xl ml-2" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="mobileMenu" class="hidden lg:hidden absolute top-full left-0 w-full bg-white border-b border-emerald-100 flex flex-col p-6 space-y-4 shadow-xl">
+        <a href="{% url 'hotel:home' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2">Home</a>
+        {% if request.user.is_authenticated %}
+            <a href="/hotel/bookings/" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
+                Bookings <i class="fas fa-chevron-right text-sm opacity-30"></i>
+            </a>
+            <a href="{% url 'hotel:roommanage' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
+                Rooms <i class="fas fa-chevron-right text-sm opacity-30"></i>
+            </a>
+            <button onclick="handleLogout()" class="text-emerald-600 font-bold text-lg text-left">Logout</button>
+        {% else %}
+            <a href="{% url 'hotel:hotellogin' %}" class="text-emerald-600 font-bold text-lg">Partner Login</a>
+        {% endif %}
+    </div>
+</nav>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    function handleLogout() {
+        if(confirm("Are you sure you want to end your session?")) {
+            // CRITICAL: Point this to your LOGOUT view URL name
+            // If your logout path name is 'hotellogout', use that here.
+            window.location.href = "{% url 'hotel:hotellogin' %}";
+        }
+    }
+</script>

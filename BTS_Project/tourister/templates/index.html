@@ -351,7 +351,7 @@ window.onload = function () {
   const loadBtn = document.getElementById("loadBtn");
   const lessBtn = document.getElementById("lessBtn");
 
-  // பட்டன்களை ஆரம்பத்தில் மறைக்க
+
   lessBtn.classList.add("hidden");
   loadBtn.classList.add("hidden");
 
@@ -375,7 +375,6 @@ window.onload = function () {
           }"></i>`;
         }
 
-        // 3-க்கு மேலுள்ள கார்டுகளை மறைக்க 'hidden extraReview' சேர்க்கிறோம்
         const hiddenClass = index >= 3 ? "hidden extraReview" : "";
 
         html += `
@@ -393,7 +392,6 @@ window.onload = function () {
 
       reviewsGrid.innerHTML = html;
 
-      // பட்டன் லாஜிக்
       const extraReviews = document.querySelectorAll(".extraReview");
 
       if (reviews.length > 3) {
@@ -410,7 +408,6 @@ window.onload = function () {
         extraReviews.forEach((card) => card.classList.add("hidden"));
         lessBtn.classList.add("hidden");
         loadBtn.classList.remove("hidden");
-        // ரிவியூ பகுதிக்குத் திரும்பச் செல்ல (Optional)
         reviewsGrid.scrollIntoView({ behavior: 'smooth' });
       };
     })

@@ -71,7 +71,7 @@ class BusAPI(APIView):
     def post(self, request):
         package_id = request.data.get('package')
         
-        # 1. ஏற்கனவே இந்த Package-க்கு பஸ் இருக்கிறதா எனச் சரிபார்க்கும் முக்கியமான பகுதி
+       
         if BusDetails.objects.filter(package_id=package_id).exists():
             return Response(
                 {"error": "This package already has a bus assigned. You cannot assign another one."}, 
@@ -91,7 +91,7 @@ class BusAPI(APIView):
         except BusDetails.DoesNotExist:
             return Response({"error": "Bus not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # 2. Update செய்யும்போது partial=True கொடுத்தால் சில ஃபீல்டுகளை மட்டும் மாற்ற வசதியாக இருக்கும்
+       
         serializer = BusDetailsSerializer(bus, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -125,7 +125,7 @@ class RouteAPI(APIView):
 
 
     def post(self, request):
-        # Validate bus exists
+        
         bus_id = request.data.get("bus")
         if not BusDetails.objects.filter(id=bus_id).exists():
             return Response({"error": "Invalid bus ID"}, status=400)
@@ -166,7 +166,7 @@ class AssignPackage(APIView):
     template_name = "assignpackage.html"
 
     def get(self, request, pk=None):
-        # Depot Manager-க்கு ஒதுக்கப்பட்ட பேக்கேஜ்களைப் பெறுதல்
+      
         packages = Package_Details.objects.filter(assigned_depot_manager=request.user).order_by('-id')
         
         if request.accepted_renderer.format == 'html':
@@ -174,8 +174,7 @@ class AssignPackage(APIView):
 
         data = []
         for pkg in packages:
-            # BusDetails மாடலில் 'package' Foreign Key அல்லது OneToOne ஆக இருந்தால் 
-            # அதன் related_name-ஐ இங்கே பயன்படுத்தவும் (பொதுவாக busdetails_set அல்லது busdetails)
+
             bus_obj = BusDetails.objects.filter(package=pkg).first()
             
             data.append({
@@ -213,7 +212,7 @@ class AddBus(APIView):
         return Response({"error": "HTML only"}, status=400)
 
     def post(self, request, pk=None, *args, **kwargs):
-        # போஸ்ட் ரிக்வஸ்ட்டுக்கும் இதேபோல் சேர்க்கவும்
+     
         pass
 
 
@@ -224,21 +223,20 @@ class UpdateBus(APIView):
     template_name = "updatebus.html"
     
     def get(self, request, pk):
-        # முதலில் டேட்டாவைக் காண்பிக்க பஸ் ஆப்ஜெக்ட்டைப் பெறுதல்
+        
         bus = get_object_or_404(BusDetails, id=pk)
         return Response({'bus': bus})
 
     def put(self, request, pk):
         try:
-            # 1. பஸ் விவரங்களை அப்டேட் செய்தல்
+           
             bus = BusDetails.objects.get(id=pk)
             bus_serializer = BusDetailsSerializer(bus, data=request.data, partial=True)
             
             if bus_serializer.is_valid():
                 bus_serializer.save()
                 
-                # 2. பஸ்ஸோடு இணைக்கப்பட்ட ரூட் விவரங்களை அப்டேட் செய்தல்
-                # BusDetails மாடலில் route என்பது ஒரு Foreign Key ஆக இருந்தால்:
+                
                 if hasattr(bus, 'route') and bus.route:
                     route_serializer = BusRouteSerializer(bus.route, data=request.data, partial=True)
                     if route_serializer.is_valid():

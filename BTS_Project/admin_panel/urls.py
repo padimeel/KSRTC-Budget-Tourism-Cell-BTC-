@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PackageAPI, DayWiseItineraryAPI,DepotSignup,DepotManagerList,UpdatePackage,AdminLogin,AdminLogout,BookingList
+from .views import PackageAPI, DayWiseItineraryAPI,DepotSignup,DepotManagerList,UpdatePackage,AdminLogin,AdminLogout,BookingList,HotelSignup,HotelList
 
 app_name='admin_site'
 urlpatterns = [
@@ -18,7 +18,12 @@ urlpatterns = [
 
     path('adminlogin/', AdminLogin.as_view(), name='adminlogin'),
     path('adminlogout/', AdminLogout.as_view(), name='adminlogout'),
-    path('bookinglist/', BookingList.as_view(), name='bookinglist')
+    path('bookinglist/', BookingList.as_view(), name='bookinglist'),
+    
+    path('hotelsignup/', HotelSignup.as_view(), name='hotelsignup'),
+    
+    path('hotellist/', HotelList.as_view(), name='hotel-list'),
+    path('hotellist/<int:pk>/', HotelList.as_view(), name='hotel-delete'),
     
 ]
 
