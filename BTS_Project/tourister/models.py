@@ -7,6 +7,8 @@ from hotel_management.models import Room
 
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True) 
+
     phone_number = models.CharField(max_length=10, blank=True, null=True)
     depot_name = models.CharField(max_length=100, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
@@ -15,10 +17,11 @@ class User(AbstractUser):
         ("Tourister", "Tourister"),
         ("Depot Manager", "Depot Manager"),
         ("Hotel", "Hotel")
-    
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="Tourister")
+
+    
 
     def __str__(self):
         return self.username

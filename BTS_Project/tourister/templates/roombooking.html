@@ -38,7 +38,7 @@
                     <p id="roomInfo" class="text-gray-500 font-bold text-[9px] mt-1 italic uppercase tracking-wider">Fetching details...</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-[8px] font-black text-red-600 uppercase leading-none">Rate per Adult</p>
+                    <p class="text-[8px] font-black text-red-600 uppercase leading-none">Rate per Room / Night</p>
                     <p id="basePrice" class="text-lg font-black text-gray-900">₹0</p>
                 </div>
             </div>
@@ -70,12 +70,12 @@
 
                 <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Adults (Full)</label>
+                        <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Adults</label>
                         <input type="number" id="adults" min="1" value="1" 
                             class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none transition-all custom-input">
                     </div>
                     <div>
-                        <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Children (50%)</label>
+                        <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Children</label>
                         <input type="number" id="children" min="0" value="0" 
                             class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none transition-all custom-input">
                     </div>
@@ -88,7 +88,7 @@
 
                 <div class="mt-6 bg-gray-900 rounded-2xl p-5 flex justify-between items-center shadow-xl">
                     <div class="flex flex-col">
-                        <span id="calcBreakdown" class="text-[8px] font-bold text-red-400 uppercase tracking-tighter mb-1">1 Adult × 1 Night</span>
+                        <span id="calcBreakdown" class="text-[8px] font-bold text-red-400 uppercase tracking-tighter mb-1">Room Price × 1 Night</span>
                         <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Total Payable</p>
                         <h2 class="text-3xl font-black text-white italic tracking-tighter leading-none mt-1">₹<span id="total_price_display">0</span></h2>
                     </div>
@@ -102,29 +102,28 @@
 
     <script>
         const roomId = "{{ room_id }}";
-        let pricePerAdult = 0;
+        let roomRate = 0; 
 
-        // அறையின் தகவல்களைப் பெறுதல்
         async function loadRoomDetails() {
             try {
-                const response = await axios.get(`/tourister/roombook/${roomId}/`, {
+                const response = await axios.get(window.location.pathname, {
                     headers: { 'Accept': 'application/json' }
                 });
+                
                 const data = response.data;
                 document.getElementById('hotelName').innerText = data.hotel_name;
-                document.getElementById('roomInfo').innerText = `${data.room_type} — Room ${data.room_number}`;
+                document.getElementById('roomInfo').innerText = `${data.room_type || 'Standard'} — Room ${data.room_number || ''}`;
                 document.getElementById('basePrice').innerText = `₹${data.price}`;
-                pricePerAdult = parseFloat(data.price);
+                
+                roomRate = parseFloat(data.price);
                 calculateTotal();
             } catch (error) {
                 console.error("Room Load Error:", error);
+                document.getElementById('hotelName').innerText = "Error loading details";
             }
         }
 
-        // விலையைக் கணக்கிடுதல்
         function calculateTotal() {
-            const adults = parseInt(document.getElementById('adults').value) || 0;
-            const children = parseInt(document.getElementById('children').value) || 0;
             const checkInVal = document.getElementById('check_in_date').value;
             const checkOutVal = document.getElementById('check_out_date').value;
             
@@ -136,17 +135,19 @@
                     nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
                 }
             }
-            const grandTotal = ((adults * pricePerAdult) + (children * pricePerAdult * 0.5)) * nights;
+
+            const grandTotal = roomRate * nights;
+            
             document.getElementById('total_price_display').innerText = grandTotal.toLocaleString('en-IN');
-            document.getElementById('calcBreakdown').innerText = `${adults}A, ${children}C × ${nights} Night(s)`;
+            document.getElementById('calcBreakdown').innerText = `Rate: ₹${roomRate} × ${nights} Night(s)`;
+            
             return grandTotal;
         }
 
-        ['check_in_date', 'check_out_date', 'adults', 'children'].forEach(id => {
+        ['check_in_date', 'check_out_date'].forEach(id => {
             document.getElementById(id).addEventListener('input', calculateTotal);
         });
 
-        // புக்கிங் சமர்ப்பித்தல்
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -164,7 +165,6 @@
                 total_price: calculateTotal()
             };
 
-            // JWT & CSRF Headers
             const token = localStorage.getItem('access_token');
             const headers = { 
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -174,26 +174,21 @@
 
             try {
                 
-                const response = await axios.post(`/tourister/roombook/${roomId}/`, payload, { 
+                await axios.post(window.location.pathname, payload, { 
                     headers: headers,
                     withCredentials: true 
                 });
                 
                 alert("Booking Confirmed Successfully!");
-                window.location.href = "/tourister/mybookings/"; 
+                window.location.href = "/tourister/hotelmybooking/"; 
             } catch (error) {
                 console.error("Booking Error:", error.response);
-                
-                if (error.response && error.response.status === 400) {
-                    const serverError = error.response.data.error || "Please check the dates.";
-                    alert("Error: " + serverError);
-                } else if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
                     alert("Your session expired. Please login again.");
                     window.location.href = "/tourister/login/";
                 } else {
-                    alert("An unexpected error occurred. Please try again.");
+                    alert("Error: " + (error.response?.data?.error || "Booking failed"));
                 }
-                
                 btn.disabled = false;
                 btn.innerText = "Confirm & Pay";
             }

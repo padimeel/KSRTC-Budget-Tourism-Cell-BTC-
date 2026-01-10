@@ -32,13 +32,19 @@ class Login(APIView):
         user = authenticate(username=username, password=password)
         
         if user is not None:
-            login(request, user) 
-            
-            return Response({
-                "message": "Login successful",
-                "username": user.username,
-                "depot_name": getattr(user, 'depot_name', '')
-            }, status=status.HTTP_200_OK)
+            if user.role == "Depot Manager" or user.is_superuser:
+                login(request, user) 
+                
+                return Response({
+                    "message": "Login successful",
+                    "username": user.username,
+                    "depot_name": getattr(user, 'depot_name', '')
+                }, status=status.HTTP_200_OK)
+            else:
+
+                return Response({
+                    "error": "Unauthorized: This account is not assigned to a Depot Manager."
+                }, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 

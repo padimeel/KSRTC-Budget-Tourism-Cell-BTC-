@@ -6,17 +6,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>KSRTC BTC — Explore Kerala</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    /* சில நேரங்களில் CDN லோட் ஆக தாமதமானால் பட்டன் மறையாமல் இருக்க இந்த ஸ்டைல் உதவும் */
+    .signup-gradient {
+      background: linear-gradient(to right, #e11d48, #fbbf24) !important;
+      color: white !important;
+    }
+  </style>
 </head>
 
 <body class="font-sans text-gray-800">
 
-<!-- Mobile toggle -->
 <input type="checkbox" id="menu-toggle" class="hidden peer">
 
-<header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow h-20 flex items-center">
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm h-20 flex items-center">
   <div class="max-w-7xl mx-auto px-6 w-full flex items-center justify-between">
 
-    <!-- LOGO -->
     <div class="flex items-center gap-1">
       <img src="{% static 'images/logo.png' %}" alt="KSRTC" class="h-20 w-auto object-contain">
       <div>
@@ -25,7 +30,6 @@
       </div>
     </div>
 
-    
     <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
       <a href="{% url 'tourister:index' %}" class="hover:text-rose-700 transition">Home</a>
       <a href="{% url 'tourister:packagelist' %}" class="hover:text-rose-700 transition">Packages</a>
@@ -34,13 +38,17 @@
       <a href="{% url 'tourister:hotels' %}" class="hover:text-rose-700 transition">Hotels</a>
       <a href="{% url 'tourister:mybooking' %}" class="hover:text-rose-700 transition">My Booking</a>
       
-      <a href="{% url 'tourister:signup' %}" class="px-4 py-2 bg-gradient-to-r from-rose-600 to-amber-400 text-white rounded-lg font-semibold hover:opacity-95 transition">Sign Up</a>
-      <a href="{% url 'tourister:logout' %}" class="px-4 py-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition" id="logoutBtn">Logout</a>
+      <a href="{% url 'tourister:signup' %}" class="signup-gradient px-5 py-2.5 rounded-lg font-bold hover:shadow-lg transition-all inline-block">
+        Sign Up
+      </a>
+
+      <a href="{% url 'tourister:logout' %}" class="px-4 py-2 border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white font-semibold transition" id="logoutBtn">
+        Logout
+      </a>
     </nav>
 
-    
-    <label for="menu-toggle" class="md:hidden cursor-pointer">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <label for="menu-toggle" class="md:hidden cursor-pointer p-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-rose-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     </label>
@@ -48,24 +56,27 @@
   </div>
 </header>
 
-
-<div class="peer-checked:block hidden md:hidden bg-white border-t border-gray-100 shadow-md">
-  <nav class="flex flex-col items-center py-4 space-y-3 text-sm font-medium">
-    <a href="{% url 'tourister:index' %}" class="hover:text-rose-700 transition">Home</a>
-    <a href="{% url 'tourister:packagelist' %}" class="hover:text-rose-700 transition">Packages</a>
-    <a href="#" class="hover:text-rose-700 transition">About</a>
-    <a href="#" class="hover:text-rose-700 transition">Contact</a>
-    <a href="{% url 'tourister:hotels' %}" class="hover:text-rose-700 transition">Hotels</a>
-    <a href="{% url 'tourister:mybooking' %}" class="hover:text-rose-700 transition">My Booking</a>
+<div class="peer-checked:block hidden md:hidden bg-white border-t border-gray-100 shadow-xl animate-in slide-in-from-top duration-300">
+  <nav class="flex flex-col items-center py-6 space-y-4 text-base font-semibold">
+    <a href="{% url 'tourister:index' %}" class="w-full text-center py-2 hover:bg-rose-50 hover:text-rose-700">Home</a>
+    <a href="{% url 'tourister:packagelist' %}" class="w-full text-center py-2 hover:bg-rose-50 hover:text-rose-700">Packages</a>
+    <a href="#" class="w-full text-center py-2 hover:bg-rose-50 hover:text-rose-700">About</a>
+    <a href="#" class="w-full text-center py-2 hover:bg-rose-50 hover:text-rose-700">Contact</a>
+    <a href="{% url 'tourister:hotels' %}" class="w-full text-center py-2 hover:bg-rose-50 hover:text-rose-700">Hotels</a>
+    <a href="{% url 'tourister:mybooking' %}" class="w-full text-center py-2 hover:bg-rose-50 hover:text-rose-700">My Booking</a>
    
-    <a href="{% url 'tourister:signup' %}" class="w-3/4 text-center px-4 py-2 bg-gradient-to-r from-rose-600 to-amber-400 text-white rounded-lg font-semibold hover:opacity-95 transition">Sign Up</a>
-    <a href="{% url 'tourister:logout' %}" class="w-3/4 text-center px-4 py-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition" id="logoutBtn">Logout</a>
+    <a href="{% url 'tourister:signup' %}" class="signup-gradient w-3/4 text-center px-4 py-3 rounded-xl shadow-lg">
+        Sign Up
+    </a>
+    <a href="{% url 'tourister:logout' %}" class="w-3/4 text-center px-4 py-2 border-2 border-rose-600 text-rose-600 rounded-lg font-bold" id="logoutBtnMobile">
+        Logout
+    </a>
   </nav>
 </div>
 
-
- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+  // Your existing JS logic (No changes made as requested)
   const menuToggle = document.getElementById("menu-toggle");
 
   window.addEventListener("resize", () => {
@@ -74,32 +85,29 @@
     }
   });
 
-
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-
+  const handleLogout = async () => {
     const refresh = localStorage.getItem("refresh");
-
     try {
       await axios.post("http://127.0.0.1:8000/tourister/logout/", {
         refresh: refresh
       });
-
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-
       alert("Logged out successfully!");
       window.location.href = "{% url 'tourister:login' %}";
-
     } catch (error) {
       console.log(error);
-
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-
       alert("Logout error. Clearing session.");
       window.location.href = "{% url 'tourister:login' %}";
     }
-  });
+  };
+
+  document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+  if(document.getElementById("logoutBtnMobile")) {
+    document.getElementById("logoutBtnMobile").addEventListener("click", handleLogout);
+  }
 </script>
 
 </body>

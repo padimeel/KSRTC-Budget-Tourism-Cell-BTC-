@@ -19,7 +19,6 @@ from .serializers import (
 
 User = get_user_model()
 
-# --- Authentication & User Management ---
 
 class AdminLogin(APIView):
     permission_classes = [permissions.AllowAny]
@@ -44,7 +43,55 @@ class AdminLogin(APIView):
             return Response({"error": "Invalid credentials"}, template_name=self.template_name, status=status.HTTP_400_BAD_REQUEST)
             
         return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class Dashboard(APIView):
+    permission_classes = [permissions.AllowAny]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    template_name = "dashboard.html"
+    
+    def get(self, request):
+        if request.accepted_renderer.format == 'html':
+            return Response({}, template_name=self.template_name)
+        
+        
+        total_packages = Package_Details.objects.count()
+        total_bookings = Package_Booking.objects.count()
+        
+     
+        # revenue = Package_Booking.objects.aggregate(Sum('total_price'))['total_price__sum'] or 0
+        
+       
+        role_stats = {
+    "tourists": User.objects.filter(role__icontains="Tourister").count(),
+    "admins": User.objects.filter(is_superuser=True).count(),
+    "managers": User.objects.filter(role__icontains="Depot Manager").count(),
+    "hotels": User.objects.filter(role__icontains="Hotel").count(),
+}
 
+        
+        recent_qs = Package_Booking.objects.select_related('package', 'user').order_by('-booking_date')[:5]
+        recent_bookings = []
+        for b in recent_qs:
+            recent_bookings.append({
+                "id": f"BTC{b.id}",
+                "pkg": b.package.package_name, 
+                "user": b.user.username,
+                # "amount": b.total_price or 0
+            })
+
+        data = {
+            "summary": {
+                "packages": total_packages,
+                "bookings": total_bookings,
+                "tourists": role_stats["tourists"],
+                # "revenue": revenue
+            },
+            "roles": role_stats,
+            "recentBookings": recent_bookings
+        }
+        return Response(data)
+    
 
 class AdminLogout(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]

@@ -17,7 +17,7 @@
             <a href="{% url 'hotel:home' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Home</a>
             {% comment %} {% if request.user.is_authenticated %} {% endcomment %}
                 <a href="{% url 'hotel:roommanage' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Manage Rooms</a>
-                <a href="/hotel/bookings/" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Bookings</a>
+                <a href="{% url 'hotel:displaybooking' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Bookings</a>
                 <a href="{% url 'hotel:hotelinfo' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Hotel Details</a>
             {% comment %} {% endif %} {% endcomment %}
         </div>
@@ -44,7 +44,7 @@
     <div id="mobileMenu" class="hidden lg:hidden absolute top-full left-0 w-full bg-white border-b border-emerald-100 flex flex-col p-6 space-y-4 shadow-xl">
         <a href="{% url 'hotel:home' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2">Home</a>
         {% if request.user.is_authenticated %}
-            <a href="/hotel/bookings/" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
+            <a href="{% url 'hotel:displaybooking' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
                 Bookings <i class="fas fa-chevron-right text-sm opacity-30"></i>
             </a>
             <a href="{% url 'hotel:roommanage' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
@@ -65,8 +65,6 @@
 
     function handleLogout() {
         if(confirm("Are you sure you want to end your session?")) {
-            // CRITICAL: Point this to your LOGOUT view URL name
-            // If your logout path name is 'hotellogout', use that here.
             window.location.href = "{% url 'hotel:hotellogin' %}";
         }
     }

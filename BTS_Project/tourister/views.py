@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model,login
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
@@ -37,64 +37,65 @@ class Signup(APIView):
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
+        
         if serializer.is_valid():
+            # 1. Save the user first
             user = serializer.save()
-            return Response ({'Response':serializer.data})
+            
+            # 2. Extract data for the email
+            username = user.username
+            email = user.email
+            # Use .get() to avoid KeyErrors if phone_number isn't in validated_data
+            phone_number = request.data.get("phone_number", "Not provided")
 
-            # Email notification
-#             username = user.username
-#             email = user.email
-#             phone_number = request.data.get("phone_number", "")
+            # 3. Prepare Email Content
+            subject = "Your KSRTC Budget Tourism Account is Successfully Created"
+            text_message = f"""
+Hi {username},
 
-#             subject = "Your KSRTC Budget Tourism Account is Successfully Created"
-#             text_message = f"""
-# Hi {username},
+Your KSRTC Budget Tourism account has been created successfully.
 
-# Your KSRTC Budget Tourism account has been created successfully.
+Username: {username}
+Phone: {phone_number}
+Email: {email}
 
-# Username: {username}
-# Phone: {phone_number}
-# Email: {email}
+Regards,
+KSRTC Budget Tourism Team
+"""
+            html_message = f"""
+            <html><body>
+            <h2>KSRTC Budget Tourism</h2>
+            <p>Hi <strong>{username}</strong>,</p>
+            <p>Your account has been created successfully.</p>
+            <div>
+                <p><strong>Username:</strong> {username}</p>
+                <p><strong>Phone Number:</strong> {phone_number}</p>
+                <p><strong>Email:</strong> {email}</p>
+            </div>
+            <p>Regards,<br>KSRTC Budget Tourism Team</p>
+            </body></html>
+            """
 
-# Regards,
-# KSRTC Budget Tourism Team
-# """
-#             html_message = f"""
-# <html><body>
-# <h2>KSRTC Budget Tourism</h2>
-# <p>Hi <strong>{username}</strong>,</p>
-# <p>Your account has been created successfully.</p>
+            try:
+                send_mail(
+                    subject,
+                    text_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"Email failed: {e}")
 
-# <div>
-#     <p><strong>Username:</strong> {username}</p>
-#     <p><strong>Phone Number:</strong> {phone_number}</p>
-#     <p><strong>Email:</strong> {email}</p>
-# </div>
-
-# <p>Regards,<br>KSRTC Budget Tourism Team</p>
-# </body></html>
-# """
-
-#             send_mail(
-#                 subject,
-#                 text_message,
-#                 settings.DEFAULT_FROM_EMAIL,
-#                 [email],
-#                 html_message=html_message,
-#                 fail_silently=False,
-#             )
-
-        return Response(
-            {"message": "User created successfully"},
+            return Response(
+                {"message": "User created successfully", "data": serializer.data},
                 status=status.HTTP_201_CREATED
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ------------------------------
-# LOGIN
-# ------------------------------
 class Login(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -117,14 +118,24 @@ class Login(APIView):
         if user is None:
             return Response({"error": "Invalid username or password"}, status=401)
 
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            "user_id": user.id,
-            "username": user.username,
-            "email": user.email,
-        }, status=200)
+        if getattr(user, 'role', None) == "Tourister" or user.is_superuser:
+            
+            login(request, user) 
+            
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+                "user_id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "role": user.role,
+                "message": "Welcome Tourister!"
+            }, status=200)
+        else:
+            return Response({
+                "error": "Access Denied: Please use the staff or hotel portal to login."
+            }, status=status.HTTP_403_FORBIDDEN)
 
 
 
@@ -209,9 +220,6 @@ class PackageDetails(APIView):
         return Response({"package": serializer.data})
 
 
-# ------------------------------
-# TEMPLATE PAGES
-# ------------------------------
 class Navbar(TemplateView):
     template_name = "navbar.html"
 
@@ -220,10 +228,6 @@ class Footer(TemplateView):
     template_name = "footer.html"
 
 
-
-# ------------------------------
-# MY BOOKINGS
-# ------------------------------
 class MyBooking(APIView):
     authentication_classes = [JWTAuthentication]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
@@ -396,8 +400,16 @@ class BookRoom(APIView):
     def get(self, request, room_id):
         room = get_object_or_404(Room, id=room_id)
         if request.accepted_renderer.format == 'html':
+            # HTML பக்கத்திற்கு room_id மட்டும் போதும்
             return Response({'room_id': room_id}, template_name='roombooking.html')
-        return Response({"hotel_name": room.hotel.hotel_name, "price": str(room.price)})
+        
+        # Axios (JSON) கேட்கும்போது அனைத்து விவரங்களையும் அனுப்பவும்
+        return Response({
+            "hotel_name": room.hotel.hotel_name,
+            "room_type": room.room_type,
+            "room_number": room.room_number,
+            "price": str(room.price)
+        })
 
     def post(self, request, room_id):
         room = get_object_or_404(Room, id=room_id)
