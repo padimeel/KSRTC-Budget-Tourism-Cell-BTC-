@@ -225,9 +225,16 @@ class Footer(TemplateView):
 class Payment(TemplateView):
     template_name = "payment.html"
 
-class Payment_Success(TemplateView):
-    template_name = "payment_success.html"
+# class Payment_Success(TemplateView):
+#     template_name = "payment_success.html"
 
+from django.views import View
+from django.shortcuts import render
+
+class Payment_Success(View):
+    def get(self, request):
+        txnid = request.GET.get('txnid', 'N/A')
+        return render(request, 'payment-success.html', {'txnid': txnid})
 
 # ---------------------------------------------------------
 # MY BOOKING (AUTH REQUIRED)
