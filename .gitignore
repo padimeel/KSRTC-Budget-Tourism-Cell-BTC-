@@ -1,16 +1,14 @@
-# 1. Databases (Prevents your local data from being uploaded)
-db.sqlite3
 BTS_Project/db.sqlite3
-
-# 2. Environments and Secrets
-BTS_Project/.env
-BTS_venv/
-
-# 3. Python Bytecode (Wildcard: covers ALL apps at once)
-**/__pycache__/
-*.py[cod]
-
-# 4. Migrations (Optional)
-# Standard practice is to track migrations, but if you want them ignored:
-**/migrations/*.py
-!**/migrations/__init__.py
+BTS_Project/admin_panel/__pycache__
+BTS_Project/admin_panel/migrations
+BTS_Project/BTS_Project/__pycache__
+BTS_Project/depot_management/__pycache__
+BTS_Project/depot_management/migrations
+BTS_Project/hotel_management/__pycache__
+BTS_Project/hotel_management/migrations
+BTS_Project/payment/__pycache__
+BTS_Project/payment/migrations
+BTS_Project/tourister/__pycache__
+BTS_Project/tourister/migrations
+BTS_venv
+BTS_Project/.env 
