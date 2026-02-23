@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Payment | KSRTC BTC</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    .active-tab {
+      background: linear-gradient(90deg, #e11d48, #f59e0b);
+      color: white !important;
+      border-color: transparent !important;
+    }
+    .summary-shadow {
+      box-shadow: 0 8px 20px rgba(17, 24, 39, 0.08);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-rose-50 to-amber-50 text-gray-800 antialiased flex flex-col">
+
+{% include 'components/navbar.html' %}
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Payment Form -->
+    <section class="lg:col-span-2 bg-white rounded-2xl p-6 summary-shadow">
+      <h2 class="text-2xl font-extrabold text-rose-700 mb-2">Complete Payment</h2>
+      <p class="text-sm text-gray-600 mb-6">Choose a payment method and fill in the details to pay for your booking.</p>
+
+      <!-- Tabs -->
+      <div class="flex gap-3 mb-4">
+        <button id="tab-upi" class="tab-btn px-4 py-2 rounded-full border border-rose-200 text-sm">UPI</button>
+        <button id="tab-card" class="tab-btn px-4 py-2 rounded-full border border-rose-200 text-sm">Card</button>
+        <button id="tab-netbank" class="tab-btn px-4 py-2 rounded-full border border-rose-200 text-sm">Netbanking</button>
+      </div>
+
+      <!-- Panels -->
+      <div id="upi-panel" class="tab-panel">
+        <div class="bg-rose-50 rounded-lg p-5">
+          <h3 class="font-semibold text-rose-700 mb-3">Pay with UPI (Sample)</h3>
+          <div class="flex flex-col sm:flex-row gap-6 items-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Qr-code.png/240px-Qr-code.png"
+                 alt="QR" class="w-36 h-36 object-cover rounded-lg border">
+            <div class="flex-1">
+              <p class="text-sm text-gray-700 mb-2">Scan this QR using your UPI app (sample only).</p>
+              <div class="bg-white rounded-lg p-3 border">
+                <p class="text-sm"><strong>UPI ID:</strong> <span class="text-rose-600 font-medium">ksrtc@upi</span></p>
+                <p class="text-xs text-gray-500 mt-1">This is a demo UPI ID — no real transaction.</p>
+                <form action="payment-success.html" method="get" class="mt-4">
+                  <label class="text-sm text-gray-600">Enter Transaction ID</label>
+                  <input name="txnid" type="text" placeholder="UPI123456" class="w-full mt-2 border rounded-md px-3 py-2" required>
+                  <button type="submit" class="mt-4 w-full bg-gradient-to-r from-rose-600 to-amber-400 text-white py-2 rounded-md font-semibold">Pay ₹11,999</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="card-panel" class="tab-panel hidden">
+        <div class="bg-white rounded-lg p-5 border">
+          <h3 class="font-semibold text-rose-700 mb-4">Pay with Card</h3>
+          <form action="payment-success.html" method="get" class="space-y-4">
+            <div>
+              <label class="text-sm text-gray-600">Cardholder Name</label>
+              <input name="cardname" type="text" class="w-full border rounded-md px-3 py-2" placeholder="Name on card" required>
+            </div>
+            <div>
+              <label class="text-sm text-gray-600">Card Number</label>
+              <input name="cardnumber" type="text" maxlength="19" placeholder="4242 4242 4242 4242" class="w-full border rounded-md px-3 py-2" required>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-sm text-gray-600">Expiry</label>
+                <input name="exp" type="text" placeholder="MM/YY" class="w-full border rounded-md px-3 py-2" required>
+              </div>
+              <div>
+                <label class="text-sm text-gray-600">CVV</label>
+                <input name="cvv" type="password" maxlength="4" placeholder="123" class="w-full border rounded-md px-3 py-2" required>
+              </div>
+            </div>
+            <button type="submit" class="mt-2 w-full bg-gradient-to-r from-rose-600 to-amber-400 text-white py-2 rounded-md font-semibold">Pay ₹11,999</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="netbank-panel" class="tab-panel hidden">
+        <div class="bg-rose-50 rounded-lg p-5">
+          <h3 class="font-semibold text-rose-700 mb-4">Netbanking</h3>
+          <form action="payment-success.html" method="get" class="space-y-4">
+            <div>
+              <label class="text-sm text-gray-600">Select Bank</label>
+              <select name="bank" class="w-full border rounded-md px-3 py-2">
+                <option>State Bank of India</option>
+                <option>ICICI Bank</option>
+                <option>HDFC Bank</option>
+                <option>Canara Bank</option>
+                <option>Axis Bank</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm text-gray-600">Customer ID / Reference</label>
+              <input name="ref" type="text" class="w-full border rounded-md px-3 py-2" placeholder="NB123456" required>
+            </div>
+            <button type="submit" class="mt-2 w-full bg-gradient-to-r from-rose-600 to-amber-400 text-white py-2 rounded-md font-semibold">Pay ₹11,999</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <aside class="bg-white rounded-2xl p-6 summary-shadow self-start">
+      <h3 class="text-lg font-bold text-rose-700 mb-3">Booking Summary</h3>
+      <div class="border rounded-lg overflow-hidden">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Munnar_hillstation_kerala.jpg" alt="Munnar" class="w-full h-36 object-cover">
+        <div class="p-4">
+          <h4 class="text-md font-semibold">Munnar Hill Adventure</h4>
+          <p class="text-sm text-gray-600 mt-1">4 Days / 3 Nights</p>
+          <p class="text-sm text-gray-600 mt-1">Passengers: 2 Adults</p>
+          <div class="mt-4 text-sm">
+            <div class="flex justify-between"><span>Base Price</span><span>₹9,999</span></div>
+            <div class="flex justify-between"><span>Taxes & Fees</span><span>₹2,000</span></div>
+            <div class="flex justify-between font-bold text-rose-700 mt-2"><span>Total</span><span>₹11,999</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-5">
+        <h5 class="text-sm font-semibold text-gray-700">Traveller Info</h5>
+        <p class="text-sm text-gray-600 mt-2">Name: <strong>John Doe</strong></p>
+        <p class="text-sm text-gray-600">Contact: <strong>+91 98xxxxxxx</strong></p>
+        <p class="text-sm text-gray-600">Travel Dates: <strong>15–18 Dec 2025</strong></p>
+      </div>
+    </aside>
+  </main>
+
+  {% include 'components/footer.html' %}
+
+  <script>
+    // Tab switching logic
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    function activateTab(tabId) {
+      panels.forEach(panel => panel.classList.add('hidden'));
+      tabs.forEach(btn => btn.classList.remove('active-tab'));
+
+      document.getElementById(`${tabId}-panel`).classList.remove('hidden');
+      document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+    }
+
+    // Default
+    activateTab('upi');
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.id.replace('tab-', '');
+        activateTab(id);
+      });
+    });
+  </script>
+</body>
+</html>

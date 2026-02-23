@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depot Manager Dashboard | KSRTC BTC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+        .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+    <script>
+        // IMMEDIATE REDIRECT IF NOT LOGGED IN
+        if (!localStorage.getItem('depot_access')) {
+            window.location.href = '/depot/depotlogin-template/';
+        }
+    </script>
+</head>
+<body class="bg-amber-50 min-h-screen font-sans">
+
+    {% include "components/depotnavbar.html" %}
+
+    <main class="max-w-[98%] mx-auto p-4 md:p-6 mt-20">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+            <div>
+                <h2 class="text-3xl font-black text-slate-800 tracking-tight uppercase">Assigned Packages</h2>
+                <p class="text-slate-500 font-medium italic text-sm">Overview of tour packages assigned by Head Office</p>
+            </div>
+            <div class="bg-white px-5 py-3 rounded-2xl shadow-sm border border-amber-100 flex items-center gap-4">
+                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600">
+                    <i class="fas fa-box-archive"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase leading-none">Total Packages</p>
+                    <span id="totalCount" class="text-2xl font-black text-slate-800">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-amber-100 mb-6">
+            <div class="relative w-full md:w-80">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by package name..." 
+                class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 text-sm font-semibold transition-all">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-xl shadow-slate-200/50 overflow-hidden border border-amber-100">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="packageTable">
+                    <thead class="bg-slate-900 text-yellow-500 uppercase text-[11px] font-black tracking-widest">
+                        <tr>
+                            <th class="p-5">Package Details</th>
+                            <th class="p-5">Duration</th>
+                            <th class="p-5">Price (₹)</th>
+                            <th class="p-5">Travel Dates</th>
+                            <th class="p-5">Target Places</th>
+                            <th class="p-5">Bus Details</th>
+                            <th class="p-5 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packageBody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="7" class="p-20 text-center">
+                                <div class="flex flex-col items-center gap-3 font-bold text-slate-400 animate-pulse italic">
+                                    <i class="fas fa-spinner fa-spin text-2xl text-yellow-500"></i>
+                                    Fetching Packages...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Set Default Axios Header for all requests on this page
+        const token = localStorage.getItem('depot_access');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        document.addEventListener('DOMContentLoaded', fetchPackages);
+
+        async function fetchPackages() {
+            try {
+                const response = await axios.get('/depot/assignpackage/', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                renderTable(response.data);
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // If token is invalid or expired
+                if (error.response && error.response.status === 401) {
+                    localStorage.clear();
+                    window.location.href = '/depot/depotlogin-template/';
+                } else {
+                    document.getElementById('packageBody').innerHTML = `
+                        <tr><td colspan="7" class="p-10 text-center text-red-500 font-bold">
+                        Failed to load data. Please check your connection.</td></tr>`;
+                }
+            }
+        }
+
+        function renderTable(packages) {
+            const body = document.getElementById('packageBody');
+            document.getElementById('totalCount').innerText = packages.length;
+
+            if (!packages || packages.length === 0) {
+                body.innerHTML = `<tr><td colspan="7" class="p-20 text-center text-slate-400 font-bold italic">No packages assigned.</td></tr>`;
+                return;
+            }
+
+            body.innerHTML = packages.map((pkg, index) => {
+                const busDisplay = pkg.has_bus ? 
+                    `<div class="flex flex-col gap-1">
+                        <span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded shadow-sm w-fit uppercase border border-green-200">
+                            <i class="fas fa-circle text-[6px] animate-pulse"></i> Bus Assigned
+                        </span>
+                        <span class="text-xs font-black text-slate-700 font-mono tracking-tighter">${pkg.bus_number}</span>
+                    </div>` : 
+                    `<span class="text-[10px] text-slate-300 font-black italic uppercase tracking-widest">No Bus Assigned</span>`;
+
+                return `
+                <tr class="hover:bg-amber-50/40 transition-all group">
+                    <td class="p-5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 font-black text-xs group-hover:bg-yellow-500 group-hover:text-slate-900 transition-all">
+                                ${index + 1}
+                            </div>
+                            <div>
+                                <p class="text-sm font-black text-slate-800 uppercase pkg-name leading-tight">
+                                    ${pkg.package_name}
+                                </p>
+                                <p class="text-[10px] text-slate-400 font-bold font-mono">ID: #BTC-${pkg.id}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <span class="text-xs font-black text-slate-600"><i class="far fa-clock mr-1.5 text-yellow-600"></i>${pkg.duration}</span>
+                    </td>
+                    <td class="p-5">
+                        <span class="text-sm font-black text-slate-800 font-mono">₹${pkg.price}</span>
+                    </td>
+                    <td class="p-5">
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-black bg-emerald-100 text-emerald-700 px-1 rounded uppercase">Start</span>
+                                <span class="text-[11px] font-bold text-slate-600">${pkg.start_date || 'N/A'}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-black bg-rose-100 text-rose-700 px-1 rounded uppercase">End</span>
+                                <span class="text-[11px] font-bold text-slate-600">${pkg.end_date || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <p class="text-[11px] text-slate-500 font-bold italic leading-relaxed max-w-[180px] line-clamp-2" title="${pkg.places}">
+                            ${pkg.places || 'Stations not specified'}
+                        </p>
+                    </td>
+                    <td class="p-5">
+                        ${busDisplay}
+                    </td>
+                    <td class="p-5">
+                        <div class="flex justify-center items-center gap-2">
+                            <button onclick="addBus('${pkg.id}')" title="Add Bus Details" class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100">
+                                <i class="fas fa-bus text-xs"></i>
+                            </button>
+                            <button onclick="updatePkg('${pkg.id}')" title="Update" class="w-9 h-9 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-900 hover:text-yellow-400 transition-all shadow-sm border border-slate-200">
+                                <i class="fas fa-pen-to-square text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function addBus(id) { window.location.href = `/depot/addbus-template/${id}/`; }
+        function updatePkg(id) { window.location.href = `/depot/updatebus-template/${id}/`; }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const rows = document.querySelectorAll('#packageTable tbody tr');
+            rows.forEach(row => {
+                const nameText = row.querySelector('.pkg-name');
+                if (nameText) {
+                    const name = nameText.innerText.toUpperCase();
+                    row.style.display = name.includes(input) ? "" : "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

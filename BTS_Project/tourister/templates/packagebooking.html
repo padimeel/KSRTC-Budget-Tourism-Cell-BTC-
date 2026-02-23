@@ -1,0 +1,356 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking Form - KSRTC BTC</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="bg-gray-50 font-sans">
+    {% include 'components/navbar.html' %}
+
+    <div
+      id="successModal"
+      class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+    >
+      <div
+        class="bg-white p-10 rounded-[2.5rem] shadow-2xl text-center max-w-sm w-full transform transition-all"
+      >
+        <div
+          class="w-20 h-20 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-200 animate-bounce"
+        >
+          <i data-lucide="check" class="text-white w-10 h-10 stroke-[4]"></i>
+        </div>
+        <h2
+          class="text-2xl font-black text-slate-800 mb-2 italic uppercase tracking-tighter"
+        >
+          Payment Success!
+        </h2>
+        <p class="text-slate-500 text-sm mb-6 font-bold">
+          Your journey has been confirmed.
+        </p>
+        <div
+          class="bg-rose-50 rounded-3xl py-4 px-6 mb-8 border border-rose-100"
+        >
+          <span
+            class="text-rose-500 text-[10px] font-black uppercase tracking-widest block"
+            >Total Paid</span
+          >
+          <span class="text-3xl font-black text-rose-600 italic"
+            >₹<span id="finalPaidAmount">0</span></span
+          >
+        </div>
+        <button
+          onclick="window.location.href='{% url 'tourister:mybooking_template' %}'"
+          class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-slate-800 transition-all uppercase tracking-widest text-[10px]"
+        >
+          Go to My Bookings
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="max-w-lg mx-auto bg-white p-8 rounded-[2.5rem] shadow-xl shadow-rose-500/5 border border-slate-100 mt-10 mb-20"
+    >
+      <h2
+        class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic border-b border-slate-50 pb-4 mb-6"
+      >
+        Confirm <span class="text-rose-600">Journey</span>
+      </h2>
+
+      <div
+        class="mb-8 p-5 bg-gradient-to-br from-rose-50 to-white rounded-3xl border border-rose-100/50"
+      >
+        <p
+          class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1"
+        >
+          Selected Package
+        </p>
+        <h4 id="package_name" class="text-xl font-black text-slate-800">
+          Loading...
+        </h4>
+        <div class="flex items-center mt-3 gap-4">
+          <div class="bg-white px-3 py-1 rounded-full border border-rose-100">
+            <span class="text-[10px] font-bold text-slate-400 uppercase"
+              >Available Seats:</span
+            >
+            <span
+              id="available_seats"
+              class="text-xs font-black text-rose-600 ml-1"
+              >--</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <form id="bookingForm" class="space-y-6">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label
+              class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
+              >Adults</label
+            >
+            <input
+              type="number"
+              id="adults"
+              min="1"
+              value="1"
+              required
+              class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
+              >Children (50% Off)</label
+            >
+            <input
+              type="number"
+              id="children"
+              min="0"
+              value="0"
+              class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label
+            class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
+            >Boarding Point</label
+          >
+          <select
+            id="boardingDropdown"
+            class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20 appearance-none"
+            required
+          >
+            <option value="">-- Loading Routes --</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            class="block text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2"
+            >Phone Number</label
+          >
+          <input
+            type="text"
+            id="phone_number"
+            placeholder="Enter 10 digit number"
+            required
+            class="w-full bg-slate-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-rose-500/20"
+          />
+        </div>
+
+        <div
+          class="bg-slate-900 p-6 rounded-[2rem] flex justify-between items-center shadow-lg shadow-slate-200"
+        >
+          <div>
+            <p
+              class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"
+            >
+              Total Amount
+            </p>
+            <p class="text-3xl font-black text-white tracking-tighter italic">
+              ₹<span id="est_price">0</span>
+            </p>
+          </div>
+          <button
+            type="submit"
+            id="confirmBtn"
+            class="bg-rose-600 hover:bg-rose-500 text-white font-black py-4 px-8 rounded-2xl transition-all shadow-lg shadow-rose-500/20 uppercase tracking-widest text-[10px] active:scale-95"
+          >
+            Pay & Confirm
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      // Initialize Lucide Icons
+      lucide.createIcons();
+
+      const pathSegments = window.location.pathname
+        .split("/")
+        .filter((s) => s !== "");
+      const packageId = pathSegments[pathSegments.length - 1];
+      const accessToken = localStorage.getItem("accessToken");
+      let packagePrice = 0;
+
+      async function loadData() {
+        if (!accessToken) {
+          alert("Please login to continue.");
+          window.location.href = "{% url 'tourister:login_template' %}";
+          return;
+        }
+        try {
+          const res = await axios.get(
+            `http://127.0.0.1:8000/tourister/packagebooking/?package_id=${packageId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                Accept: "application/json",
+              },
+            },
+          );
+          const data = res.data;
+          // Ensure packagePrice is a number
+          packagePrice = parseFloat(data.price) || 0;
+          document.getElementById("package_name").innerText = data.package_name;
+          document.getElementById("available_seats").innerText =
+            data.bus_seats + " seats";
+
+          const routeRes = await axios.get(
+            `http://127.0.0.1:8000/depot/route/`,
+            {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            },
+          );
+          const dropdown = document.getElementById("boardingDropdown");
+          dropdown.innerHTML =
+            '<option value="">-- Choose Location --</option>';
+          const filteredRoutes = routeRes.data.filter(
+            (r) => r.bus === data.bus_id,
+          );
+          if (filteredRoutes.length > 0) {
+            filteredRoutes.forEach((r) => {
+              dropdown.innerHTML += `<option value="${r.location}">${r.location}</option>`;
+            });
+          } else {
+            dropdown.innerHTML =
+              '<option value="Default">Default (Main Station)</option>';
+          }
+          updatePrice();
+        } catch (err) {
+          console.error("Error loading data:", err);
+        }
+      }
+
+      function updatePrice() {
+        const a = parseInt(document.getElementById("adults").value) || 0;
+        const c = parseInt(document.getElementById("children").value) || 0;
+        
+        // Final total calculation: Adults full price, Children 50%
+        const total = (a * packagePrice) + (c * packagePrice * 0.5);
+        
+        document.getElementById("est_price").innerText =
+          total.toLocaleString("en-IN");
+        return total;
+      }
+
+      document.getElementById("adults").addEventListener("input", updatePrice);
+      document.getElementById("children").addEventListener("input", updatePrice);
+
+      // --- PAYMENT LOGIC ---
+      document
+        .getElementById("bookingForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("confirmBtn");
+          const boarding = document.getElementById("boardingDropdown").value;
+          const totalAmount = updatePrice();
+
+          if (!boarding) {
+            alert("Please select a boarding point");
+            return;
+          }
+
+          btn.disabled = true;
+          btn.innerText = "Initiating...";
+
+          try {
+            // 1. Create Order in Backend
+            const orderRes = await axios.post(
+              "http://127.0.0.1:8000/payment/create-order/",
+              {
+                package_id: parseInt(packageId),
+                adults: parseInt(document.getElementById("adults").value),
+                children: parseInt(document.getElementById("children").value),
+                phone_number: document.getElementById("phone_number").value,
+                boarding_point: boarding,
+                total_price: totalAmount,
+              },
+              {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              },
+            );
+
+            const orderData = orderRes.data;
+
+            // 2. Open Razorpay Popup
+            const options = {
+              key: orderData.key,
+              amount: orderData.amount * 100, // backend amount to paise
+              currency: "INR",
+              name: "KSRTC BTC",
+              description: "Package Booking Payment",
+              order_id: orderData.razorpay_order_id,
+              handler: async function (response) {
+                // 3. Verify Payment in Backend
+                try {
+                  await axios.post(
+                    "http://127.0.0.1:8000/payment/verify-payment/",
+                    {
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_signature: response.razorpay_signature,
+                    },
+                    {
+                      headers: { Authorization: `Bearer ${accessToken}` },
+                    },
+                  );
+                  showSuccess(totalAmount);
+                } catch (err) {
+                  alert("Verification Failed!");
+                  btn.disabled = false;
+                  btn.innerText = "Pay & Confirm";
+                }
+              },
+              theme: { color: "#e11d48" },
+              modal: {
+                ondismiss: function () {
+                  btn.disabled = false;
+                  btn.innerText = "Pay & Confirm";
+                },
+              },
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } catch (err) {
+            alert(err.response?.data?.error || "Booking Failed");
+            btn.disabled = false;
+            btn.innerText = "Pay & Confirm";
+          }
+        });
+
+      function showSuccess(amt) {
+        document.getElementById("finalPaidAmount").innerText =
+          amt.toLocaleString("en-IN");
+        document.getElementById("successModal").classList.remove("hidden");
+
+        // Sky Crackers Effect
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#e11d48", "#fb7185", "#ffffff"],
+        });
+        
+        // Refresh icons for the modal
+        lucide.createIcons();
+      }
+
+      loadData();
+    </script>
+  </body>
+</html>

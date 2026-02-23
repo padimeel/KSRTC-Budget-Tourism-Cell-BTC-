@@ -1,0 +1,140 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<nav class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-emerald-100 px-6 lg:px-10 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white rotate-3 shadow-lg shadow-emerald-200">
+                <i class="fas fa-bus-simple text-sm"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xl font-black text-emerald-900 leading-none" style="font-family: 'Playfair Display', serif;">
+                    KSRTC <span class="text-emerald-600">HOTELS</span>
+                </span>
+                <span class="text-[9px] uppercase tracking-[0.2em] font-bold text-emerald-500">Budget Tourism</span>
+            </div>
+        </div>
+
+        <div id="hotelNavLinks" class="hidden lg:flex items-center space-x-6 opacity-0 transition-opacity duration-300">
+            <a href="{% url 'hotel:home_template' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Home</a>
+            <a href="{% url 'hotel:roommanagement_template' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Manage Rooms</a>
+            <a href="{% url 'hotel:displayroombookings_template' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Bookings</a>
+            <a href="{% url 'hotel:hotelprofile_template' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Hotel Details</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div id="hotelLogoutWrapper" class="hidden">
+                <button onclick="handleLogout()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2 rounded-full transition-all active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2 shadow-sm shadow-emerald-100 border border-emerald-500">
+                    <span>Logout</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+
+            <div id="hotelLoginWrapper" class="hidden">
+                <a href="{% url 'hotel:hotellogin_template' %}" class="flex items-center gap-2 bg-emerald-600 text-white hover:bg-emerald-700 px-5 py-2 rounded-full font-bold text-xs transition-all border border-emerald-500 shadow-sm shadow-emerald-100">
+                    <i class="fas fa-user-check"></i>
+                    PARTNER LOGIN
+                </a>
+            </div>
+
+            <button class="lg:hidden text-emerald-900 text-2xl ml-2" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="mobileMenu" class="hidden lg:hidden absolute top-full left-0 w-full bg-white border-b border-emerald-100 flex flex-col p-6 space-y-4 shadow-xl">
+        <a href="{% url 'hotel:home_template' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2">Home</a>
+        
+        <div id="mobileProtectedLinks" class="hidden flex flex-col space-y-4">
+            <a href="{% url 'hotel:displayroombookings_template' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
+                Bookings <i class="fas fa-chevron-right text-sm opacity-30"></i>
+            </a>
+            <a href="{% url 'hotel:roommanagement_template' %}" class="text-emerald-900 font-bold text-lg border-b border-emerald-50 pb-2 flex items-center justify-between">
+                Rooms <i class="fas fa-chevron-right text-sm opacity-30"></i>
+            </a>
+
+            <a href="{% url 'hotel:hotelprofile_template' %}" class="text-emerald-900 font-semibold text-sm hover:text-emerald-600 transition-colors uppercase tracking-wider">Hotel Details</a>
+            <button onclick="handleLogout()" class="text-emerald-600 font-bold text-lg text-left">Logout</button>
+        </div>
+
+        <div id="mobileLoginLink" class="hidden">
+            <a href="{% url 'hotel:hotellogin_template' %}" class="text-emerald-600 font-bold text-lg">Partner Login</a>
+        </div>
+    </div>
+</nav>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    function updateHotelAuthUI() {
+        // Change 'hotel_access' to the exact key you use in your Hotel Login page
+        const token = localStorage.getItem("hotel_access");
+        
+        const desktopNav = document.getElementById('hotelNavLinks');
+        const desktopLogin = document.getElementById('hotelLoginWrapper');
+        const desktopLogout = document.getElementById('hotelLogoutWrapper');
+        
+        const mobileProtected = document.getElementById('mobileProtectedLinks');
+        const mobileLogin = document.getElementById('mobileLoginLink');
+
+        if (token) {
+            // LOGGED IN
+            desktopNav?.classList.remove('hidden');
+            desktopNav?.classList.add('flex');
+            desktopNav.style.opacity = "1";
+            
+            desktopLogout?.classList.remove('hidden');
+            desktopLogin?.classList.add('hidden');
+
+            mobileProtected?.classList.remove('hidden');
+            mobileLogin?.classList.add('hidden');
+        } else {
+            // LOGGED OUT
+            desktopNav?.classList.add('hidden');
+            desktopLogout?.classList.add('hidden');
+            desktopLogin?.classList.remove('hidden');
+
+            mobileProtected?.classList.add('hidden');
+            mobileLogin?.classList.remove('hidden');
+
+            
+        }
+    }
+
+    async function handleLogout() {
+        if(confirm("Are you sure you want to Logout?")) {
+            const accessToken = localStorage.getItem("hotel_access");
+            const refreshToken = localStorage.getItem("hotel_refresh");
+
+            try {
+                await fetch("{% url 'hotel:logout' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ "refresh": refreshToken })
+                });
+            } catch (e) {
+                console.log("Session cleared locally");
+            } finally {
+                // Clear all hotel related keys
+                localStorage.removeItem("hotel_access");
+                localStorage.removeItem("hotel_refresh");
+                localStorage.removeItem("hotel_name");
+                
+                window.location.replace("{% url 'hotel:hotellogin_template' %}");
+            }
+        }
+    }
+
+    // Run on load and whenever page is shown (fixes back-button)
+    document.addEventListener("DOMContentLoaded", updateHotelAuthUI);
+    window.addEventListener('pageshow', updateHotelAuthUI);
+</script>

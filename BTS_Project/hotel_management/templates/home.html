@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerald Stays | Welcome Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* Very light emerald green background */
+        }
+
+        .heading-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .wave-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            line-height: 0;
+            z-index: -1;
+        }
+
+        /* Animation for the hero content */
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    {% include "components/hotelnavbar.html" %}
+
+    <main class="min-h-screen flex items-center px-10 lg:px-24">
+        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
+            
+            <div class="fade-in">
+                <h1 class="heading-font text-5xl lg:text-7xl text-emerald-900 leading-tight mb-6">
+                    Welcome,<br>
+                    Hospitality<br>
+                    Partner!
+                </h1>
+                <p class="text-emerald-700 text-xl font-medium mb-10 max-w-md">
+                    Manage your bookings and guest details with our dedicated partner dashboard.
+                </p>
+                
+            </div>
+
+            <div class="relative hidden lg:block fade-in" style="animation-delay: 0.2s;">
+                <div class="relative z-10">
+                    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                        <rect x="100" y="300" width="300" height="150" rx="10" fill="#059669" /> <circle cx="350" cy="180" r="40" fill="#fca5a5" /> <rect x="310" y="220" width="80" height="100" rx="20" fill="#10b981" /> <rect x="250" y="230" width="60" height="10" fill="#34d399" transform="rotate(-20)" /> <rect x="220" y="200" width="40" height="60" fill="#ffffff" stroke="#059669" stroke-width="2" /> <path d="M 310 160 Q 350 120 390 160" fill="#422006" /> <rect x="420" y="320" width="60" height="140" rx="30" fill="#065f46" /> <rect x="20" y="350" width="80" height="100" rx="20" fill="#065f46" opacity="0.4" /> </svg>
+                </div>
+                
+                <div class="absolute top-10 right-10 w-24 h-24 bg-emerald-100 rounded-lg -z-10 transform rotate-12"></div>
+                <div class="absolute bottom-20 left-10 w-16 h-16 bg-lime-100 rounded-full -z-10"></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="wave-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+            <path fill="#059669" fill-opacity="1" d="M0,224L60,202.7C120,181,240,139,360,144C480,149,600,203,720,208C840,213,960,171,1080,144C1200,117,1320,107,1380,101.3L1440,96L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+            <path fill="#065f46" fill-opacity="0.6" d="M0,288L80,266.7C160,245,320,203,480,202.7C640,203,800,245,960,245.3C1120,245,1280,203,1360,181.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        </svg>
+    </div>
+
+    <div class="fixed top-24 left-10 opacity-10">
+        <i class="fas fa-leaf text-[200px] text-emerald-900"></i>
+    </div>
+
+</body>
+</html>

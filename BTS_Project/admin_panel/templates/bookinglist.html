@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - All Bookings</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script>
+if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/admin_site/adminlogin-template/';
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-slate-50 font-sans">
+
+     {% include "navbar.html" %}
+
+    <main class="container mx-auto px-6 py-10">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-15">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-purple-100 md:col-span-2 flex flex-col md:flex-row items-center gap-6">
+                <div class="flex-1 w-full">
+                    <label class="text-[10px] font-black text-purple-600 uppercase mb-2 block">Filter by Booking Date</label>
+                    <div class="relative">
+                        <input type="date" id="dateFilter" class="w-full bg-purple-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-purple-500 outline-none text-purple-900 font-bold">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="applyFilter()" class="bg-purple-700 text-white px-8 py-3 rounded-xl text-xs font-black uppercase hover:bg-purple-800 transition shadow-md">Apply</button>
+                    <button onclick="resetFilter()" class="bg-slate-200 text-slate-600 px-8 py-3 rounded-xl text-xs font-black uppercase hover:bg-slate-300 transition">Reset</button>
+                </div>
+            </div>
+            
+            <div class="bg-purple-900 p-6 rounded-3xl shadow-xl text-white flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-purple-300 uppercase">Live Count</p>
+                    <h2 id="totalCount" class="text-4xl font-black">0</h2>
+                </div>
+                <i class="fas fa-ticket-alt text-4xl text-purple-700 opacity-50"></i>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-purple-50 text-purple-700">
+                            <th class="p-5 text-xs font-black uppercase tracking-widest border-b border-purple-100">Booking ID</th>
+                            <th class="p-5 text-xs font-black uppercase tracking-widest border-b border-purple-100">Package & Bus</th>
+                            <th class="p-5 text-xs font-black uppercase tracking-widest border-b border-purple-100">Journey Dates</th>
+                            <th class="p-5 text-xs font-black uppercase tracking-widest border-b border-purple-100">Boarding</th>
+                            <th class="p-5 text-xs font-black uppercase tracking-widest border-b border-purple-100">Travelers</th>
+                            <th class="p-5 text-xs font-black uppercase tracking-widest border-b border-purple-100 text-right">Fare</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTableBody" class="text-slate-600 font-medium">
+                        </tbody>
+                </table>
+            </div>
+
+            <div id="loader" class="py-20 text-center">
+                <i class="fas fa-spinner fa-spin text-3xl text-purple-600"></i>
+                <p class="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Syncing Database...</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+        const accessToken = localStorage.getItem('accessToken');
+
+        // Apply to ALL Axios requests automatically
+        if (accessToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+            console.log("Token attached to Axios successfully.");
+        } else {
+            console.warn("No access token found in localStorage.");
+        }
+        let allBookings = [];
+
+        async function fetchAllBookings() {
+            try {
+                const response = await axios.get('/admin_site/bookinglist/', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                allBookings = response.data;
+                renderTable(allBookings);
+            } catch (error) {
+                console.error("Error fetching data", error);
+                document.getElementById('bookingTableBody').innerHTML = `<tr><td colspan="6" class="p-10 text-center text-rose-500 font-bold">Failed to load bookings.</td></tr>`;
+            } finally {
+                document.getElementById('loader').classList.add('hidden');
+            }
+        }
+
+        function renderTable(data) {
+            const tableBody = document.getElementById('bookingTableBody');
+            const totalCountDisp = document.getElementById('totalCount');
+            tableBody.innerHTML = "";
+            totalCountDisp.innerText = data.length;
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400 font-medium italic">No booking records found for the selected filter.</td></tr>`;
+                return;
+            }
+
+            data.forEach(b => {
+                const date = new Date(b.booking_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                
+                tableBody.innerHTML += `
+                    <tr class="border-b border-slate-50 hover:bg-purple-50/50 transition-colors">
+                        <td class="p-5">
+                            <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-lg text-[10px] font-black italic">#BTC-${b.id}</span>
+                            <p class="text-[9px] text-slate-400 mt-1 font-bold uppercase">${date}</p>
+                        </td>
+                        <td class="p-5">
+                            <p class="text-sm font-black text-slate-800">${b.package.package_name}</p>
+                            <p class="text-[10px] font-bold text-purple-600"><i class="fas fa-bus mr-1"></i> ${b.package.bus.bus_number}</p>
+                        </td>
+                        <td class="p-5">
+                            <p class="text-[11px] font-bold text-slate-500 italic">${b.package.start_date} <i class="fas fa-arrow-right mx-1 text-[8px]"></i> ${b.package.end_date}</p>
+                        </td>
+                        <td class="p-5 text-xs font-bold text-slate-600 uppercase">${b.boarding_point}</td>
+                        <td class="p-5">
+                            <div class="flex gap-2">
+                                <span class="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold"> ${b.adults}A</span>
+                                <span class="bg-slate-100 px-2 py-1 rounded text-[10px] font-bold"> ${b.children}K</span>
+                            </div>
+                        </td>
+                        <td class="p-5 text-right font-black text-purple-700 text-lg">₹${b.total_price}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function applyFilter() {
+            const filterDate = document.getElementById('dateFilter').value;
+            if (!filterDate) return;
+
+            const filtered = allBookings.filter(b => {
+                const bookingDate = b.booking_date.split('T')[0]; 
+                return bookingDate === filterDate;
+            });
+            renderTable(filtered);
+        }
+
+        function resetFilter() {
+            document.getElementById('dateFilter').value = "";
+            renderTable(allBookings);
+        }
+
+        // Initialize
+        fetchAllBookings();
+    </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | KSRTC BTC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-rose-50 to-amber-50 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div class="max-w-4xl w-full flex flex-col md:flex-row bg-white rounded-3xl shadow-2xl overflow-hidden border border-rose-100">
+        
+        <div class="md:w-1/2 bg-rose-600 p-8 md:p-10 flex flex-col justify-between text-white relative overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-40 h-40 bg-rose-500 rounded-full opacity-40"></div>
+            <div class="relative z-10">
+                <div class="text-xl font-black tracking-tighter italic flex items-center gap-2">
+                    <div class="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-rose-600 shadow-md">
+                        <i class="fas fa-bus-alt"></i>
+                    </div>
+                    <span class="uppercase">KSRTC <span class="text-rose-200">BTC</span></span>
+                </div>
+                <h2 class="text-3xl font-extrabold mt-8 leading-tight uppercase tracking-tighter">
+                    Join the <br><span class="text-rose-200 text-2xl font-bold italic">Journey Today</span>
+                </h2>
+                <p class="text-rose-50 mt-4 text-xs leading-relaxed opacity-90 font-medium max-w-xs">
+                    Create your account to book affordable tours and explore the beauty of Kerala with KSRTC.
+                </p>
+            </div>
+            <div class="relative z-10 text-[9px] text-rose-200 font-bold uppercase tracking-[0.4em] mt-6">
+                &copy; 2026 KSRTC Budget Tourism
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 p-8 md:px-10 md:py-8 bg-white flex flex-col justify-center">
+            <div class="mb-5 text-center md:text-left">
+                <div class="inline-block px-2.5 py-0.5 bg-rose-100 text-rose-600 rounded-full text-[9px] font-black uppercase tracking-widest mb-2">
+                    New Registration
+                </div>
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight leading-none">Create Account</h3>
+            </div>
+
+            <div id="statusAlert" class="hidden mb-6 p-4 rounded-2xl border flex items-center gap-3 transition-all duration-300">
+                <i id="statusIcon" class="fas text-sm"></i>
+                <p id="statusText" class="text-[11px] font-black uppercase tracking-tight leading-tight"></p>
+            </div>
+
+            <form id="signupForm" class="space-y-3.5" novalidate>
+                {% csrf_token %}
+                
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Username</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-id-badge text-xs"></i>
+                        </span>
+                        <input type="text" id="username" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-xs font-bold" placeholder="username123">
+                    </div>
+                    <p id="usernameMsg" class="text-[9px] font-bold mt-0.5 ml-2"></p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-envelope text-xs"></i>
+                        </span>
+                        <input type="email" id="email" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-xs font-bold" placeholder="example@mail.com">
+                    </div>
+                    <p id="emailMsg" class="text-[9px] font-bold mt-0.5 ml-2"></p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-phone text-xs"></i>
+                        </span>
+                        <input type="tel" id="phone_number" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-xs font-bold" placeholder="9876543210">
+                    </div>
+                    <p id="phoneMsg" class="text-[9px] font-bold mt-0.5 ml-2"></p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Password</label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-lock text-xs"></i>
+                        </span>
+                        <input type="password" id="password" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50 focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-xs font-bold" placeholder="••••••••">
+                    </div>
+                    <p id="passwordMsg" class="text-[9px] font-bold mt-0.5 ml-2"></p>
+                </div>
+
+                <button type="submit" id="signupBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-3.5 rounded-xl shadow-lg shadow-rose-100 transition-all flex items-center justify-center gap-3 active:scale-[0.98] group mt-1">
+                    <span class="tracking-widest uppercase text-xs italic">Create Account</span>
+                    <i class="fas fa-arrow-right-long group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+            
+            <div class="mt-5 pt-4 border-t border-slate-50 text-center">
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-tight">Already have an account?</p>
+                <a href="{% url 'tourister:login_template' %}" class="inline-flex items-center gap-2 mt-1.5 text-rose-600 font-black text-[11px] uppercase tracking-widest hover:text-rose-700 transition-all group">
+                    <span>Sign In Now</span>
+                    <i class="fas fa-sign-in-alt group-hover:scale-110 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("signupForm");
+        const btn = document.getElementById("signupBtn");
+        const statusAlert = document.getElementById("statusAlert");
+        const statusText = document.getElementById("statusText");
+        const statusIcon = document.getElementById("statusIcon");
+
+        /**
+         * SHOW ALERT BOX
+         * type: 'error' (Red) or 'success' (Green)
+         */
+        function displayStatus(message, type) {
+            statusAlert.classList.remove("hidden", "bg-rose-50", "border-rose-200", "text-rose-800", "bg-green-50", "border-green-200", "text-green-800");
+            
+            if (type === "error") {
+                statusAlert.classList.add("bg-rose-50", "border-rose-200", "text-rose-800");
+                statusIcon.className = "fas fa-triangle-exclamation text-rose-600";
+            } else {
+                statusAlert.classList.add("bg-green-50", "border-green-200", "text-green-800");
+                statusIcon.className = "fas fa-circle-check text-green-600";
+            }
+            
+            statusText.innerText = message;
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if(el) { el.innerText = msg; el.style.color = "#e11d48"; }
+        }
+
+        function showSuccess(id, msg) {
+            const el = document.getElementById(id);
+            if(el) { el.innerText = msg; el.style.color = "#16a34a"; }
+        }
+
+        // Clear error messages on input
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("input", () => {
+                const msgId = input.id.includes('phone') ? 'phoneMsg' : input.id + "Msg";
+                const msg = document.getElementById(msgId);
+                if (msg) msg.innerText = "";
+                statusAlert.classList.add("hidden");
+            });
+        });
+
+        function validateForm() {
+            let isValid = true;
+            const u = document.getElementById("username").value.trim();
+            const e = document.getElementById("email").value.trim();
+            const ph = document.getElementById("phone_number").value.trim();
+            const p = document.getElementById("password").value.trim();
+
+            if (u.length < 3) { showError("usernameMsg", "Username too short"); isValid = false; }
+            else showSuccess("usernameMsg", "Username OK");
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(e)) { showError("emailMsg", "Invalid email format"); isValid = false; }
+            else showSuccess("emailMsg", "Email OK");
+
+            const phonePattern = /^[0-9]{10}$/;
+            if (!phonePattern.test(ph)) { showError("phoneMsg", "Need 10 digits"); isValid = false; }
+            else showSuccess("phoneMsg", "Phone OK");
+
+            if (p.length < 6) { showError("passwordMsg", "Minimum 6 chars"); isValid = false; }
+            else showSuccess("passwordMsg", "Password OK");
+
+            return isValid;
+        }
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (!validateForm()) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+
+            const data = {
+                username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
+                phone_number: document.getElementById("phone_number").value,
+                password: document.getElementById("password").value,
+            };
+
+            try {
+                const res = await axios.post("/tourister/signup/", data, {
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                // Use fallback if 'message' is missing in res.data
+                const msg = res.data.message || res.data.msg || "Account created successfully!";
+                displayStatus(msg, "success");
+
+                setTimeout(() => {
+                    window.location.href = "{% url 'tourister:index_template' %}";
+                }, 2000);
+
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="tracking-widest uppercase text-xs italic">Create Account</span> <i class="fas fa-arrow-right-long"></i>';
+                
+                let errorOutput = "Signup Failed";
+                if (err.response && err.response.data) {
+                    // This handles both {"message": "error"} and {"username": ["already exists"]}
+                    const data = err.response.data;
+                    errorOutput = data.message || data.error || Object.values(data).flat().join(" | ");
+                }
+                
+                displayStatus(errorOutput, "error");
+            }
+        });
+    </script>
+</body>
+</html>

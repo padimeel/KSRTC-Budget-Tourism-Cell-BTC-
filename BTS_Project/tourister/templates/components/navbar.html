@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>KSRTC BTC — Explore Kerala</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .auth-hidden { display: none !important; }
+        
+        /* Smooth Mobile Menu */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+        
+        #menu-toggle:checked ~ #mobile-menu {
+            max-height: 600px;
+            opacity: 1;
+            padding: 1.5rem 0;
+        }
+
+        /* Nav Underline Animation */
+        .nav-link {
+            position: relative;
+            font-weight: 700;
+            color: #334155;
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: -6px;
+            left: 0;
+            background: linear-gradient(to right, #e11d48, #fb7185);
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #e11d48;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Premium Blur Effect */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-slate-50">
+
+<header class="sticky top-0 z-50 glass-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-24">
+            
+            <div class="flex items-center flex-shrink-0 group cursor-pointer" onclick="window.location.href='{% url 'tourister:index_template' %}'">
+                <div class="relative p-1">
+                    <img src="{% static 'images/logo.png' %}" alt="KSRTC" class="h-18 md:h-20 w-auto object-contain transition-transform duration-500 group-hover:scale-105">
+                </div>
+                <div class="ml-4 border-l-2 border-slate-200 pl-4 py-1">
+                    <h1 class="text-2xl font-black text-slate-900 tracking-tighter leading-none">
+                        KSRTC <span class="text-rose-600">BTC</span>
+                    </h1>
+                    <p class="text-xs uppercase tracking-[0.15em] font-extrabold text-slate-500 mt-1">
+                        Budget Tourism Cell
+                    </p>
+                </div>
+            </div>
+
+            <nav class="hidden lg:flex items-center space-x-10">
+                <div class="flex items-center space-x-8 text-[13px] tracking-widest">
+                    <a href="{% url 'tourister:index_template' %}" class="nav-link uppercase">Home</a>
+                    <a href="{% url 'tourister:packagelist_template' %}" class="nav-link uppercase">Packages</a>
+                    <a href="{% url 'tourister:hotels_template' %}" class="nav-link uppercase">Hotels</a>
+                    <a href="{% url 'tourister:mybooking_template' %}" class="nav-link uppercase">My Bookings</a>
+                    <a href="{% url 'tourister:hotels_template' %}" class="nav-link uppercase">About US</a>
+                    <a href="{% url 'tourister:mybooking_template' %}" class="nav-link uppercase">Contact</a>
+                </div>
+
+                <div class="flex items-center gap-4 pl-4">
+                    <a href="{% url 'tourister:login_template' %}" id="loginBtn" class="flex items-center gap-2 px-7 py-3 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-rose-600 hover:shadow-xl hover:shadow-rose-200 transition-all duration-300">
+                        <i class="ri-user-smile-line text-base"></i> Sign In
+                    </a>
+
+                    <button id="logoutBtn" class="auth-hidden flex items-center gap-2 px-7 py-3 border-2 border-slate-200 text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-rose-600 hover:text-rose-600 transition-all">
+                        <i class="ri-shut-down-line text-base"></i> Logout
+                    </button>
+                </div>
+            </nav>
+
+            <div class="lg:hidden">
+                <input type="checkbox" id="menu-toggle" class="hidden peer">
+                <label for="menu-toggle" class="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-xl text-slate-900 cursor-pointer active:scale-90 transition-all">
+                    <i class="ri-menu-4-fill text-2xl"></i>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <input type="checkbox" id="menu-toggle" class="hidden peer">
+    <div id="mobile-menu" class="lg:hidden bg-white shadow-2xl">
+        <div class="px-6 flex flex-col gap-6">
+            <a href="{% url 'tourister:index_template' %}" class="text-xl font-bold text-slate-800 flex items-center gap-4">
+                <i class="ri-home-4-line text-rose-600"></i> Home
+            </a>
+            <a href="{% url 'tourister:packagelist_template' %}" class="text-xl font-bold text-slate-800 flex items-center gap-4">
+                <i class="ri-bus-fill text-rose-600"></i> Packages
+            </a>
+            <a href="{% url 'tourister:hotels_template' %}" class="text-xl font-bold text-slate-800 flex items-center gap-4">
+                <i class="ri-hotel-bed-line text-rose-600"></i> Hotels
+            </a>
+            <a href="{% url 'tourister:mybooking_template' %}" class="text-xl font-bold text-slate-800 flex items-center gap-4">
+                <i class="ri-ticket-2-line text-rose-600"></i> My Bookings
+            </a>
+            
+            <div class="pt-6 pb-4 border-t border-slate-100 space-y-4">
+                <a href="{% url 'tourister:login_template' %}" id="loginBtnMobile" class="block w-full py-4 bg-rose-600 text-white text-center rounded-2xl font-black uppercase tracking-widest">
+                    Login to Portal
+                </a>
+                <button id="logoutBtnMobile" class="auth-hidden w-full py-4 border-2 border-slate-900 text-slate-900 rounded-2xl font-black uppercase tracking-widest">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    const updateAuthUI = () => {
+        const token = localStorage.getItem("accessToken");
+        const loginBtns = [document.getElementById("loginBtn"), document.getElementById("loginBtnMobile")];
+        const logoutBtns = [document.getElementById("logoutBtn"), document.getElementById("logoutBtnMobile")];
+
+        if (token) {
+            loginBtns.forEach(btn => btn?.classList.add("auth-hidden"));
+            logoutBtns.forEach(btn => btn?.classList.remove("auth-hidden"));
+        } else {
+            loginBtns.forEach(btn => btn?.classList.remove("auth-hidden"));
+            logoutBtns.forEach(btn => btn?.classList.add("auth-hidden"));
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", updateAuthUI);
+
+    const handleLogout = async (e) => {
+        e.preventDefault();
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+
+        if (!refreshToken) {
+            localStorage.clear();
+            window.location.href = "{% url 'tourister:login_template' %}";
+            return;
+        }
+
+        try {
+            await axios.post("http://127.0.0.1:8000/tourister/logout/", 
+                { refresh: refreshToken }, 
+                { headers: { 'Authorization': `Bearer ${accessToken}` } }
+            );
+        } catch (error) {
+            console.error("Logout error:", error);
+        } finally {
+            localStorage.clear();
+            window.location.href = "{% url 'tourister:login_template' %}";
+        }
+    };
+
+    document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
+    document.getElementById("logoutBtnMobile")?.addEventListener("click", handleLogout);
+</script>
+
+</body>
+</html>

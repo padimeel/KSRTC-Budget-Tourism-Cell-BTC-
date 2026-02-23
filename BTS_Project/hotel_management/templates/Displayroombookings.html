@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sreeram Hotel | Secure Ledger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; }
+        .table-row-fade { animation: tableFade 0.4s ease-out; }
+        @keyframes tableFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        th { white-space: nowrap; }
+    </style>
+</head>
+<body class="text-slate-900">
+    
+    {% include 'components/hotelnavbar.html' %}
+    
+    <header class="bg-white sticky top-14 z-10 border-b border-slate-100 shadow-sm">
+        <div class="container mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <a href="javascript:history.back()" class="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-500 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                </a>
+                <h1 class="text-xl font-black text-slate-800 tracking-tight uppercase italic">
+                    Booking <span class="text-emerald-600">Ledger</span>
+                </h1>
+            </div>
+
+            <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 p-1 rounded-2xl shadow-inner">
+                <input type="date" id="liveDateFilter" 
+                       class="bg-white border border-slate-100 text-xs font-bold text-slate-700 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer">
+                <button onclick="resetFilter()" id="resetBtn" class="hidden pr-3 text-[10px] font-black text-rose-500 hover:underline">RESET</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <div class="mb-8">
+            <div class="bg-white border-l-4 border-emerald-500 px-8 py-4 rounded-xl shadow-sm inline-flex flex-col min-w-[200px] mt-10">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Bookings</span>
+                <h3 id="totalCount" class="text-3xl font-black text-slate-800 tracking-tighter">0</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/30 border border-slate-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.15em]">
+                            <th class="px-8 py-5">Guest Information</th>
+                            <th class="px-8 py-5">Room Details</th>
+                            <th class="px-8 py-5">Check-In</th>
+                            <th class="px-8 py-5">Check-Out</th>
+                            <th class="px-8 py-5">Capacity</th>
+                            <th class="px-8 py-5">Booking Date</th>
+                            <th class="px-8 py-5 text-right">Fare</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTableBody" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="7" class="py-24 text-center">
+                                <div class="inline-block animate-spin w-7 h-7 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
+                                <p class="mt-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest italic">Fetching Data...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        
+        
+        // --- CONFIGURATION ---
+        const JWT_TOKEN = localStorage.getItem('hotel_access');
+        if (!JWT_TOKEN) { window.location.href = "/hotel/hotellogin-template/"; }
+        const LOGIN_PAGE = "/hotel/hotellogin-template/";
+        
+        
+        const BOOKING_API_URL = "http://127.0.0.1:8000/hotel/displaybooking/"; 
+
+        // 1. SET GLOBAL AXIOS DEFAULTS
+        if (JWT_TOKEN) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${JWT_TOKEN}`;
+        }
+        axios.defaults.headers.common['Accept'] = 'application/json';
+
+        let rawData = [];
+        const tableBody = document.getElementById("bookingTableBody");
+        const totalCountDisplay = document.getElementById("totalCount");
+        const dateFilter = document.getElementById("liveDateFilter");
+        const resetBtn = document.getElementById("resetBtn");
+
+        // 2. LOAD DATA FROM EXTERNAL ENDPOINT
+        async function loadData() {
+            if (!JWT_TOKEN) {
+                window.location.replace(LOGIN_PAGE);
+                return;
+            }
+
+            try {
+                // Using the specific BOOKING_API_URL variable
+                const res = await axios.get(BOOKING_API_URL);
+                
+                // If your API wraps data in an object like { data: [...] }, 
+                // you might need: rawData = res.data.data;
+                rawData = Array.isArray(res.data) ? res.data : res.data.results || [];
+                
+                updateView(rawData);
+            } catch (err) {
+                console.error("API Error:", err);
+                handleApiError(err);
+            }
+        }
+
+        // 3. UI RENDERING
+        function updateView(data) {
+            totalCountDisplay.innerText = data.length;
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="py-24 text-center text-slate-300 font-bold uppercase text-xs tracking-widest italic">No bookings found</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = data.map(b => `
+                <tr class="table-row-fade hover:bg-emerald-50/20 transition-all group">
+                    <td class="px-8 py-6">
+                        <p class="text-sm font-black text-slate-800 uppercase tracking-tight">${b.guest_name}</p>
+                        <p class="text-[10px] font-bold text-emerald-600 italic tracking-tight">${b.guest_phone || 'N/A'}</p>
+                        <p class="text-[9px] font-medium text-slate-400 lowercase italic">${b.guest_email}</p>
+                    </td>
+                    <td class="px-8 py-6">
+                        <span class="text-[10px] font-black text-emerald-600 uppercase block">Room ${b.room_no}</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase">${b.room_type}</span>
+                    </td>
+                    <td class="px-8 py-6 text-xs font-black text-slate-700">${b.display_check_in || b.check_in}</td>
+                    <td class="px-8 py-6 text-xs font-black text-slate-400">${b.display_check_out || b.check_out}</td>
+                    <td class="px-8 py-6">
+                        <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md uppercase">${b.members}</span>
+                    </td>
+                    <td class="px-8 py-6 text-[10px] font-bold text-slate-400 italic">${b.booking_date}</td>
+                    <td class="px-8 py-6 text-right font-black text-slate-900 italic">₹${b.total_price}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 4. FILTERING
+        dateFilter.addEventListener("input", (e) => {
+            const val = e.target.value; // YYYY-MM-DD
+            if (!val) { resetFilter(); return; }
+            resetBtn.classList.remove("hidden");
+            const filtered = rawData.filter(item => item.check_in === val);
+            updateView(filtered);
+        });
+
+        function resetFilter() {
+            dateFilter.value = "";
+            resetBtn.classList.add("hidden");
+            updateView(rawData);
+        }
+
+        // 5. ERROR HANDLING
+        function handleApiError(err) {
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                localStorage.removeItem('hotel_access');
+                window.location.replace(LOGIN_PAGE);
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-rose-500 font-black uppercase text-xs">Failed to fetch data from API.</td></tr>`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadData);
+    </script>
+</body>
+</html>

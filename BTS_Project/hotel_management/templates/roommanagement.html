@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management | KSRTC Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-emerald-50 min-h-screen pt-20 pb-10">
+
+    {% include "components/hotelnavbar.html" %}
+
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="flex flex-col md:flex-row gap-8">
+            
+            <div class="w-full md:w-1/3">
+                <div class="bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden sticky top-24">
+                    <div class="bg-emerald-700 px-6 py-4 text-white">
+                        <h3 id="formTitle" class="font-bold flex items-center gap-2">
+                            <i class="fas fa-plus-circle"></i> Add New Room
+                        </h3>
+                    </div>
+                    
+                    <form id="roomForm" class="p-6 space-y-4">
+                        <input type="hidden" id="room_id"> 
+                        
+                        <div>
+                            <label class="text-[10px] font-bold text-emerald-800 uppercase ml-1">Room Category</label>
+                            <select id="room_type" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" required>
+                                <option value="Standard">Standard Room</option>
+                                <option value="Deluxe">Deluxe Room</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-emerald-800 uppercase ml-1">Room Number</label>
+                            <input type="text" id="room_number" placeholder="e.g. 101" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" required>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-emerald-800 uppercase ml-1">Price (₹)</label>
+                            <input type="number" id="price" placeholder="0.00" class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500" required>
+                        </div>
+
+                        <div class="pt-2 space-y-2">
+                            <button type="submit" id="submitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95">
+                                SAVE ROOM
+                            </button>
+                            <button type="button" id="cancelBtn" class="hidden w-full bg-slate-100 text-slate-500 font-bold py-2 rounded-xl">
+                                Cancel Edit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="w-full md:w-2/3">
+                <div class="bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden">
+                    <div class="bg-slate-900 px-8 py-5 text-white flex justify-between items-center">
+                        <h2 class="font-bold flex items-center gap-2"><i class="fas fa-list"></i> Inventory</h2>
+                        <span id="roomCount" class="text-[10px] bg-emerald-500/20 border border-emerald-500/50 px-3 py-1 rounded-full uppercase font-black">
+                            0 Rooms
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-emerald-50 text-emerald-900 border-b border-emerald-100">
+                                    <th class="p-5 text-xs font-bold uppercase">Room Detail</th>
+                                    <th class="p-5 text-xs font-bold uppercase text-center">Price</th>
+                                    <th class="p-5 text-xs font-bold uppercase text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roomTableBody" class="divide-y divide-emerald-50">
+                                <tr><td colspan="3" class="p-20 text-center text-slate-400 italic">Loading rooms...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. JWT Configuration
+        const token = localStorage.getItem('hotel_access');
+        if (!token) { window.location.href = "/hotel/hotellogin-template/"; }
+
+        const axiosConfig = {
+            headers: { 'Authorization': `Bearer ${token}` }
+        };
+
+        // 2. DOM Elements
+        const roomTableBody = document.getElementById('roomTableBody');
+        const roomCount = document.getElementById('roomCount');
+        const roomForm = document.getElementById('roomForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        // 3. Fetch and Render Rooms
+        async function fetchRooms() {
+            try {
+                // Ensure your API returns a list of rooms at this endpoint
+                const response = await axios.get('/hotel/rooms/', axiosConfig);
+                const rooms = response.data;
+                renderRooms(rooms);
+            } catch (err) {
+                console.error("Fetch error:", err);
+                roomTableBody.innerHTML = `<tr><td colspan="3" class="p-10 text-center text-red-500">Failed to load rooms. Please login again.</td></tr>`;
+            }
+        }
+
+        function renderRooms(rooms) {
+            roomCount.innerText = `${rooms.length} Rooms`;
+            if (rooms.length === 0) {
+                roomTableBody.innerHTML = `<tr><td colspan="3" class="p-20 text-center text-slate-400 italic">No rooms added.</td></tr>`;
+                return;
+            }
+
+            roomTableBody.innerHTML = rooms.map(room => `
+                <tr class="hover:bg-emerald-50/30">
+                    <td class="p-5">
+                        <p class="font-bold text-slate-800">${room.room_number}</p>
+                        <p class="text-[10px] font-bold text-emerald-600 uppercase">${room.room_type}</p>
+                    </td>
+                    <td class="p-5 text-center font-bold text-emerald-700">₹${room.price}</td>
+                    <td class="p-5">
+                        <div class="flex justify-center gap-3">
+                            <button onclick="editRoom('${room.id}', '${room.room_type}', '${room.room_number}', '${room.price}')" 
+                                class="w-8 h-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteRoom('${room.id}')" 
+                                class="w-8 h-8 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 4. Create / Update Logic
+        roomForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const roomId = document.getElementById('room_id').value;
+            const data = {
+                room_type: document.getElementById('room_type').value,
+                room_number: document.getElementById('room_number').value,
+                price: document.getElementById('price').value
+            };
+
+            try {
+                if (roomId) {
+                    await axios.put(`/hotel/rooms/${roomId}/`, data, axiosConfig);
+                } else {
+                    await axios.post('/hotel/rooms/', data, axiosConfig);
+                }
+                roomForm.reset();
+                resetFormUI();
+                fetchRooms(); // Refresh the list without reloading page
+            } catch (err) {
+                alert("Operation failed: " + JSON.stringify(err.response?.data || "Server Error"));
+            }
+        });
+
+        // 5. Delete Logic
+        window.deleteRoom = async function(id) {
+            if (confirm("Delete this room?")) {
+                try {
+                    await axios.delete(`/hotel/rooms/${id}/`, axiosConfig);
+                    fetchRooms();
+                } catch (err) { alert("Delete failed"); }
+            }
+        };
+
+        // 6. Edit Logic
+        window.editRoom = function(id, type, number, price) {
+            document.getElementById('room_id').value = id;
+            document.getElementById('room_type').value = type;
+            document.getElementById('room_number').value = number;
+            document.getElementById('price').value = price;
+            
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-edit"></i> Edit Room ${number}`;
+            submitBtn.innerText = "UPDATE ROOM";
+            submitBtn.classList.replace('bg-emerald-600', 'bg-blue-600');
+            cancelBtn.classList.remove('hidden');
+        };
+
+        function resetFormUI() {
+            document.getElementById('room_id').value = "";
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-plus-circle"></i> Add New Room`;
+            submitBtn.innerText = "SAVE ROOM";
+            submitBtn.classList.replace('bg-blue-600', 'bg-emerald-600');
+            cancelBtn.classList.add('hidden');
+        }
+
+        cancelBtn.addEventListener('click', () => {
+            roomForm.reset();
+            resetFormUI();
+        });
+
+        // Initialize
+        fetchRooms();
+    </script>
+</body>
+</html>

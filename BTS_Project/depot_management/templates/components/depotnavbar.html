@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>KSRTC Depot Manager - Golden Theme</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+      @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
+      /* Pre-hide elements that require login */
+      .auth-hidden { display: none !important; }
+    </style>
+  </head>
+  <body class="bg-slate-50">
+    <nav class="bg-slate-900 border-b-4 border-yellow-500 fixed w-full z-50 top-0 shadow-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20">
+          
+          <div class="flex items-center">
+            <div class="flex-shrink-0 flex items-center gap-3 group">
+              <div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-yellow-500/20 group-hover:rotate-6 transition-transform">
+                <i class="fas fa-bus-alt text-slate-900 text-2xl"></i>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-2xl font-black tracking-tighter text-white uppercase leading-none">
+                  KSRTC <span class="text-yellow-500">DEPOT</span>
+                </span>
+                <span class="text-[10px] text-yellow-500 font-bold tracking-[0.2em] uppercase opacity-80">Manager Portal</span>
+              </div>
+            </div>
+
+            <div id="navLinks" class="hidden lg:ml-12 lg:flex lg:space-x-4 auth-hidden">
+              <a href="{% url 'depot:assignpackage_template' %}" class="bg-yellow-500 text-slate-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                <i class="fas fa-chart-pie"></i> My Packages
+              </a>
+            </div>
+          </div>
+
+          <div class="hidden md:flex items-center gap-4">
+            <div id="userInfo" class="flex flex-col text-right border-r border-slate-700 pr-4 auth-hidden">
+              <span class="text-[10px] font-black text-yellow-500 uppercase tracking-widest leading-none mb-1">Station Chief</span>
+              <span id="display_depot_name" class="text-sm font-bold text-white">---</span>
+            </div>
+            
+            <div id="desktopLoginBtn">
+              <a href="{% url 'depot:login' %}" class="h-11 px-4 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-yellow-500 hover:bg-yellow-500 hover:text-slate-900 transition-all text-xs font-bold gap-2">
+                  <i class="fas fa-sign-in-alt text-base"></i>
+                  <span>LOGIN</span>
+              </a>
+            </div>
+
+            <div id="desktopAuthMenu" class="relative group auth-hidden">
+                <button class="h-11 w-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-yellow-500 hover:bg-yellow-500 hover:text-slate-900 transition-all shadow-inner">
+                <i class="fas fa-user-gear text-lg"></i>
+              </button>
+              <div class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl border border-slate-100 hidden group-hover:block animate-slide-down overflow-hidden">
+                 <div class="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Account Management</p>
+                 </div>
+                 <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-4 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors">
+                    <i class="fas fa-power-off text-base"></i> 
+                    <span>Logout System</span>
+                 </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center lg:hidden">
+            <button id="mobileMenuBtn" class="p-2 rounded-xl bg-slate-800 text-yellow-500 border border-slate-700">
+              <i class="fas fa-bars-staggered text-2xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="mobileMenu" class="hidden lg:hidden bg-slate-900 border-t border-slate-800 p-4 space-y-2">
+        <div id="mobileProtectedLinks" class="auth-hidden">
+            <a href="{% url 'depot:assignpackage_template' %}" class="bg-yellow-500 text-slate-900 block px-4 py-3 rounded-xl font-bold flex items-center gap-3">
+                <i class="fas fa-chart-pie"></i> My Packages
+            </a>
+            <hr class="border-slate-800 my-2">
+        </div>
+        
+        <div id="mobileLoginBtn">
+            <a href="{% url 'depot:login' %}" class="text-yellow-500 hover:bg-slate-800 block px-4 py-3 rounded-xl font-bold flex items-center gap-3">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+        </div>
+
+        <div id="mobileLogoutBtn" class="auth-hidden">
+            <button onclick="handleLogout()" class="w-full text-red-400 hover:bg-red-950/30 block px-4 py-3 rounded-xl font-bold flex items-center gap-3 transition-colors text-left">
+              <i class="fas fa-power-off"></i> Logout
+            </button>
+        </div>
+      </div>
+    </nav>
+
+    <script>
+      // 1. DOM Elements
+      const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      // 2. Auth Visibility Logic
+      function updateAuthUI() {
+        // Updated keys based on your login page logic
+        const token = localStorage.getItem("depot_access");
+        const depotName = localStorage.getItem("depot_name");
+        
+        const dLogin = document.getElementById("desktopLoginBtn");
+        const dAuth = document.getElementById("desktopAuthMenu");
+        const userInfo = document.getElementById("userInfo");
+        const navLinks = document.getElementById("navLinks");
+        const nameDisplay = document.getElementById("display_depot_name");
+
+        const mLogin = document.getElementById("mobileLoginBtn");
+        const mLogout = document.getElementById("mobileLogoutBtn");
+        const mProtected = document.getElementById("mobileProtectedLinks");
+
+        if (token) {
+          // Update the name text
+          if (nameDisplay && depotName) {
+            nameDisplay.innerText = depotName;
+          }
+
+          // Show Private UI
+          dLogin?.classList.add("hidden");
+          dAuth?.classList.remove("auth-hidden");
+          userInfo?.classList.remove("auth-hidden");
+          navLinks?.classList.remove("auth-hidden");
+
+          mLogin?.classList.add("hidden");
+          mLogout?.classList.remove("auth-hidden");
+          mProtected?.classList.remove("auth-hidden");
+        } else {
+          // Show Public UI
+          dLogin?.classList.remove("hidden");
+          dAuth?.classList.add("auth-hidden");
+          userInfo?.classList.add("auth-hidden");
+          navLinks?.classList.add("auth-hidden");
+
+          mLogin?.classList.remove("hidden");
+          mLogout?.classList.add("auth-hidden");
+          mProtected?.classList.add("auth-hidden");
+
+          // Redirect if token missing on a protected page
+          if (!window.location.href.includes('login')) {
+             window.location.replace("{% url 'depot:login' %}");
+          }
+        }
+      }
+
+      // 3. POST Logout with Refresh Token
+      async function handleLogout() {
+        const accessToken = localStorage.getItem("depot_access");
+        const refreshToken = localStorage.getItem("depot_refresh");
+
+        try {
+          await fetch("{% url 'depot:depotlogout' %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ "refresh": refreshToken })
+          });
+        } catch (error) {
+          console.error("Logout failed:", error);
+        } finally {
+          // Clear all keys we set earlier
+          localStorage.removeItem("depot_access");
+          localStorage.removeItem("depot_refresh");
+          localStorage.removeItem("depot_name");
+          
+          // Use replace to kill history stack
+          window.location.replace("{% url 'depot:depotlogin_template' %}");
+        }
+      }
+
+      // 4. Interaction
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      // Run check on load and back-button
+      document.addEventListener("DOMContentLoaded", updateAuthUI);
+      window.addEventListener('pageshow', updateAuthUI);
+    </script>
+  </body>
+</html>

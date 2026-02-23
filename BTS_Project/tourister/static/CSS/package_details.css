@@ -1,0 +1,7 @@
+html {
+        scroll-behavior: smooth;
+      }
+      .thumb_img {
+        height: 400px;
+        position: relative;
+      }
