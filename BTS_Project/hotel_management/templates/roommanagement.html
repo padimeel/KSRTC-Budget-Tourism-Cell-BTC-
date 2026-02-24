@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Management | {{ hotel.hotel_name }}</title>
+    <title>Room Management | KSRTC Partner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -24,7 +24,6 @@
                     </div>
                     
                     <form id="roomForm" class="p-6 space-y-4">
-                        {% csrf_token %}
                         <input type="hidden" id="room_id"> 
                         
                         <div>
@@ -61,8 +60,8 @@
                 <div class="bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden">
                     <div class="bg-slate-900 px-8 py-5 text-white flex justify-between items-center">
                         <h2 class="font-bold flex items-center gap-2"><i class="fas fa-list"></i> Inventory</h2>
-                        <span class="text-[10px] bg-emerald-500/20 border border-emerald-500/50 px-3 py-1 rounded-full uppercase font-black">
-                            {{ rooms|length }} Rooms
+                        <span id="roomCount" class="text-[10px] bg-emerald-500/20 border border-emerald-500/50 px-3 py-1 rounded-full uppercase font-black">
+                            0 Rooms
                         </span>
                     </div>
 
@@ -75,30 +74,8 @@
                                     <th class="p-5 text-xs font-bold uppercase text-center">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-emerald-50">
-                                {% for room in rooms %}
-                                <tr class="hover:bg-emerald-50/30">
-                                    <td class="p-5">
-                                        <p class="font-bold text-slate-800">{{ room.room_number }}</p>
-                                        <p class="text-[10px] font-bold text-emerald-600 uppercase">{{ room.room_type }}</p>
-                                    </td>
-                                    <td class="p-5 text-center font-bold text-emerald-700">₹{{ room.price }}</td>
-                                    <td class="p-5">
-                                        <div class="flex justify-center gap-3">
-                                            <button onclick="editRoom('{{ room.id }}', '{{ room.room_type }}', '{{ room.room_number }}', '{{ room.price }}')" 
-                                                class="w-8 h-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button onclick="deleteRoom('{{ room.id }}')" 
-                                                class="w-8 h-8 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="3" class="p-20 text-center text-slate-400 italic">No rooms added.</td></tr>
-                                {% endfor %}
+                            <tbody id="roomTableBody" class="divide-y divide-emerald-50">
+                                <tr><td colspan="3" class="p-20 text-center text-slate-400 italic">Loading rooms...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -108,12 +85,65 @@
     </div>
 
     <script>
-        const axiosConfig = { headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value } };
+        // 1. JWT Configuration
+        const token = localStorage.getItem('hotel_access');
+        if (!token) { window.location.href = "/hotel/hotellogin-template/"; }
 
+        const axiosConfig = {
+            headers: { 'Authorization': `Bearer ${token}` }
+        };
+
+        // 2. DOM Elements
+        const roomTableBody = document.getElementById('roomTableBody');
+        const roomCount = document.getElementById('roomCount');
         const roomForm = document.getElementById('roomForm');
         const submitBtn = document.getElementById('submitBtn');
         const cancelBtn = document.getElementById('cancelBtn');
 
+        // 3. Fetch and Render Rooms
+        async function fetchRooms() {
+            try {
+                // Ensure your API returns a list of rooms at this endpoint
+                const response = await axios.get('/hotel/rooms/', axiosConfig);
+                const rooms = response.data;
+                renderRooms(rooms);
+            } catch (err) {
+                console.error("Fetch error:", err);
+                roomTableBody.innerHTML = `<tr><td colspan="3" class="p-10 text-center text-red-500">Failed to load rooms. Please login again.</td></tr>`;
+            }
+        }
+
+        function renderRooms(rooms) {
+            roomCount.innerText = `${rooms.length} Rooms`;
+            if (rooms.length === 0) {
+                roomTableBody.innerHTML = `<tr><td colspan="3" class="p-20 text-center text-slate-400 italic">No rooms added.</td></tr>`;
+                return;
+            }
+
+            roomTableBody.innerHTML = rooms.map(room => `
+                <tr class="hover:bg-emerald-50/30">
+                    <td class="p-5">
+                        <p class="font-bold text-slate-800">${room.room_number}</p>
+                        <p class="text-[10px] font-bold text-emerald-600 uppercase">${room.room_type}</p>
+                    </td>
+                    <td class="p-5 text-center font-bold text-emerald-700">₹${room.price}</td>
+                    <td class="p-5">
+                        <div class="flex justify-center gap-3">
+                            <button onclick="editRoom('${room.id}', '${room.room_type}', '${room.room_number}', '${room.price}')" 
+                                class="w-8 h-8 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteRoom('${room.id}')" 
+                                class="w-8 h-8 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 4. Create / Update Logic
         roomForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const roomId = document.getElementById('room_id').value;
@@ -127,37 +157,54 @@
                 if (roomId) {
                     await axios.put(`/hotel/rooms/${roomId}/`, data, axiosConfig);
                 } else {
-                    await axios.post(window.location.href, data, axiosConfig);
+                    await axios.post('/hotel/rooms/', data, axiosConfig);
                 }
-                location.reload();
+                roomForm.reset();
+                resetFormUI();
+                fetchRooms(); // Refresh the list without reloading page
             } catch (err) {
-                alert("Error: " + JSON.stringify(err.response.data));
+                alert("Operation failed: " + JSON.stringify(err.response?.data || "Server Error"));
             }
         });
 
-        async function deleteRoom(id) {
-            if(confirm("Delete room?")) {
+        // 5. Delete Logic
+        window.deleteRoom = async function(id) {
+            if (confirm("Delete this room?")) {
                 try {
                     await axios.delete(`/hotel/rooms/${id}/`, axiosConfig);
-                    location.reload();
+                    fetchRooms();
                 } catch (err) { alert("Delete failed"); }
             }
-        }
+        };
 
-        function editRoom(id, type, number, price) {
+        // 6. Edit Logic
+        window.editRoom = function(id, type, number, price) {
             document.getElementById('room_id').value = id;
             document.getElementById('room_type').value = type;
             document.getElementById('room_number').value = number;
             document.getElementById('price').value = price;
-            document.getElementById('formTitle').innerText = "Edit Room " + number;
+            
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-edit"></i> Edit Room ${number}`;
             submitBtn.innerText = "UPDATE ROOM";
             submitBtn.classList.replace('bg-emerald-600', 'bg-blue-600');
             cancelBtn.classList.remove('hidden');
+        };
+
+        function resetFormUI() {
+            document.getElementById('room_id').value = "";
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-plus-circle"></i> Add New Room`;
+            submitBtn.innerText = "SAVE ROOM";
+            submitBtn.classList.replace('bg-blue-600', 'bg-emerald-600');
+            cancelBtn.classList.add('hidden');
         }
 
         cancelBtn.addEventListener('click', () => {
-            location.reload();
+            roomForm.reset();
+            resetFormUI();
         });
+
+        // Initialize
+        fetchRooms();
     </script>
 </body>
 </html>

@@ -9,16 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; }
         .table-row-fade { animation: tableFade 0.4s ease-out; }
         @keyframes tableFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         th { white-space: nowrap; }
     </style>
 </head>
-<body class="bg-[#fcfcfc] font-sans text-slate-900">
+<body class="text-slate-900">
+    
     {% include 'components/hotelnavbar.html' %}
     
-    {% csrf_token %}
-
     <header class="bg-white sticky top-14 z-10 border-b border-slate-100 shadow-sm">
         <div class="container mx-auto px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
@@ -39,10 +40,9 @@
     </header>
 
     <main class="container mx-auto px-6 py-8">
-        
         <div class="mb-8">
             <div class="bg-white border-l-4 border-emerald-500 px-8 py-4 rounded-xl shadow-sm inline-flex flex-col min-w-[200px] mt-10">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Booking Records</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Bookings</span>
                 <h3 id="totalCount" class="text-3xl font-black text-slate-800 tracking-tighter">0</h3>
             </div>
         </div>
@@ -65,7 +65,7 @@
                         <tr>
                             <td colspan="7" class="py-24 text-center">
                                 <div class="inline-block animate-spin w-7 h-7 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
-                                <p class="mt-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest italic">Verifying Session...</p>
+                                <p class="mt-4 text-slate-400 font-bold text-[10px] uppercase tracking-widest italic">Fetching Data...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -75,37 +75,52 @@
     </main>
 
     <script>
+
+        
+        
+        // --- CONFIGURATION ---
+        const JWT_TOKEN = localStorage.getItem('hotel_access');
+        if (!JWT_TOKEN) { window.location.href = "/hotel/hotellogin-template/"; }
+        const LOGIN_PAGE = "/hotel/hotellogin-template/";
+        
+        
+        const BOOKING_API_URL = "http://127.0.0.1:8000/hotel/displaybooking/"; 
+
+        // 1. SET GLOBAL AXIOS DEFAULTS
+        if (JWT_TOKEN) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${JWT_TOKEN}`;
+        }
+        axios.defaults.headers.common['Accept'] = 'application/json';
+
         let rawData = [];
         const tableBody = document.getElementById("bookingTableBody");
         const totalCountDisplay = document.getElementById("totalCount");
         const dateFilter = document.getElementById("liveDateFilter");
         const resetBtn = document.getElementById("resetBtn");
 
-        // CSRF Setup
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
-
+        // 2. LOAD DATA FROM EXTERNAL ENDPOINT
         async function loadData() {
+            if (!JWT_TOKEN) {
+                window.location.replace(LOGIN_PAGE);
+                return;
+            }
+
             try {
-                // தற்போதைய URL வழியாகவே JSON டேட்டாவை எடுக்கிறோம்
-                const res = await axios.get(window.location.pathname, {
-                    headers: { 'Accept': 'application/json' },
-                    withCredentials: true 
-                });
-
-                rawData = res.data;
+                // Using the specific BOOKING_API_URL variable
+                const res = await axios.get(BOOKING_API_URL);
+                
+                // If your API wraps data in an object like { data: [...] }, 
+                // you might need: rawData = res.data.data;
+                rawData = Array.isArray(res.data) ? res.data : res.data.results || [];
+                
                 updateView(rawData);
-
             } catch (err) {
                 console.error("API Error:", err);
-                if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                    window.location.href = "/tourister/login/"; 
-                } else {
-                    tableBody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-rose-500 font-black uppercase text-xs">Failed to load data. Please refresh.</td></tr>`;
-                }
+                handleApiError(err);
             }
         }
 
+        // 3. UI RENDERING
         function updateView(data) {
             totalCountDisplay.innerText = data.length;
             if (data.length === 0) {
@@ -124,8 +139,8 @@
                         <span class="text-[10px] font-black text-emerald-600 uppercase block">Room ${b.room_no}</span>
                         <span class="text-xs font-bold text-slate-400 uppercase">${b.room_type}</span>
                     </td>
-                    <td class="px-8 py-6 text-xs font-black text-slate-700">${b.display_check_in}</td>
-                    <td class="px-8 py-6 text-xs font-black text-slate-400">${b.display_check_out}</td>
+                    <td class="px-8 py-6 text-xs font-black text-slate-700">${b.display_check_in || b.check_in}</td>
+                    <td class="px-8 py-6 text-xs font-black text-slate-400">${b.display_check_out || b.check_out}</td>
                     <td class="px-8 py-6">
                         <span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-md uppercase">${b.members}</span>
                     </td>
@@ -135,10 +150,10 @@
             `).join('');
         }
 
+        // 4. FILTERING
         dateFilter.addEventListener("input", (e) => {
-            const val = e.target.value; // Format: YYYY-MM-DD
+            const val = e.target.value; // YYYY-MM-DD
             if (!val) { resetFilter(); return; }
-            
             resetBtn.classList.remove("hidden");
             const filtered = rawData.filter(item => item.check_in === val);
             updateView(filtered);
@@ -148,6 +163,16 @@
             dateFilter.value = "";
             resetBtn.classList.add("hidden");
             updateView(rawData);
+        }
+
+        // 5. ERROR HANDLING
+        function handleApiError(err) {
+            if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                localStorage.removeItem('hotel_access');
+                window.location.replace(LOGIN_PAGE);
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-rose-500 font-black uppercase text-xs">Failed to fetch data from API.</td></tr>`;
+            }
         }
 
         document.addEventListener("DOMContentLoaded", loadData);

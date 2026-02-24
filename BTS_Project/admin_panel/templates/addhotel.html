@@ -8,6 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <script>
+if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/admin_site/adminlogin-template/';
+        }
+    </script>
+
+
     <style>
         .bubble {
             position: absolute;
@@ -55,8 +62,8 @@
     <div class="relative min-h-screen flex items-start justify-center overflow-y-auto pt-28 pb-12 px-4">
         
         <div class="bubble w-40 h-40 top-20 left-10"></div>
-        <div class="bubble w-28 h-28 bottom-16 right-10 animate-[floatUp_12s_ease-in-out_infinite]"></div>
-        <div class="bubble w-32 h-32 top-1/2 right-[110px] animate-[floatUp_12s_ease-in-out_infinite] [animation-delay:1.5s]"></div>
+        <div class="bubble w-28 h-28 bottom-16 right-10"></div>
+        <div class="bubble w-32 h-32 top-1/2 right-[110px]"></div>
 
         <div class="bg-white shadow-xl rounded-xl w-full max-w-md p-6 border border-purple-200 backdrop-blur-lg relative z-10 mx-4">
 
@@ -68,8 +75,6 @@
             </p>
 
             <form id="hotelSignupForm" class="space-y-4">
-                {% csrf_token %} 
-                
                 <div>
                     <label class="block text-purple-700 font-semibold mb-1 text-sm">Hotel Username</label>
                     <input type="text" id="username" required minlength="3"
@@ -111,23 +116,21 @@
     </div>
 
     <script>
-        // CSRF Token Helper
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+        // --- 1. GLOBAL AXIOS CONFIGURATION ---
+        const accessToken = localStorage.getItem('accessToken');
 
-        // Custom Toast Function
+        if (accessToken) {
+            // Set the Bearer token for every request
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+            console.log("Token successfully attached.");
+        } else {
+            console.warn("No access token found. Redirecting might be necessary.");
+        }
+        
+        // Standard Content-Type for JSON requests
+        axios.defaults.headers.post['Content-Type'] = 'application/json';
+
+        // --- 2. UI UTILITIES ---
         function showToast(message, type = "success") {
             const toast = document.getElementById("toast");
             toast.innerText = message;
@@ -138,17 +141,16 @@
             setTimeout(() => { toast.classList.remove("show"); }, 3000);
         }
 
-        // Handle Form Submission
+        // --- 3. FORM SUBMISSION ---
         document.getElementById("hotelSignupForm").addEventListener("submit", async function (e) {
             e.preventDefault();
             const btn = document.getElementById("submitBtn");
             
-            // UI State Change
+            // Disable button to prevent double submission
             btn.disabled = true;
             btn.innerText = "Processing Registration...";
 
-            // Collect Data (Matches Serializer Fields)
-            const data = {
+            const payload = {
                 username: document.getElementById("username").value.trim(),
                 email: document.getElementById("email").value.trim(),
                 password: document.getElementById("password").value.trim(),
@@ -156,31 +158,29 @@
             };
 
             try {
-                // Ensure this URL matches your urls.py path for the Hotel View
-                const response = await axios.post("/admin_site/hotelsignup/", data, {
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json'
-                    }
-                });
+                // We don't need to pass headers manually here because of global config above
+                const response = await axios.post("/admin_site/hotelsignup/", payload);
 
                 showToast("Hotel Account created successfully!");
                 document.getElementById("hotelSignupForm").reset();
 
-                // Optional: Reload or Redirect
-                // setTimeout(() => { window.location.reload(); }, 2000);
-
             } catch (err) {
                 let errorMessage = "Failed to register hotel!";
-                if (err.response && err.response.data) {
-                    const errorData = err.response.data;
-                    // Extracting first specific error from DRF Response
-                    if (typeof errorData === 'object') {
-                        const firstKey = Object.keys(errorData)[0];
-                        errorMessage = Array.isArray(errorData[firstKey]) ? errorData[firstKey][0] : errorData[firstKey];
-                        // If it's a field error, prefix it (e.g., "username: This field is required")
-                        if (firstKey !== 'detail' && firstKey !== 'non_field_errors') {
-                            errorMessage = `${firstKey}: ${errorMessage}`;
+                
+                if (err.response) {
+                    if (err.response.status === 401) {
+                        errorMessage = "Session expired. Please log in again.";
+                    } else if (err.response.data) {
+                        const errorData = err.response.data;
+                        // Handle Django Rest Framework error objects
+                        if (typeof errorData === 'object') {
+                            const firstKey = Object.keys(errorData)[0];
+                            const errorValue = errorData[firstKey];
+                            errorMessage = Array.isArray(errorValue) ? errorValue[0] : errorValue;
+                            
+                            if (firstKey !== 'detail' && firstKey !== 'non_field_errors') {
+                                errorMessage = `${firstKey}: ${errorMessage}`;
+                            }
                         }
                     }
                 }

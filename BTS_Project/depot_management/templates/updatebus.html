@@ -7,12 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // AUTH GUARD
+        if (!localStorage.getItem('depot_access')) {
+            window.location.href = '/depot/depotlogin-template/';
+        }
+    </script>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans">
 
     {% include "components/depotnavbar.html" %}
 
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" id="deleted_routes" value="[]">
 
     <main class="max-w-[95%] mx-auto p-6">
@@ -23,95 +28,55 @@
             <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter">
                 Update Bus <span class="text-yellow-600">Details</span>
             </h2>
-            <p class="text-slate-500 italic">Modify vehicle information and itinerary for Bus ID: #{{ bus.id }}</p>
+            <p id="bus_subtitle" class="text-slate-500 italic">Loading Bus #{{ bus_id }}...</p>
         </div>
 
         <form id="updateBusForm">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
                 <div class="lg:col-span-5 bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100 sticky top-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-yellow-500 shadow-lg">
-                            <i class="fas fa-edit"></i>
-                        </div>
-                        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Modify Bus Info</h3>
-                    </div>
-
                     <div class="space-y-5">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Bus Number</label>
-                            <input type="text" id="bus_number" value="{{ bus.bus_number }}" required 
-                                   class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold uppercase">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Bus Number</label>
+                            <input type="text" id="bus_number" required class="w-full border border-slate-200 p-3 rounded-xl font-bold uppercase outline-none focus:border-yellow-500">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Main Route Name</label>
-                            <input type="text" id="route_name" value="{{ bus.route_name }}" required 
-                                   class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Main Route Name</label>
+                            <input type="text" id="route_name" required class="w-full border border-slate-200 p-3 rounded-xl font-bold outline-none focus:border-yellow-500">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Bus Type</label>
-                            <select id="bus_type" required class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold">
-                                <option value="AC" {% if bus.bus_type == "AC" %}selected{% endif %}>AC Bus</option>
-                                <option value="NON-AC" {% if bus.bus_type == "NON-AC" %}selected{% endif %}>Non-AC Bus</option>
-                                <option value="SLEEPER" {% if bus.bus_type == "SLEEPER" %}selected{% endif %}>Sleeper Bus</option>
-                                <option value="SEMI-SLEEPER" {% if bus.bus_type == "SEMI-SLEEPER" %}selected{% endif %}>Semi Sleeper Bus</option>
-                                <option value="VOLVO" {% if bus.bus_type == "VOLVO" %}selected{% endif %}>Volvo Bus</option>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Bus Type</label>
+                            <select id="bus_type" class="w-full border border-slate-200 p-3 rounded-xl font-bold outline-none focus:border-yellow-500">
+                                <option value="AC">AC Bus</option>
+                                <option value="NON-AC">Non-AC Bus</option>
+                                <option value="SLEEPER">Sleeper Bus</option>
+                                <option value="SEMI-SLEEPER">Semi Sleeper Bus</option>
+                                <option value="VOLVO">Volvo Bus</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Capacity</label>
-                            <input type="number" id="total_seats" value="{{ bus.total_seats }}" required 
-                                   class="w-full border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-500 outline-none transition-all font-bold">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Total Capacity</label>
+                            <input type="number" id="total_seats" required class="w-full border border-slate-200 p-3 rounded-xl font-bold outline-none focus:border-yellow-500">
                         </div>
                     </div>
                 </div>
 
                 <div class="lg:col-span-7 bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
                     <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-slate-900 shadow-lg">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                            <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Travel Itinerary</h3>
-                        </div>
+                        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Itinerary</h3>
                         <button type="button" onclick="addRouteField()" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-black uppercase hover:bg-yellow-500 hover:text-slate-900 transition-all">
                             <i class="fas fa-plus mr-2"></i> Add Stop
                         </button>
                     </div>
 
                     <div id="routeContainer" class="space-y-4">
-                        {% for route in bus.routes.all %}
-                        <div class="route-item bg-slate-50 p-6 rounded-2xl border border-slate-100 relative animate-fade-in" data-route-id="{{ route.id }}">
-                            <button type="button" onclick="removeRouteField(this)" class="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white rounded-full text-[10px] shadow-lg flex items-center justify-center hover:bg-rose-700 transition-colors">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="text-[9px] font-black text-slate-400 uppercase">Location</label>
-                                    <input type="text" name="location" value="{{ route.location }}" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-black text-slate-400 uppercase">Arrival</label>
-                                    <input type="time" name="arrival_time" value="{{ route.arrival_time|time:'H:i' }}" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-black text-slate-400 uppercase">Departure</label>
-                                    <input type="time" name="departure_time" value="{{ route.departure_time|time:'H:i' }}" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
-                                </div>
-                                <div class="md:col-span-3">
-                                    <label class="text-[9px] font-black text-slate-400 uppercase">Short Description</label>
-                                    <textarea name="description" rows="1" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">{{ route.description }}</textarea>
-                                </div>
-                            </div>
                         </div>
-                        {% endfor %}
-                    </div>
                 </div>
             </div>
 
             <div class="flex justify-end gap-4 py-10">
                 <button type="button" onclick="history.back()" class="px-8 py-4 rounded-2xl font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-all">Cancel</button>
-                <button type="submit" id="submitBtn" class="bg-slate-900 px-10 py-4 rounded-2xl font-black text-yellow-500 uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-yellow-500 hover:text-slate-900 transition-all">
+                <button type="submit" id="submitBtn" class="bg-slate-900 px-10 py-4 rounded-2xl font-black text-yellow-500 uppercase tracking-widest shadow-xl hover:bg-yellow-500 hover:text-slate-900 transition-all">
                     <span id="btnText">Update All Details</span>
                     <i id="btnSpinner" class="fas fa-spinner fa-spin hidden ml-2"></i>
                 </button>
@@ -120,52 +85,82 @@
     </main>
 
     <script>
-        const getCsrfToken = () => document.getElementById('csrf_token').value;
+        const busId = "{{ bus_id }}";
+        const token = localStorage.getItem('depot_access');
+        
+        // GLOBAL AXIOS CONFIG
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        axios.defaults.baseURL = 'http://127.0.0.1:8000';
 
-        // NEW: Function to remove UI element AND track the ID for deletion
-        function removeRouteField(button) {
-            const item = button.closest('.route-item');
-            const routeId = item.getAttribute('data-route-id');
-            
-            if (routeId) {
-                const deletedInput = document.getElementById('deleted_routes');
-                let deletedIds = JSON.parse(deletedInput.value);
-                deletedIds.push(routeId);
-                deletedInput.value = JSON.stringify(deletedIds);
+        // 1. FETCH INITIAL DATA
+        async function fetchBusDetails() {
+            try {
+                const response = await axios.get(`/depot/bus/${busId}/`);
+                const bus = response.data;
+
+                document.getElementById('bus_number').value = bus.bus_number;
+                document.getElementById('route_name').value = bus.route_name;
+                document.getElementById('bus_type').value = bus.bus_type;
+                document.getElementById('total_seats').value = bus.total_seats;
+                document.getElementById('bus_subtitle').innerText = `Modifying Vehicle: ${bus.bus_number}`;
+
+                if(bus.routes && bus.routes.length > 0) {
+                    bus.routes.forEach(route => renderRouteRow(route));
+                }
+            } catch (error) {
+                console.error("Load Error:", error);
+                alert("Could not load data. Session might be expired.");
             }
-            
-            item.remove();
         }
 
-        function addRouteField() {
+        // 2. RENDER ROUTE ROWS
+        function renderRouteRow(route = {}) {
             const container = document.getElementById('routeContainer');
             const div = document.createElement('div');
-            div.className = "route-item bg-slate-50 p-6 rounded-2xl border border-slate-100 relative animate-fade-in mt-4";
+            div.className = "route-item bg-slate-50 p-6 rounded-2xl border border-slate-100 relative animate-fade-in mb-4";
+            div.setAttribute('data-route-id', route.id || '');
+
             div.innerHTML = `
-                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white rounded-full text-[10px] shadow-lg flex items-center justify-center hover:bg-rose-700 transition-colors">
+                <button type="button" onclick="removeRouteField(this)" class="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 text-white rounded-full flex items-center justify-center hover:bg-rose-700 transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase">Location</label>
-                        <input type="text" name="location" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                        <input type="text" name="location" value="${route.location || ''}" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase">Arrival</label>
-                        <input type="time" name="arrival_time" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                        <input type="time" name="arrival_time" value="${route.arrival_time ? route.arrival_time.substring(0,5) : ''}" required class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-slate-400 uppercase">Departure</label>
-                        <input type="time" name="departure_time" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
+                        <input type="time" name="departure_time" value="${route.departure_time ? route.departure_time.substring(0,5) : ''}" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">
                     </div>
                     <div class="md:col-span-3">
-                        <label class="text-[9px] font-black text-slate-400 uppercase">Short Description</label>
-                        <textarea name="description" rows="1" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1"></textarea>
+                        <label class="text-[9px] font-black text-slate-400 uppercase">Description</label>
+                        <textarea name="description" rows="1" class="w-full p-2.5 rounded-lg border border-slate-200 text-sm font-bold mt-1">${route.description || ''}</textarea>
                     </div>
                 </div>`;
             container.appendChild(div);
         }
 
+        function removeRouteField(button) {
+            const item = button.closest('.route-item');
+            const routeId = item.getAttribute('data-route-id');
+            if (routeId) {
+                let deletedIds = JSON.parse(document.getElementById('deleted_routes').value);
+                deletedIds.push(routeId);
+                document.getElementById('deleted_routes').value = JSON.stringify(deletedIds);
+            }
+            item.remove();
+        }
+
+        function addRouteField() {
+            renderRouteRow();
+        }
+
+        // 3. SUBMIT CHANGES
         document.getElementById('updateBusForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
@@ -173,11 +168,10 @@
             const btnSpinner = document.getElementById('btnSpinner');
 
             submitBtn.disabled = true;
-            btnText.innerText = "Processing...";
+            btnText.innerText = "Syncing Data...";
             btnSpinner.classList.remove('hidden');
 
-            const busId = "{{ bus.id }}";
-            const updatedBusData = {
+            const busData = {
                 bus_number: document.getElementById('bus_number').value.trim().toUpperCase(),
                 route_name: document.getElementById('route_name').value.trim(),
                 bus_type: document.getElementById('bus_type').value,
@@ -185,25 +179,20 @@
             };
 
             try {
-                // 1. Update Bus Details
-                await axios.put(`/depot/updatebus/${busId}/`, updatedBusData, {
-                    headers: { 'X-CSRFToken': getCsrfToken() }
-                });
+                // Update Bus
+                await axios.put(`/depot/updatebus/${busId}/`, busData);
 
-                // 2. Handle Deletions (Items removed from UI)
+                // Handle Deletions
                 const deletedIds = JSON.parse(document.getElementById('deleted_routes').value);
-                const deletePromises = deletedIds.map(id => {
-                    return axios.delete(`/depot/route/${id}/`, {
-                        headers: { 'X-CSRFToken': getCsrfToken() }
-                    });
-                });
-                await Promise.all(deletePromises);
+                for (const id of deletedIds) {
+                    await axios.delete(`/depot/route/${id}/`);
+                }
 
-                // 3. Update existing or Create new routes
+                // Handle Add/Update Routes
                 const routeItems = document.querySelectorAll('.route-item');
-                const routePromises = Array.from(routeItems).map(item => {
-                    const existingRouteId = item.getAttribute('data-route-id');
-                    const routeData = {
+                for (const item of routeItems) {
+                    const rId = item.getAttribute('data-route-id');
+                    const rData = {
                         bus: busId,
                         location: item.querySelector('[name="location"]').value.trim(),
                         arrival_time: item.querySelector('[name="arrival_time"]').value,
@@ -211,40 +200,32 @@
                         description: item.querySelector('[name="description"]').value.trim()
                     };
 
-                    if (existingRouteId) {
-                        // Update existing route (PUT)
-                        return axios.put(`/depot/route/${existingRouteId}/`, routeData, {
-                            headers: { 'X-CSRFToken': getCsrfToken() }
-                        });
+                    if (rId) {
+                        await axios.put(`/depot/route/${rId}/`, rData);
                     } else {
-                        // Create new route (POST)
-                        return axios.post('/depot/route/', routeData, {
-                            headers: { 'X-CSRFToken': getCsrfToken() }
-                        });
+                        await axios.post('/depot/route/', rData);
                     }
-                });
+                }
 
-                await Promise.all(routePromises);
-                
-                alert('Success! Fleet and Routes Synchronized.');
-                window.location.href = '/depot/assignpackage/';
+                alert("Successfully Updated!");
+                window.location.href = '/depot/assignpackage-template/';
 
-            } catch (error) {
-                console.error(error);
-                alert("Synchronization failed. Ensure your backend handles DELETE and PUT requests for routes.");
+            } catch (err) {
+                console.error(err);
+                alert("Update failed. Check console for details.");
             } finally {
                 submitBtn.disabled = false;
                 btnText.innerText = "Update All Details";
                 btnSpinner.classList.add('hidden');
             }
         });
+
+        // Initialize Page
+        fetchBusDetails();
     </script>
 
     <style>
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
     </style>
 </body>

@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+<<<<<<< HEAD
 from django.db import transaction
+=======
+>>>>>>> main
 from .models import User, RateReview, Package_Booking, Package_Details,RoomBooking
 from django.db.models import F
 
@@ -46,7 +49,12 @@ class BookingSerializer(serializers.ModelSerializer):
         package_id = data.get("package_id")
         
         try:
+<<<<<<< HEAD
             package = Package_Details.objects.select_related('bus').get(id=package_id)
+=======
+            # We use select_for_update() to prevent race conditions during seat booking
+            package = Package_Details.objects.select_for_update().select_related('bus').get(id=package_id)
+>>>>>>> main
         except Package_Details.DoesNotExist:
             raise serializers.ValidationError({"package_id": "Package does not exist"})
 
@@ -65,6 +73,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 "error": f"Not enough seats. Available: {package.bus.total_seats}"
             })
 
+<<<<<<< HEAD
         data['package_obj'] = package
         return data
 
@@ -94,6 +103,35 @@ class BookingSerializer(serializers.ModelSerializer):
             package=package,
             **validated_data
         )
+=======
+        # Pass the package object to the create method
+        data['package_obj'] = package
+        data['total_passengers'] = total_passengers
+        return data
+
+    def create(self, validated_data):
+        package = validated_data.pop('package_obj')
+        total_passengers = validated_data.pop('total_passengers')
+        user = self.context['request'].user
+
+        # 1. Price Calculation (Package Price * Number of People)
+        calculated_price = package.price * total_passengers
+
+        # 2. Decrease Seats in Bus model
+        bus = package.bus
+        bus.total_seats -= total_passengers
+        bus.save()
+
+        # 3. Create Booking Record
+        booking = Package_Booking.objects.create(
+            user=user,
+            package=package,
+            total_price=calculated_price,
+            **validated_data
+        )
+        return booking
+    
+>>>>>>> main
         
         
         

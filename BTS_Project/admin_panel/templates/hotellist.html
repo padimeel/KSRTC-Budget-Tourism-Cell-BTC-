@@ -8,6 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/admin_site/adminlogin-template/';
+        }
+    </script>
     
     <style>
         .fade-out {
@@ -81,21 +87,15 @@
         const searchInput = document.getElementById("search-input");
 
         // Helper for CSRF Token
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+        const accessToken = localStorage.getItem('accessToken');
 
+        // Apply to ALL Axios requests automatically
+        if (accessToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+            console.log("Token attached to Axios successfully.");
+        } else {
+            console.warn("No access token found in localStorage.");
+        }
         function showToast(msg, isError = false) {
             const t = document.getElementById("toast");
             t.innerText = msg;

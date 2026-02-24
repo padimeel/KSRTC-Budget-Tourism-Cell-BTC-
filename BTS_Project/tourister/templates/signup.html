@@ -102,7 +102,11 @@
             
             <div class="mt-5 pt-4 border-t border-slate-50 text-center">
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-tight">Already have an account?</p>
+<<<<<<< HEAD
                 <a href="{% url 'tourister:login' %}" class="inline-flex items-center gap-2 mt-1.5 text-rose-600 font-black text-[11px] uppercase tracking-widest hover:text-rose-700 transition-all group">
+=======
+                <a href="{% url 'tourister:login_template' %}" class="inline-flex items-center gap-2 mt-1.5 text-rose-600 font-black text-[11px] uppercase tracking-widest hover:text-rose-700 transition-all group">
+>>>>>>> main
                     <span>Sign In Now</span>
                     <i class="fas fa-sign-in-alt group-hover:scale-110 transition-transform"></i>
                 </a>
@@ -206,7 +210,11 @@
                 displayStatus(msg, "success");
 
                 setTimeout(() => {
+<<<<<<< HEAD
                     window.location.href = "{% url 'tourister:index' %}";
+=======
+                    window.location.href = "{% url 'tourister:index_template' %}";
+>>>>>>> main
                 }, 2000);
 
             } catch (err) {

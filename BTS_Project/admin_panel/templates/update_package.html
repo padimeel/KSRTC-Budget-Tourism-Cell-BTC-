@@ -6,7 +6,14 @@
     <title>Admin - Update Travel Package</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/admin_site/adminlogin-template/';
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -15,6 +22,7 @@
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
     </style>
 </head>
+
 <body class="bg-purple-50 min-h-screen font-sans text-gray-800">
 
     {% include "navbar.html" %}
@@ -22,7 +30,8 @@
     <div class="container mx-auto py-8 px-4">
         <div class="flex items-center justify-between mb-8 mt-20">
             <h1 class="text-3xl font-black text-purple-900 uppercase">Edit Package</h1>
-            <button onclick="window.location.href='/admin_site/packages/'" class="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-xl font-bold transition">
+            <button onclick="window.location.href='/admin_site/packages/'" 
+                    class="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-xl font-bold transition flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
             </button>
         </div>
@@ -36,17 +45,18 @@
                             <i class="fas fa-edit mr-3"></i> Package Information
                         </h2>
                         
-                        <div id="backendErrors" class="hidden mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm">
-                        </div>
+                        <div id="backendErrors" class="hidden mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm"></div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-600 mb-2">Package Name</label>
-                                <input type="text" id="package_name" required class="w-full bg-purple-50 border border-purple-100 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500">
+                                <input type="text" id="package_name" required 
+                                       class="w-full bg-purple-50 border border-purple-100 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none transition">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-600 mb-2">Overview</label>
-                                <textarea id="package_overview" rows="4" required class="w-full bg-purple-50 border border-purple-100 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                                <textarea id="package_overview" rows="4" required 
+                                          class="w-full bg-purple-50 border border-purple-100 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none transition"></textarea>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-600 mb-2">Duration</label>
@@ -73,15 +83,18 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-purple-100 p-6">
                         <h2 class="text-lg font-bold text-purple-900 mb-4">Gallery Previews</h2>
                         <div class="grid grid-cols-2 gap-2 mb-4" id="imagePreviewGrid"></div>
+                        
                         <div class="space-y-3">
-                            <input type="file" id="image1" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1">
-                            <input type="file" id="image2" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1">
-                            <input type="file" id="image3" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1">
-                            <input type="file" id="image4" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1">
+                            <label class="block text-xs font-bold text-gray-400 uppercase">Upload New Images</label>
+                            <input type="file" id="image1" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1 cursor-pointer">
+                            <input type="file" id="image2" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1 cursor-pointer">
+                            <input type="file" id="image3" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1 cursor-pointer">
+                            <input type="file" id="image4" class="text-xs w-full file:bg-purple-100 file:border-0 file:rounded-lg file:px-2 file:py-1 cursor-pointer">
                         </div>
                     </div>
 
-                    <button type="submit" id="updateBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all text-lg">
+                    <button type="submit" id="updateBtn" 
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all text-lg transform hover:-translate-y-1">
                         SAVE ALL CHANGES
                     </button>
                 </div>
@@ -90,83 +103,90 @@
     </div>
 
     <script>
-        axios.defaults.withCredentials = true;
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+        /**
+         * 1. CONFIGURATION & STATE
+         */
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         }
 
+        // Extracts the ID from the URL path: /admin_site/updatepackage/5/
         const pathSegments = window.location.pathname.split('/').filter(s => s !== "");
         const packageId = pathSegments[pathSegments.length - 1];
 
+        /**
+         * 2. DATA LOADING LOGIC
+         */
         async function loadAllData() {
             try {
-                // Manager request removed from Promise.all
+                // Fetch Package and Itineraries in parallel
                 const [pkgRes, itinRes] = await Promise.all([
-                    axios.get(`http://127.0.0.1:8000/admin_site/packages/${packageId}/`),
-                    axios.get('http://127.0.0.1:8000/admin_site/itineraries/')
+                    axios.get(`/admin_site/packages/${packageId}/`),
+                    axios.get('/admin_site/itineraries/')
                 ]);
 
                 const pkg = pkgRes.data;
+
+                // Fill Form Fields
                 document.getElementById('package_name').value = pkg.package_name;
                 document.getElementById('package_overview').value = pkg.package_overview;
                 document.getElementById('duration').value = pkg.duration;
                 document.getElementById('price').value = pkg.price;
 
+                // Build Image Preview Grid
                 const previewGrid = document.getElementById('imagePreviewGrid');
                 previewGrid.innerHTML = "";
                 ['image1', 'image2', 'image3', 'image4'].forEach(imgKey => {
                     if (pkg[imgKey]) {
-                        previewGrid.innerHTML += `<div class="h-20 bg-gray-100 rounded-lg overflow-hidden border"><img src="${pkg[imgKey]}" class="w-full h-full object-cover"></div>`;
+                        previewGrid.innerHTML += `
+                            <div class="h-20 bg-gray-100 rounded-lg overflow-hidden border">
+                                <img src="${pkg[imgKey]}" class="w-full h-full object-cover">
+                            </div>`;
                     }
                 });
 
-                const filteredItin = itinRes.data.filter(i => i.package == packageId);
+                // Build Itinerary Blocks
                 const container = document.getElementById('itineraryContainer');
                 container.innerHTML = "";
+                const filteredItin = itinRes.data.filter(i => i.package == packageId);
+
                 filteredItin.forEach(day => {
                     container.innerHTML += `
                         <div class="itinerary-block bg-purple-50 p-5 rounded-xl border border-purple-100 mb-4 animate-fade-in">
                             <div class="flex justify-between items-center mb-3">
-                                <span class="bg-purple-700 text-white px-3 py-1 rounded-full text-xs font-bold">DAY ${day.day_number}</span>
+                                <span class="day-label bg-purple-700 text-white px-3 py-1 rounded-full text-xs font-bold">DAY ${day.day_number}</span>
                                 <input type="hidden" class="day-id" value="${day.id}">
                             </div>
-                            <input type="text" value="${day.title}" class="day-title w-full p-2 mb-2 rounded border outline-none">
-                            <textarea class="day-desc w-full p-2 rounded border outline-none" rows="2">${day.description}</textarea>
+                            <input type="text" value="${day.title}" class="day-title w-full p-2 mb-2 rounded border outline-none focus:ring-2 focus:ring-purple-200">
+                            <textarea class="day-desc w-full p-2 rounded border outline-none focus:ring-2 focus:ring-purple-200" rows="2">${day.description}</textarea>
                         </div>`;
                 });
             } catch (err) {
-                console.error(err);
-                alert("Critical error loading data.");
+                console.error("Fetch Error:", err);
+                alert("Failed to load package details. Please check your connection.");
             }
         }
 
+        /**
+         * 3. SUBMISSION LOGIC
+         */
         document.getElementById('updateForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('updateBtn');
             const errorDiv = document.getElementById('backendErrors');
             
+            // UI State: Loading
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> UPDATING...';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> UPDATING...';
             errorDiv.classList.add('hidden');
 
+            // Collect Package Data (Multipart for possible image uploads)
             const formData = new FormData();
             formData.append('package_name', document.getElementById('package_name').value);
             formData.append('package_overview', document.getElementById('package_overview').value);
             formData.append('duration', document.getElementById('duration').value);
             formData.append('price', document.getElementById('price').value);
-            // managerSelect append removed
 
             ['image1', 'image2', 'image3', 'image4'].forEach(id => {
                 const file = document.getElementById(id).files[0];
@@ -174,39 +194,41 @@
             });
 
             try {
-                await axios.put(`http://127.0.0.1:8000/admin_site/packages/${packageId}/`, formData, {
-                    headers: { 
-                        'Content-Type': 'multipart/form-data',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
+                // Task 1: Update the main package
+                await axios.put(`/admin_site/packages/${packageId}/`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
                 });
 
+                // Task 2: Update all itinerary days
                 const dayBlocks = document.querySelectorAll('.itinerary-block');
                 const dayPromises = Array.from(dayBlocks).map(block => {
                     const id = block.querySelector('.day-id').value;
-                    return axios.put(`http://127.0.0.1:8000/admin_site/itineraries/${id}/`, {
+                    const dayNum = block.querySelector('.day-label').innerText.replace('DAY ', '');
+                    
+                    return axios.put(`/admin_site/itineraries/${id}/`, {
                         package: packageId,
                         title: block.querySelector('.day-title').value,
                         description: block.querySelector('.day-desc').value,
-                        day_number: block.querySelector('.bg-purple-700').innerText.replace('DAY ', '')
-                    }, {
-                        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                        day_number: dayNum
                     });
                 });
 
                 await Promise.all(dayPromises);
-                alert("Success! Package updated.");
-                window.location.href = '/admin_site/packages/';
+                
+                alert("Package and Itinerary updated successfully!");
+                window.location.href = '/admin_site/addpackage-template/';
 
             } catch (err) {
+                // UI State: Error
                 errorDiv.classList.remove('hidden');
                 if (err.response && err.response.data) {
                     let messages = [];
-                    const data = err.response.data;
-                    for (let key in data) { messages.push(`${key.toUpperCase()}: ${data[key]}`); }
-                    errorDiv.innerHTML = `<strong>Fix the following:</strong><br>${messages.join('<br>')}`;
+                    for (let key in err.response.data) {
+                        messages.push(`${key.toUpperCase()}: ${err.response.data[key]}`);
+                    }
+                    errorDiv.innerHTML = `<strong>Error:</strong><br>${messages.join('<br>')}`;
                 } else {
-                    errorDiv.innerText = "Connection lost or server error.";
+                    errorDiv.innerText = "Connection lost or server timeout.";
                 }
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } finally {
@@ -215,7 +237,8 @@
             }
         });
 
+        // Initialize
         window.onload = loadAllData;
     </script>
 </body>
-</html>
+</html> 

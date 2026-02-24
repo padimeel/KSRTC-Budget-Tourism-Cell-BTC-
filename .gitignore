@@ -11,6 +11,4 @@ BTS_Project/payment/migrations
 BTS_Project/tourister/__pycache__
 BTS_Project/tourister/migrations
 BTS_venv
-.env
-
-
+BTS_Project/.env 

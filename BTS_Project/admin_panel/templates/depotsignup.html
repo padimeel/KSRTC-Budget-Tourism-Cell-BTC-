@@ -9,6 +9,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <script>
+if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/admin_site/adminlogin-template/';
+        }
+    </script>
+
     <style>
         .bubble {
             position: absolute;
@@ -108,69 +114,74 @@
     </div>
 
     <script>
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+        
+const token = localStorage.getItem("accessToken");
 
-        function showToast(message, type = "success") {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.style.background = type === "error"
-                ? "linear-gradient(to right, #dc2626, #b91c1c)"
-                : "linear-gradient(to right, #9333ea, #6b21a8)";
-            toast.classList.add("show");
-            setTimeout(() => { toast.classList.remove("show"); }, 2500);
-        }
 
-        document.getElementById("signupForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
-            const btn = document.getElementById("submitBtn");
-            btn.disabled = true;
-            btn.innerText = "Creating Account...";
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    
+    toast.style.background = type === "error"
+        ? "linear-gradient(to right, #dc2626, #b91c1c)" 
+        : "linear-gradient(to right, #9333ea, #6b21a8)"; 
+    
+    toast.classList.add("show");
+    
+    setTimeout(() => { 
+        toast.classList.remove("show"); 
+    }, 2500);
+}
 
-            const data = {
-                username: document.getElementById("username").value.trim(),
-                email: document.getElementById("email").value.trim(),
-                password: document.getElementById("password").value.trim(),
-                depot_name: document.getElementById("depot_name").value.trim(),
-                role: "depot_manager"
-            };
 
-            try {
-                const response = await axios.post("/admin_site/depotsignup/", data, {
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json'
-                    }
-                });
-                showToast("Depot Account created successfully!");
-                document.getElementById("signupForm").reset();
-            } catch (err) {
-                let errorMessage = "Failed to create account!";
-                if (err.response && err.response.data) {
-                    const data = err.response.data;
-                    if (typeof data === 'object') {
-                        const firstKey = Object.keys(data)[0];
-                        errorMessage = Array.isArray(data[firstKey]) ? data[firstKey][0] : data[firstKey];
-                    }
-                }
-                showToast(errorMessage, "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Create Depot Account";
+document.getElementById("signupForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.innerText = "Creating Account...";
+
+    const data = {
+        username: document.getElementById("username").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value.trim(),
+        depot_name: document.getElementById("depot_name").value.trim(),
+        role: "depot_manager"
+    };
+
+    try {
+        const response = await axios.post("/admin_site/depotsignup/", data, {
+            headers: { 
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             }
         });
+
+        showToast("Depot Account created successfully!");
+        document.getElementById("signupForm").reset();
+
+    } catch (err) {
+        let errorMessage = "Failed to create account!";
+        
+        if (err.response) {
+            if (err.response.status === 401) {
+                errorMessage = "Unauthorized! Please login again.";
+            } else if (err.response.data) {
+                const errorData = err.response.data;
+                const firstKey = Object.keys(errorData)[0];
+                errorMessage = Array.isArray(errorData[firstKey]) 
+                    ? errorData[firstKey][0] 
+                    : errorData[firstKey];
+            }
+        }
+        
+        showToast(errorMessage, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Create Depot Account";
+    }
+});
     </script>
 </body>
 </html>

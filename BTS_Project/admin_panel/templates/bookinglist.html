@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - All Bookings</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <script>
+if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/admin_site/adminlogin-template/';
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body class="bg-slate-50 font-sans">
@@ -64,6 +70,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+
+        const accessToken = localStorage.getItem('accessToken');
+
+        // Apply to ALL Axios requests automatically
+        if (accessToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+            console.log("Token attached to Axios successfully.");
+        } else {
+            console.warn("No access token found in localStorage.");
+        }
         let allBookings = [];
 
         async function fetchAllBookings() {

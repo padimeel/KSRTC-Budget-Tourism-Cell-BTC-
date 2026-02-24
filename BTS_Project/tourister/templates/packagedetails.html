@@ -1,9 +1,14 @@
+<<<<<<< HEAD
+=======
+{% load static %}
+>>>>>>> main
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KSRTC BTC — Package Details</title>
+<<<<<<< HEAD
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
@@ -124,6 +129,121 @@
                 id="busRoute"
               >
                 </div>
+=======
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
+    <style>
+      .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+      }
+      .custom-shadow {
+        box-shadow: 0 10px 30px -12px rgba(225, 29, 72, 0.15);
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-50 min-h-screen text-gray-800 font-sans">
+    {% include 'components/navbar.html' %}
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div class="mb-8">
+        <h2 id="packageName" class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight"></h2>
+      </div>
+
+      <section class="grid grid-cols-1 lg:grid-cols-[7fr_4fr] gap-10">
+        <div class="space-y-8">
+          <div class="space-y-4">
+            <div class="relative group">
+               <img id="mainImage" class="w-full h-[450px] object-cover rounded-2xl shadow-xl transition-transform duration-500" alt="Main View" />
+               <div class="absolute bottom-4 right-4 bg-white/90 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">
+                  <i class="ri-camera-line mr-1"></i> Gallery View
+               </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
+              <img id="image1" class="h-28 w-full object-cover rounded-xl shadow-md cursor-pointer hover:ring-2 ring-rose-500 transition-all" />
+              <img id="image2" class="h-28 w-full object-cover rounded-xl shadow-md cursor-pointer hover:ring-2 ring-rose-500 transition-all" />
+              <img id="image3" class="h-28 w-full object-cover rounded-xl shadow-md cursor-pointer hover:ring-2 ring-rose-500 transition-all" />
+            </div>
+          </div>
+
+          <section class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 custom-shadow">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-1 h-8 bg-rose-600 rounded-full"></div>
+              <h3 class="text-2xl font-bold text-slate-800">Package Overview</h3>
+            </div>
+            <p id="overview" class="text-gray-600 leading-relaxed text-lg"></p>
+          </section>
+
+          <section class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 custom-shadow">
+            <div class="flex items-center gap-3 mb-8">
+              <div class="w-1 h-8 bg-rose-600 rounded-full"></div>
+              <h3 class="text-2xl font-bold text-slate-800">Travel Itinerary</h3>
+            </div>
+            <div class="space-y-0 relative before:absolute before:left-5 before:top-2 before:bottom-2 before:w-0.5 before:bg-rose-100" id="itineraryContainer">
+                <p class="text-gray-400 italic">Loading itinerary...</p>
+            </div>
+          </section>
+        </div>
+
+        <div class="space-y-6">
+          <div class="sticky top-6">
+            <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+              <div class="bg-slate-900 p-8 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-rose-600/10 rounded-full -mr-16 -mt-16"></div>
+                <p class="text-rose-500 font-bold text-sm uppercase tracking-widest mb-2">Total Package Cost</p>
+                <p id="price" class="text-white font-black text-4xl leading-tight"></p>
+                <p class="text-xs text-slate-400 mt-2">*Below 12 years - 50% discount applies</p>
+              </div>
+
+              <div class="p-8 space-y-6">
+                <div class="grid grid-cols-1 gap-4">
+                  <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span class="text-slate-500 text-sm flex items-center gap-2"><i class="ri-time-line text-rose-500"></i> Duration</span>
+                    <span id="duration" class="font-bold text-slate-800"></span>
+                  </div>
+                  <div class="flex flex-col gap-1 p-3 bg-slate-50 rounded-xl">
+                    <span class="text-slate-500 text-sm flex items-center gap-2"><i class="ri-map-pin-line text-rose-500"></i> Places</span>
+                    <span id="places" class="font-bold text-slate-800 text-sm leading-snug"></span>
+                  </div>
+                  <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span class="text-slate-500 text-sm flex items-center gap-2"><i class="ri-calendar-event-line text-rose-500"></i> Starts</span>
+                    <span id="startingDate" class="font-bold text-slate-800"></span>
+                  </div>
+                  <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span class="text-slate-500 text-sm flex items-center gap-2"><i class="ri-calendar-check-line text-rose-500"></i> Ends</span>
+                    <span id="endingDate" class="font-bold text-slate-800"></span>
+                  </div>
+                </div>
+
+                <button id="bookBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-rose-200 transition-all active:scale-95 flex items-center justify-center gap-2">
+                  <i class="ri-ticket-2-line"></i> PROCEED TO BOOK
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-8 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+              <div class="p-6 bg-rose-50 border-b border-rose-100 flex items-center justify-between">
+                <h4 class="font-bold text-rose-800 flex items-center gap-2"><i class="ri-bus-fill"></i> Transit Details</h4>
+                <span id="totalSeats" class="px-3 py-1 rounded-full text-xs font-bold shadow-sm"></span>
+              </div>
+              
+              <div class="p-6">
+                <div class="text-center mb-6">
+                  <div class="flex gap-2 justify-center items-center mb-1">
+                    <p id="busName" class="text-slate-900 font-extrabold text-xl"></p>
+                    <span id="busType" class="text-[10px] bg-slate-800 text-white px-2 py-0.5 rounded-md font-bold"></span>
+                  </div>
+                  <p id="busNumber" class="text-rose-600 font-mono text-sm font-bold tracking-widest"></p>
+                  <p id="busRouteDate" class="text-slate-400 text-xs mt-1 uppercase font-semibold"></p>
+                </div>
+
+                <div class="space-y-6 relative" id="busRoute">
+                  <p class="text-center text-gray-400 text-sm italic py-4">Loading route details...</p>
+                </div>
+              </div>
+>>>>>>> main
             </div>
           </div>
         </div>
@@ -131,6 +251,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<<<<<<< HEAD
 
     <script>
       const urlParams = new URLSearchParams(window.location.search);
@@ -240,6 +361,129 @@ if (availableSeats <= 5) {
           return;
         }
         window.location.href = `/tourister/packagebooking/?package_id=${packageId}`;
+=======
+    <script>
+      const token = localStorage.getItem("accessToken");
+      const pathSegments = window.location.pathname.split('/').filter(segment => segment !== "");
+      const packageId = pathSegments[pathSegments.length - 1];
+
+      if (!token) {
+        window.location.href = "/tourister/login-template/";
+      }
+
+      async function loadAllData() {
+        if (!token) return;
+        if (!packageId || isNaN(packageId)) {
+          console.error("Invalid Package ID");
+          return;
+        }
+
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        try {
+          const pkgResponse = await axios.get(`http://127.0.0.1:8000/tourister/packagedetails/${packageId}/`, config);
+          const data = pkgResponse.data.package;
+
+          document.getElementById("packageName").innerText = data.package_name || "N/A";
+          document.getElementById("overview").innerText = data.package_overview || "No description available.";
+          document.getElementById("duration").innerText = data.duration || "N/A";
+          
+          // Fix: Ensure full text is shown by not restricting width
+          document.getElementById("places").innerText = data.places || "N/A";
+          
+          document.getElementById("startingDate").innerText = data.start_date || "N/A";
+          document.getElementById("endingDate").innerText = data.end_date || "N/A";
+          document.getElementById("price").innerHTML = `₹${data.price} <span class='text-sm font-normal text-slate-400'>/ Adult</span>`;
+          
+          document.getElementById("mainImage").src = data.image1 || '';
+          document.getElementById("image1").src = data.image1 || '';
+          document.getElementById("image2").src = data.image2 || '';
+          document.getElementById("image3").src = data.image3 || '';
+
+          const itineraryDiv = document.getElementById("itineraryContainer");
+          itineraryDiv.innerHTML = "";
+          const itineraries = data.itineraries || []; 
+          
+          if (itineraries.length > 0) {
+            itineraries.forEach((item) => {
+              itineraryDiv.innerHTML += `
+                <div class="relative pl-12 pb-10 last:pb-0">
+                  <div class="absolute left-0 w-10 h-10 flex items-center justify-center rounded-full bg-white border-4 border-rose-50 text-rose-600 font-black shadow-sm z-10">
+                    ${item.day_number}
+                  </div>
+                  <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:border-rose-200 transition-colors">
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <i class="ri-sun-line text-rose-500"></i> ${item.title}
+                    </h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">${item.description}</p>
+                  </div>
+                </div>`;
+            });
+          } else {
+            itineraryDiv.innerHTML = "<p class='text-gray-500 italic ml-12'>No itinerary details found.</p>";
+          }
+
+          const busId = data.bus_id || (data.bus && data.bus.id);
+          if (busId) {
+            try {
+              const busResponse = await axios.get(`http://127.0.0.1:8000/depot/bus/${busId}/`, config);
+              const bus = busResponse.data;
+
+              document.getElementById("busName").innerText = bus.bus_name || "";
+              document.getElementById("busType").innerText = bus.bus_type || "";
+              document.getElementById("busNumber").innerText = bus.bus_number || "N/A";
+              
+              const seatElement = document.getElementById("totalSeats");
+              const availableSeats = bus.total_seats || 0;
+              seatElement.innerText = availableSeats + " seats left";
+              seatElement.className += availableSeats <= 5 ? " bg-rose-100 text-rose-600" : " bg-green-100 text-green-600";
+
+              document.getElementById("busRouteDate").innerHTML = `${data.start_date} • ${bus.route_name || 'Main Route'}`;
+
+              const routeResponse = await axios.get(`http://127.0.0.1:8000/depot/route/?bus_id=${busId}`, config);
+              const routes = routeResponse.data;
+              const routesContainer = document.getElementById("busRoute");
+              routesContainer.innerHTML = "";
+
+              if(routes.length > 0) {
+                routes.forEach((route) => {
+                  routesContainer.innerHTML += `
+                    <div class="flex items-start gap-4">
+                      <div class="z-10 bg-white p-1">
+                        <div class="w-3 h-3 bg-rose-600 rounded-full ring-4 ring-rose-50"></div>
+                      </div>
+                      <div class="flex-grow border-b border-slate-50 pb-3">
+                        <h6 class="font-bold text-slate-800 text-sm">${route.location}</h6>
+                        <p class="text-slate-400 text-[10px] flex items-center gap-2 mt-1 uppercase font-bold tracking-tighter">
+                          <i class="ri-time-line"></i> ARR ${route.arrival_time} • <i class="ri-share-forward-line"></i> DEP ${route.departure_time}
+                        </p>
+                      </div>
+                    </div>`;
+                });
+              } else {
+                routesContainer.innerHTML = "<p class='text-center text-gray-400 py-4'>No stops listed.</p>";
+              }
+            } catch (busErr) {
+              console.error("Bus Fetch Error:", busErr);
+            }
+          }
+        } catch (error) {
+          console.error("API Error:", error);
+          if (error.response && error.response.status === 401) {
+            window.location.href = "/tourister/login-template/";
+          }
+        }
+      }
+
+      loadAllData();
+
+      document.getElementById("bookBtn").addEventListener("click", function () {
+        if (!token) {
+          window.location.href = "/tourister/login-template/";
+          return;
+        }
+        window.location.href = `/tourister/packagebooking-template/${packageId}/`;
+>>>>>>> main
       });
     </script>
 

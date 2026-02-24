@@ -27,8 +27,16 @@ class BusDetails(models.Model):
     bus_name = models.CharField(max_length=100, default="KSRTC BUS", editable=False)
     bus_number = models.CharField(max_length=50)
     route_name = models.CharField(max_length=100)
-    total_seats = models.IntegerField()
+    total_seats = models.PositiveIntegerField() 
     bus_type = models.CharField(max_length=50, choices=BUS_TYPE_CHOICES)
+    
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(total_seats__gte=0), 
+                name='seats_cannot_be_negative'
+            )
+        ]
 
     def __str__(self):
         return f"{self.bus_name} - {self.bus_number}"

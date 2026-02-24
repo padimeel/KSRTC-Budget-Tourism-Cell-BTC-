@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+{% load static %}
+>>>>>>> main
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,9 +11,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<<<<<<< HEAD
     <style>
         body { overflow-x: hidden; }
         @media (min-height: 850px) { body { overflow-y: hidden; } }
+=======
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { overflow-x: hidden; }
+>>>>>>> main
         .custom-input:focus {
             box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
             border-color: #ef4444;
@@ -19,9 +31,32 @@
 <body class="bg-gray-50 min-h-screen font-sans flex flex-col">
     {% include 'components/navbar.html' %}
 
+<<<<<<< HEAD
     <div class="flex-grow flex items-center justify-center p-4">
         <div class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
             
+=======
+    <div id="successModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl text-center max-w-sm w-full transform transition-all">
+            <div class="w-20 h-20 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-200 animate-bounce">
+                <i data-lucide="check" class="text-white w-10 h-10 stroke-[4]"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800 mb-2 italic uppercase tracking-tighter">Payment Success!</h2>
+            <p class="text-slate-500 text-sm mb-6 font-bold">Your journey has been confirmed.</p>
+            <div class="bg-rose-50 rounded-3xl py-4 px-6 mb-8 border border-rose-100">
+                <span class="text-rose-500 text-[10px] font-black uppercase tracking-widest block">Total Paid</span>
+                <span class="text-3xl font-black text-rose-600 italic">₹<span id="finalPaidAmount">0</span></span>
+            </div>
+            <button onclick="window.location.href='/tourister/hotel-mybookings-template/'"
+                class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl hover:bg-slate-800 transition-all uppercase tracking-widest text-[10px]">
+                Go to My Bookings
+            </button>
+        </div>
+    </div>
+
+    <div class="flex-grow flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+>>>>>>> main
             <div class="bg-red-600 p-5 text-white">
                 <div class="flex justify-between items-center">
                     <div>
@@ -34,16 +69,25 @@
 
             <div class="px-8 py-3 bg-red-50/50 border-b border-red-100 flex justify-between items-center">
                 <div class="flex-1">
+<<<<<<< HEAD
                     <h3 id="hotelName" class="text-xl font-black text-gray-900 leading-none">Loading...</h3>
                     <p id="roomInfo" class="text-gray-500 font-bold text-[9px] mt-1 italic uppercase tracking-wider">Fetching details...</p>
                 </div>
                 <div class="text-right">
                     <p class="text-[8px] font-black text-red-600 uppercase leading-none">Rate per Room / Night</p>
+=======
+                    <h3 id="hotelName" class="text-xl font-black text-gray-900 leading-none tracking-tight">Loading...</h3>
+                    <p id="roomInfo" class="text-gray-500 font-bold text-[9px] mt-1 italic uppercase tracking-wider">Fetching details...</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[8px] font-black text-red-600 uppercase leading-none">Rate per Room</p>
+>>>>>>> main
                     <p id="basePrice" class="text-lg font-black text-gray-900">₹0</p>
                 </div>
             </div>
 
             <form id="bookingForm" class="p-6 space-y-4">
+<<<<<<< HEAD
                 {% csrf_token %}
                 
                 <div>
@@ -53,10 +97,17 @@
                         <input type="text" id="guest_name" required placeholder="Enter name as per Govt ID" 
                             class="w-full bg-gray-50 border-none rounded-xl pl-11 pr-4 py-3 text-xs font-bold outline-none transition-all custom-input">
                     </div>
+=======
+                <div>
+                    <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Guest Full Name</label>
+                    <input type="text" id="guest_name" required placeholder="Name as per Govt ID" 
+                           class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none transition-all custom-input">
+>>>>>>> main
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
+<<<<<<< HEAD
                         <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Check-In</label>
                         <input type="date" id="check_in_date" required 
                             class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none transition-all custom-input">
@@ -65,10 +116,19 @@
                         <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Check-Out</label>
                         <input type="date" id="check_out_date" required 
                             class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none transition-all custom-input">
+=======
+                        <label class="block text-[9px] font-black uppercase text-gray-400 mb-1 ml-1">Check In</label>
+                        <input type="date" id="check_in_date" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold custom-input">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black uppercase text-gray-400 mb-1 ml-1">Check Out</label>
+                        <input type="date" id="check_out_date" required class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold custom-input">
+>>>>>>> main
                     </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-4">
+<<<<<<< HEAD
                     <div>
                         <label class="block text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1 ml-1">Adults</label>
                         <input type="number" id="adults" min="1" value="1" 
@@ -84,15 +144,28 @@
                         <input type="tel" id="phone_number" required placeholder="10 Digits" 
                             class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold outline-none transition-all custom-input">
                     </div>
+=======
+                    <input type="number" id="adults" min="1" value="1" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold custom-input">
+                    <input type="number" id="children" min="0" value="0" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold custom-input">
+                    <input type="tel" id="phone_number" required placeholder="Mobile No" class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-xs font-bold custom-input">
+>>>>>>> main
                 </div>
 
                 <div class="mt-6 bg-gray-900 rounded-2xl p-5 flex justify-between items-center shadow-xl">
                     <div class="flex flex-col">
+<<<<<<< HEAD
                         <span id="calcBreakdown" class="text-[8px] font-bold text-red-400 uppercase tracking-tighter mb-1">Room Price × 1 Night</span>
                         <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Total Payable</p>
                         <h2 class="text-3xl font-black text-white italic tracking-tighter leading-none mt-1">₹<span id="total_price_display">0</span></h2>
                     </div>
                     <button type="submit" id="submitBtn" class="bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95 shadow-lg shadow-red-900/30">
+=======
+                        <span id="calcBreakdown" class="text-[8px] font-bold text-red-400 uppercase tracking-tighter mb-1">Rate × 1 Night</span>
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Total Payable</p>
+                        <h2 class="text-3xl font-black text-white italic tracking-tighter leading-none mt-1">₹<span id="total_price_display">0</span></h2>
+                    </div>
+                    <button type="submit" id="submitBtn" class="bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all active:scale-95">
+>>>>>>> main
                         Confirm & Pay
                     </button>
                 </div>
@@ -101,6 +174,7 @@
     </div>
 
     <script>
+<<<<<<< HEAD
         const roomId = "{{ room_id }}";
         let roomRate = 0; 
 
@@ -120,10 +194,51 @@
             } catch (error) {
                 console.error("Room Load Error:", error);
                 document.getElementById('hotelName').innerText = "Error loading details";
+=======
+        const token = localStorage.getItem('accessToken');
+        const roomId = "{{ room_id }}"; 
+        let roomRate = 0; 
+
+        if (!token) window.location.href = "/tourister/login-template/";
+
+        // Initialize Dates
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('check_in_date').setAttribute('min', today);
+        document.getElementById('check_out_date').setAttribute('min', today);
+
+        function showSuccess(amt) {
+            document.getElementById("finalPaidAmount").innerText = amt.toLocaleString("en-IN");
+            document.getElementById("successModal").classList.remove("hidden");
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ["#e11d48", "#fb7185", "#ffffff"],
+                zIndex: 9999
+            });
+            lucide.createIcons();
+        }
+
+        async function loadRoomDetails() {
+            try {
+                const response = await axios.get(`/tourister/roombook/${roomId}/`, { 
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = response.data;
+                document.getElementById('hotelName').innerText = data.hotel_name;
+                document.getElementById('roomInfo').innerText = `${data.room_type} — Room ${data.room_number}`;
+                document.getElementById('basePrice').innerText = `₹${data.price}`;
+                roomRate = parseFloat(data.price);
+                calculateTotal();
+            } catch (error) { 
+                console.error("Room Detail Error:", error); 
+                alert("Failed to load room details.");
+>>>>>>> main
             }
         }
 
         function calculateTotal() {
+<<<<<<< HEAD
             const checkInVal = document.getElementById('check_in_date').value;
             const checkOutVal = document.getElementById('check_out_date').value;
             
@@ -142,6 +257,19 @@
             document.getElementById('calcBreakdown').innerText = `Rate: ₹${roomRate} × ${nights} Night(s)`;
             
             return grandTotal;
+=======
+            const cin = document.getElementById('check_in_date').value;
+            const cout = document.getElementById('check_out_date').value;
+            let nights = 1;
+            if (cin && cout) {
+                const diff = (new Date(cout) - new Date(cin)) / (1000 * 60 * 60 * 24);
+                nights = diff > 0 ? Math.ceil(diff) : 1;
+            }
+            const total = roomRate * nights;
+            document.getElementById('total_price_display').innerText = total.toLocaleString('en-IN');
+            document.getElementById('calcBreakdown').innerText = `Rate: ₹${roomRate} × ${nights} Night(s)`;
+            return total;
+>>>>>>> main
         }
 
         ['check_in_date', 'check_out_date'].forEach(id => {
@@ -150,10 +278,26 @@
 
         document.getElementById('bookingForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+<<<<<<< HEAD
             
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+=======
+            const btn = document.getElementById('submitBtn');
+            const totalAmount = calculateTotal();
+
+            // Form validation for checkout date
+            const cin = new Date(document.getElementById('check_in_date').value);
+            const cout = new Date(document.getElementById('check_out_date').value);
+            if (cout <= cin) {
+                alert("Check-out date must be after check-in date.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = 'Initializing...';
+>>>>>>> main
 
             const payload = {
                 guest_name: document.getElementById('guest_name').value,
@@ -162,6 +306,7 @@
                 phone_number: document.getElementById('phone_number').value,
                 adults: parseInt(document.getElementById('adults').value),
                 children: parseInt(document.getElementById('children').value),
+<<<<<<< HEAD
                 total_price: calculateTotal()
             };
 
@@ -189,12 +334,61 @@
                 } else {
                     alert("Error: " + (error.response?.data?.error || "Booking failed"));
                 }
+=======
+                total_price: totalAmount
+            };
+
+            try {
+                const response = await axios.post(`/tourister/roombook/${roomId}/`, payload, { 
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const options = {
+                    "key": response.data.key,
+                    "amount": response.data.amount * 100, // Frontend calculation uses amount from backend response
+                    "currency": "INR",
+                    "name": "KSRTC Tourism",
+                    "order_id": response.data.razorpay_order_id,
+                    "handler": async function (resp) {
+                        try {
+                            await axios.post('/payment/verify-payment/', {
+                                razorpay_order_id: resp.razorpay_order_id,
+                                razorpay_payment_id: resp.razorpay_payment_id,
+                                razorpay_signature: resp.razorpay_signature
+                            }, { headers: { 'Authorization': `Bearer ${token}` } });
+
+                            showSuccess(totalAmount);
+                        } catch (err) { 
+                            console.error("Verification Error:", err);
+                            alert("Payment verification failed. Please contact support."); 
+                        }
+                    },
+                    "modal": { 
+                        "ondismiss": () => { 
+                            btn.disabled = false; 
+                            btn.innerText = "Confirm & Pay"; 
+                        } 
+                    },
+                    "theme": { "color": "#e11d48" }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (error) {
+                const errorMsg = error.response?.data?.error || "Booking failed. Please try again.";
+                alert("Error: " + errorMsg);
+>>>>>>> main
                 btn.disabled = false;
                 btn.innerText = "Confirm & Pay";
             }
         });
 
+<<<<<<< HEAD
         loadRoomDetails();
+=======
+        document.addEventListener('DOMContentLoaded', loadRoomDetails);
+>>>>>>> main
     </script>
 </body>
 </html>

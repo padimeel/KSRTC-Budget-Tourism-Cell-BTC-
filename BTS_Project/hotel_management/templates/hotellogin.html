@@ -33,7 +33,6 @@
             </div>
 
             <form id="loginForm" class="space-y-6">
-                {% csrf_token %}
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Hotel Username / ID</label>
                     <div class="relative">
@@ -77,47 +76,57 @@
     </div>
 
     <script>
-        // Use the built-in Django CSRF token from the template
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        axios.defaults.withCredentials = true;
+    const loginForm = document.getElementById('loginForm');
+    
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btn = document.getElementById('loginBtn');
+        const errorBox = document.getElementById('errorBox');
+        const errorMessage = document.getElementById('errorMessage');
+        const usernameValue = document.getElementById('username').value;
+        const passwordValue = document.getElementById('password').value;
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const btn = document.getElementById('loginBtn');
-            const errorBox = document.getElementById('errorBox');
-            const errorMessage = document.getElementById('errorMessage');
-            const usernameValue = document.getElementById('username').value;
-            const passwordValue = document.getElementById('password').value;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
+        errorBox.classList.add('hidden');
 
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
-            errorBox.classList.add('hidden');
+        try {
+            const response = await axios.post('/hotel/hotellogin/', {
+                username: usernameValue,
+                password: passwordValue
+            });
 
-            try {
-                // Point to the relative URL or the correct full URL
-                const response = await axios.post('/hotel/hotellogin/', {
-                    username: usernameValue,
-                    password: passwordValue
-                }, {
-                    headers: { 'X-CSRFToken': csrftoken }
-                });
+            if (response.status === 200) {
+                // FIXED: Extract tokens AND message from response.data
+                const { access, refresh, message, role } = response.data;
 
-                if (response.status === 200) {
-                    window.location.href = '/hotel/home/';
-                }
-            } catch (err) {
-                errorBox.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = '<span>PARTNER SIGN IN</span> <i class="fas fa-shield-check"></i>';
-                
-                if (err.response && err.response.data && err.response.data.error) {
-                    errorMessage.innerText = err.response.data.error;
-                } else {
-                    errorMessage.innerText = "Connection Error. Please try again later.";
-                }
+                // Store tokens in localStorage
+                localStorage.setItem('hotel_access', access);
+                localStorage.setItem('hotel_refresh', refresh);
+                localStorage.setItem('user_role', role);
+
+                // Now logs will work correctly because variables are defined
+                console.log("Login Success:", message);
+                console.log("Access Token:", access);
+                console.log("Refresh Token:", refresh);
+
+                // Redirect to the dashboard
+                window.location.href = '/hotel/home-template/';
             }
-        });
-    </script>
+        } catch (err) {
+            errorBox.classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = '<span>PARTNER SIGN IN</span> <i class="fas fa-shield-check"></i>';
+            
+            if (err.response && err.response.data && err.response.data.error) {
+                errorMessage.innerText = err.response.data.error;
+            } else {
+                errorMessage.innerText = "Connection Error. Please try again later.";
+            }
+            console.error("Login Error:", err);
+        }
+    });
+</script>
 </body>
 </html>

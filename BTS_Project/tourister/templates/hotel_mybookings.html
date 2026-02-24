@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+{% load static %}
+>>>>>>> main
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +14,10 @@
 </head>
 <body class="bg-gray-100 min-h-screen font-sans">
     {% include 'components/navbar.html' %}
+<<<<<<< HEAD
     {% csrf_token %}
+=======
+>>>>>>> main
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         <div class="flex items-center gap-4 mb-8">
@@ -32,14 +39,31 @@
     </div>
 
     <script>
+<<<<<<< HEAD
         // உங்கள் API URL
+=======
+>>>>>>> main
         const API_URL = '/tourister/hotelmybooking/'; 
 
         async function fetchMyBookings() {
             const container = document.getElementById('bookingsContainer');
+<<<<<<< HEAD
             const token = localStorage.getItem('access_token');
             const headers = { 'Accept': 'application/json' };
             if (token) headers['Authorization'] = `Bearer ${token}`;
+=======
+            const token = localStorage.getItem('accessToken');
+            
+            // Set Authorization header using accessToken
+            const headers = { 'Accept': 'application/json' };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            } else {
+                // Redirect to login if no token is found
+                window.location.href = "/tourister/login-template/";
+                return;
+            }
+>>>>>>> main
 
             try {
                 const response = await axios.get(API_URL, { 
@@ -51,7 +75,11 @@
                 console.error("Fetch Error:", error);
                 container.innerHTML = `
                     <div class="bg-red-50 p-6 rounded-xl border border-red-100 text-center">
+<<<<<<< HEAD
                         <p class="text-red-600 font-bold">Unable to load bookings. Please check your connection or login.</p>
+=======
+                        <p class="text-red-600 font-bold">Unable to load bookings. Please check your connection or login again.</p>
+>>>>>>> main
                     </div>`;
             }
         }
@@ -65,7 +93,11 @@
                         <i class="fas fa-calendar-times text-gray-300 text-4xl mb-4"></i>
                         <h3 class="text-lg font-bold text-gray-700 uppercase tracking-tight">No Active Stays</h3>
                         <p class="text-sm text-gray-400 mb-6">You haven't booked any rooms yet.</p>
+<<<<<<< HEAD
                         <a href="/tourister/hotels/" class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-red-700 transition-all">Start Booking</a>
+=======
+                        <a href="/tourister/hotels-template/" class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-red-700 transition-all">Start Booking</a>
+>>>>>>> main
                     </div>`;
                 return;
             }
@@ -105,6 +137,7 @@
             `).join('');
         }
 
+<<<<<<< HEAD
    async function cancelBooking(bookingId) {
     if (!confirm("Are you sure you want to cancel this booking?")) return;
 
@@ -151,6 +184,49 @@
         alert(errorMsg);
     }
 }
+=======
+        async function cancelBooking(bookingId) {
+            if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+            // Get accessToken from storage
+            const token = localStorage.getItem('accessToken');
+            
+            // Set Authorization header
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            try {
+                // Send DELETE request to the specified URL
+                const response = await axios.delete(`/tourister/roombook/${bookingId}/`, { 
+                    headers: headers,
+                    withCredentials: true 
+                });
+                
+                // If deletion is successful
+                if (response.status === 204 || response.status === 200) {
+                    alert("Booking Cancelled Successfully!");
+                    
+                    const card = document.getElementById(`booking-card-${bookingId}`);
+                    if (card) {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            card.remove();
+                            const container = document.getElementById('bookingsContainer');
+                            if (container && container.children.length === 0) {
+                                location.reload();
+                            }
+                        }, 500);
+                    }
+                }
+            } catch (error) {
+                console.error("Cancellation Error:", error);
+                const errorMsg = error.response?.data?.error || "Error cancelling booking.";
+                alert(errorMsg);
+            }
+        }
+>>>>>>> main
 
         document.addEventListener('DOMContentLoaded', fetchMyBookings);
     </script>

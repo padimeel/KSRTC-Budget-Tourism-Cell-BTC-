@@ -22,7 +22,11 @@
             </h2>
             
             <div class="mt-4 md:mt-0 md:absolute md:right-0">
+<<<<<<< HEAD
                 <a href="/tourister/hotelmybooking/" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all shadow-sm">
+=======
+                <a href="/tourister/hotel-mybookings-template/" class="flex items-center gap-2 px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all shadow-sm">
+>>>>>>> main
                     <i class="fas fa-hotel"></i>
                     My Hotels
                 </a>
@@ -71,12 +75,31 @@
 
         // 1. Fetch Bookings
         async function fetchBookings() {
+<<<<<<< HEAD
             const token = localStorage.getItem("access");
             if (!token) { window.location.href = "{% url 'tourister:login' %}"; return; }
 
             try {
                 const response = await axios.get(apiUrl, {
                     headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
+=======
+            const token = localStorage.getItem("accessToken");
+            console.log(localStorage.getItem("accessToken"));
+
+            
+            if (!token) { 
+                console.error("No token found, redirecting to login...");
+                window.location.href = "{% url 'tourister:login_template' %}"; 
+                return; 
+            }
+
+            try {
+                const response = await axios.get(apiUrl, {
+                    headers: { 
+                        "Authorization": `Bearer ${token}`, 
+                        "Accept": "application/json" 
+                    }
+>>>>>>> main
                 });
 
                 const bookings = response.data;
@@ -136,6 +159,10 @@
                     bookingList.appendChild(card);
                 });
             } catch (error) {
+<<<<<<< HEAD
+=======
+                console.error("Fetch Error:", error);
+>>>>>>> main
                 bookingList.innerHTML = `<p class="text-center text-rose-500 py-10 font-bold uppercase text-xs tracking-widest">Error loading data.</p>`;
             }
         }
@@ -154,7 +181,11 @@
         // 3. Review Submission
         async function submitReview() {
             const reviewText = document.getElementById("reviewText").value;
+<<<<<<< HEAD
             const token = localStorage.getItem("access");
+=======
+            const token = localStorage.getItem("accessToken"); 
+>>>>>>> main
             const btn = document.getElementById("submitBtn");
 
             if (selectedRating === 0 || !reviewText.trim()) {
@@ -206,9 +237,17 @@
 
         async function cancelBooking(id) {
             if (!confirm("Are you sure? Seats will be released back.")) return;
+<<<<<<< HEAD
             const token = localStorage.getItem("access");
             try {
                 await axios.delete(`${apiUrl}${id}/`, { headers: { "Authorization": `Bearer ${token}` } });
+=======
+            const token = localStorage.getItem("accessToken"); 
+            try {
+                await axios.delete(`${apiUrl}${id}/`, { 
+                    headers: { "Authorization": `Bearer ${token}` } 
+                });
+>>>>>>> main
                 document.getElementById(`booking-card-${id}`).classList.add('card-fade-out');
                 setTimeout(() => fetchBookings(), 400);
             } catch (error) { alert("Cancellation failed."); }

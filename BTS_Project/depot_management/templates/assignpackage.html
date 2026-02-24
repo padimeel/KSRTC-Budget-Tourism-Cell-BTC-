@@ -11,6 +11,12 @@
         .overflow-x-auto::-webkit-scrollbar { height: 6px; }
         .overflow-x-auto::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
+    <script>
+        // IMMEDIATE REDIRECT IF NOT LOGGED IN
+        if (!localStorage.getItem('depot_access')) {
+            window.location.href = '/depot/depotlogin-template/';
+        }
+    </script>
 </head>
 <body class="bg-amber-50 min-h-screen font-sans">
 
@@ -71,6 +77,10 @@
     </main>
 
     <script>
+        // Set Default Axios Header for all requests on this page
+        const token = localStorage.getItem('depot_access');
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
         document.addEventListener('DOMContentLoaded', fetchPackages);
 
         async function fetchPackages() {
@@ -81,7 +91,16 @@
                 renderTable(response.data);
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('packageBody').innerHTML = `<tr><td colspan="7" class="p-10 text-center text-red-500 font-bold">Failed to load data from server.</td></tr>`;
+                
+                // If token is invalid or expired
+                if (error.response && error.response.status === 401) {
+                    localStorage.clear();
+                    window.location.href = '/depot/depotlogin-template/';
+                } else {
+                    document.getElementById('packageBody').innerHTML = `
+                        <tr><td colspan="7" class="p-10 text-center text-red-500 font-bold">
+                        Failed to load data. Please check your connection.</td></tr>`;
+                }
             }
         }
 
@@ -95,7 +114,6 @@
             }
 
             body.innerHTML = packages.map((pkg, index) => {
-                // Bus Status Logic - Shows Green Badge if assigned
                 const busDisplay = pkg.has_bus ? 
                     `<div class="flex flex-col gap-1">
                         <span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded shadow-sm w-fit uppercase border border-green-200">
@@ -160,18 +178,18 @@
             }).join('');
         }
 
-        function addBus(id) { window.location.href = `/depot/addbus/${id}/`; }
-        function updatePkg(id) { 
-    // குறிப்பிட்ட பஸ் ஐடியைப் பயன்படுத்தி அப்டேட் பக்கத்திற்குச் செல்லும்
-    window.location.href = `/depot/updatebus/${id}/`; 
-}
+        function addBus(id) { window.location.href = `/depot/addbus-template/${id}/`; }
+        function updatePkg(id) { window.location.href = `/depot/updatebus-template/${id}/`; }
 
         function filterTable() {
             const input = document.getElementById('searchInput').value.toUpperCase();
             const rows = document.querySelectorAll('#packageTable tbody tr');
             rows.forEach(row => {
-                const name = row.querySelector('.pkg-name')?.innerText.toUpperCase();
-                if (name) row.style.display = name.includes(input) ? "" : "none";
+                const nameText = row.querySelector('.pkg-name');
+                if (nameText) {
+                    const name = nameText.innerText.toUpperCase();
+                    row.style.display = name.includes(input) ? "" : "none";
+                }
             });
         }
     </script>

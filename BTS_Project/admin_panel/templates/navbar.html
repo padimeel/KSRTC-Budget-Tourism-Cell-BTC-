@@ -11,18 +11,11 @@
     />
   </head>
   <body>
-    <!-- NAVBAR -->
-    <nav
-      class="backdrop-blur-md bg-purple-700/80 border-b border-purple-300 shadow-xl fixed w-full z-40"
-    >
-      <div
-        class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between"
-      >
-       
+    <nav class="backdrop-blur-md bg-purple-700/80 border-b border-purple-300 shadow-xl fixed w-full z-40">
+      <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        
         <div class="flex items-center gap-4">
-          <div
-            class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md ring-2 ring-purple-300"
-          >
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md ring-2 ring-purple-300">
             <span class="text-purple-700 font-bold text-lg">K</span>
           </div>
           <div>
@@ -31,129 +24,64 @@
           </div>
         </div>
 
-        
         <ul class="hidden md:flex items-center gap-5 text-white font-medium">
-          
-          <li>
-            <a href="{% url 'admin_site:dashboard' %}" class="hover:text-purple-200 transition">Dashboard</a>
-          </li> 
-          
-          <li>
-            <a
-              href="{% url 'admin_site:depotsignup' %}"
-              class="hover:text-purple-200 transition"
-              >Add Manager</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'admin_site:managerlist' %}"
-              class="hover:text-purple-200 transition"
-              >Managers</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'admin_site:packages' %}"
-              class="hover:text-purple-200 transition"
-              >Add Package</a
-            >
-          </li>
-          <li>
-            <a href="{% url 'admin_site:hotelsignup' %}" class="hover:text-purple-200 transition">Add hotels</a>
-          </li>
-          <li>
-            <a href="{% url 'admin_site:hotel-list' %}" class="hover:text-purple-200 transition">Hotels List</a>
-          </li>
-           <li>
-            <a href="{% url 'admin_site:bookinglist' %}" class="hover:text-purple-200 transition">Bookings</a>
-          </li> 
+          <li><a href="{% url 'admin_site:dashboard_template' %}" class="hover:text-purple-200 transition">Dashboard</a></li> 
+          <li><a href="{% url 'admin_site:depotsignup_template' %}" class="hover:text-purple-200 transition">Add Manager</a></li>
+          <li><a href="{% url 'admin_site:depotmanagers_template' %}" class="hover:text-purple-200 transition">Managers</a></li>
+          <li><a href="{% url 'admin_site:addpackage_template' %}" class="hover:text-purple-200 transition">Add Package</a></li>
+          <li><a href="{% url 'admin_site:addhotel_template' %}" class="hover:text-purple-200 transition">Add hotels</a></li>
+          <li><a href="{% url 'admin_site:hotellist_template' %}" class="hover:text-purple-200 transition">Hotels List</a></li>
+          <li><a href="{% url 'admin_site:bookinglist_template' %}" class="hover:text-purple-200 transition">Bookings</a></li> 
         </ul>
 
-        <!-- Right Buttons -->
-
         <div class="hidden md:flex items-center gap-4">
-          <a
-            href="{% url 'admin_site:adminlogin' %}"
-            class="px-6 py-2.5 bg-purple-700 text-white font-bold rounded-xl hover:bg-purple-800 flex items-center gap-2"
-          >
-            <i class="fas fa-sign-in-alt text-sm"></i>
-            <span>Login</span>
-          </a>
+          <div id="desktopLoginBtn">
+            <a href="{% url 'admin_site:adminlogin_template' %}" class="px-6 py-2.5 bg-purple-700 text-white font-bold rounded-xl hover:bg-purple-800 flex items-center gap-2 transition">
+              <i class="fas fa-sign-in-alt text-sm"></i>
+              <span>Login</span>
+            </a>
+          </div>
 
-          <a
-            href="{% url 'admin_site:adminlogout' %}"
-            class="px-6 py-2.5 bg-white text-purple-700 font-bold rounded-xl border border-purple-100 flex items-center gap-2"
-          >
-            <i class="fas fa-power-off text-sm"></i>
-            <span>Logout</span>
-          </a>
+          <div id="desktopLogoutBtn" class="hidden">
+            <button onclick="handleLogout()" class="px-6 py-2.5 bg-white text-purple-700 font-bold rounded-xl border border-purple-100 flex items-center gap-2 hover:bg-gray-100 transition">
+              <i class="fas fa-power-off text-sm"></i>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Mobile Menu Button -->
         <button id="menuBtn" class="md:hidden text-white text-3xl">
           <i class="fas fa-bars"></i>
         </button>
       </div>
 
-      <!-- Mobile Menu -->
-      <div
-        id="mobileMenu"
-        class="hidden flex flex-col bg-purple-800 text-white p-5 space-y-4 md:hidden"
-      >
-        <a
-          href="{% url 'admin_site:dashboard' %}"
-          class="py-2 border-b border-purple-600 hover:text-purple-200"
-          >Dashboard</a
-        >
-        <a
-          href="{% url 'admin_site:depotsignup' %}"
-          class="py-2 border-b border-purple-600 hover:text-purple-200"
-          >Add Manager</a
-        >
-        <a
-          href="{% url 'admin_site:managerlist' %}"
-          class="py-2 border-b border-purple-600 hover:text-purple-200"
-          >Managers</a
-        >
-        <a
-          href="{% url 'admin_site:packages' %}"
-          class="py-2 border-b border-purple-600 hover:text-purple-200"
-          >Add Package</a
-        >
-        <li>
-          <a href="{% url 'admin_site:hotelsignup' %}" class="hover:text-purple-200 transition">Add hotels</a>
-        </li>
-        <li>
-          <a href="{% url 'admin_site:hotel-list' %}" class="hover:text-purple-200 transition">Hotels List</a>
-        </li>
-        <a
-          href="{% url 'admin_site:bookinglist' %}"
-          class="py-2 border-b border-purple-600 hover:text-purple-200"
-          >Bookings</a
-        > 
+      <div id="mobileMenu" class="hidden flex flex-col bg-purple-800 text-white p-5 space-y-4 md:hidden">
+        <a href="{% url 'admin_site:dashboard_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Dashboard</a>
+        <a href="{% url 'admin_site:depotsignup_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Add Manager</a>
+        <a href="{% url 'admin_site:depotmanagers_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Managers</a>
+        <a href="{% url 'admin_site:addpackage_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Add Package</a>
+        <a href="{% url 'admin_site:addhotel_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Add hotels</a>
+        <a href="{% url 'admin_site:hotellist_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Hotels List</a>
+        <a href="{% url 'admin_site:bookinglist_template' %}" class="py-2 border-b border-purple-600 hover:text-purple-200">Bookings</a>
 
         <div class="flex flex-col gap-3 pt-4">
-          <a
-            href="{% url 'admin_site:adminlogin' %}"
-            class="w-full px-6 py-3 bg-purple-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 border border-purple-400"
-          >
-            <i class="fas fa-sign-in-alt"></i>
-            <span>Login</span>
-          </a>
+          <div id="mobileLoginBtn">
+            <a href="{% url 'admin_site:adminlogin_template' %}" class="w-full px-6 py-3 bg-purple-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 border border-purple-400">
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Login</span>
+            </a>
+          </div>
 
-          <a
-            href="{% url 'admin_site:adminlogout' %}"
-            class="w-full px-6 py-3 bg-white text-purple-800 font-bold rounded-xl flex items-center justify-center gap-2"
-          >
-            <i class="fas fa-power-off"></i>
-            <span>Logout</span>
-          </a>
+          <div id="mobileLogoutBtn" class="hidden">
+            <button onclick="handleLogout()" class="w-full px-6 py-3 bg-white text-purple-800 font-bold rounded-xl flex items-center justify-center gap-2">
+              <i class="fas fa-power-off"></i>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
 
-    <!-- Mobile Menu JS -->
     <script>
       const menuBtn = document.getElementById("menuBtn");
       const mobileMenu = document.getElementById("mobileMenu");
@@ -161,6 +89,58 @@
       menuBtn.addEventListener("click", () => {
         mobileMenu.classList.toggle("hidden");
       });
+
+      // Update UI based on Token
+      function updateAuthUI() {
+        const token = localStorage.getItem("accessToken");
+        const dLogin = document.getElementById("desktopLoginBtn");
+        const dLogout = document.getElementById("desktopLogoutBtn");
+        const mLogin = document.getElementById("mobileLoginBtn");
+        const mLogout = document.getElementById("mobileLogoutBtn");
+
+        if (token) {
+          dLogin?.classList.add("hidden");
+          dLogout?.classList.remove("hidden");
+          mLogin?.classList.add("hidden");
+          mLogout?.classList.remove("hidden");
+        } else {
+          dLogin?.classList.remove("hidden");
+          dLogout?.classList.add("hidden");
+          mLogin?.classList.remove("hidden");
+          mLogout?.classList.add("hidden");
+        }
+      }
+
+      // Logout Handler
+      async function handleLogout() {
+        const accessToken = localStorage.getItem("accessToken");
+        const refreshToken = localStorage.getItem("refreshToken");
+
+        try {
+          // Attempt to blacklist the token on the server
+          const response = await fetch("{% url 'admin_site:adminlogout' %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ "refresh": refreshToken })
+          });
+
+          if (response.ok || response.status === 401) {
+             console.log("Logged out successfully");
+          }
+        } catch (error) {
+          console.error("Logout error:", error);
+        } finally {
+          // Always clear local storage and redirect regardless of API success
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          window.location.href = "{% url 'admin_site:adminlogin_template' %}";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", updateAuthUI);
     </script>
   </body>
 </html>

@@ -19,7 +19,11 @@ class User(AbstractUser):
         ("Hotel", "Hotel")
     ]
 
+<<<<<<< HEAD
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="Tourister")
+=======
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+>>>>>>> main
 
     
 

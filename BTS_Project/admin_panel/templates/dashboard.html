@@ -8,6 +8,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    if (!localStorage.getItem('accessToken')) {
+        window.location.href = '/admin_site/adminlogin-template/';
+    }
+  </script>
   <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -18,7 +24,6 @@
       border: 1px solid rgba(124, 58, 237, 0.1);
     }
     main { margin-top: 0 !important; }
-    /* சார்ட் உயரமாகத் தெரிய சிறிய ஸ்டைல் */
     .chart-container { position: relative; height: 200px; width: 100%; }
   </style>
 </head>
@@ -93,8 +98,7 @@
           <div class="chart-container">
             <canvas id="roleDonut"></canvas>
           </div>
-          <div class="mt-8 w-full space-y-3" id="legendContainer">
-            </div>
+          <div class="mt-8 w-full space-y-3" id="legendContainer"></div>
         </div>
       </div>
 
@@ -112,18 +116,16 @@
                 <th class="pb-4 font-bold text-right">Amount</th>
               </tr>
             </thead>
-            <tbody id="bookingsTableBody" class="divide-y divide-slate-50">
-              </tbody>
+            <tbody id="bookingsTableBody" class="divide-y divide-slate-50"></tbody>
           </table>
         </div>
       </div>
     </div>
   </main>
 
- 
-
   <script>
     let myChart = null;
+    const API_BASE_URL = "http://127.0.0.1:8000";
 
     const Dashboard = {
       colors: {
@@ -134,9 +136,13 @@
       },
 
       async init() {
+        const token = localStorage.getItem("accessToken");
         try {
-          const response = await axios.get(window.location.href, {
-            headers: { 'Accept': 'application/json' }
+          const response = await axios.get(`${API_BASE_URL}/admin_site/dashboard/`, {
+            headers: { 
+                'Accept': 'application/json',
+                "Authorization": `Bearer ${token}` 
+            }
           });
           
           if (response.data) {
@@ -148,16 +154,15 @@
       },
 
       render(data) {
+        // Update Stats
         document.getElementById('totalPackages').innerText = data.summary.packages || 0;
         document.getElementById('totalBookings').innerText = data.summary.bookings || 0;
         document.getElementById('totalTourists').innerText = (data.summary.tourists || 0).toLocaleString();
         document.getElementById('totalPayments').innerText = '₹' + (data.summary.revenue || 0).toLocaleString();
 
+        // Handle Chart
         const ctx = document.getElementById('roleDonut').getContext('2d');
-        
-        if (myChart) {
-          myChart.destroy();
-        }
+        if (myChart) { myChart.destroy(); }
 
         const chartData = [
           data.roles.tourists || 0,
@@ -181,12 +186,11 @@
             cutout: '80%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
           }
         });
 
+        // Legend
         const roles = ['tourists', 'admins', 'managers', 'hotels'];
         document.getElementById('legendContainer').innerHTML = roles.map((role, i) => `
           <div class="flex items-center justify-between text-sm">
@@ -198,7 +202,7 @@
           </div>
         `).join('');
 
-        
+        // Table
         const tableBody = document.getElementById('bookingsTableBody');
         if (data.recentBookings && data.recentBookings.length > 0) {
           tableBody.innerHTML = data.recentBookings.map(b => `

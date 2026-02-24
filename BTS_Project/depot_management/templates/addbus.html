@@ -7,12 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // AUTH GUARD: Check for token before page renders
+        if (!localStorage.getItem('depot_access')) {
+            window.location.href = '/depot/depotlogin-template/';
+        }
+    </script>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans">
 
     {% include "components/depotnavbar.html" %}
-
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
     <main class="max-w-[95%] mx-auto p-6">
         <div class="mb-8 mt-20">
@@ -103,6 +107,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="flex justify-end gap-4 py-10">
                 <button type="button" onclick="history.back()" class="px-8 py-4 rounded-2xl font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-all">Cancel</button>
                 <button type="submit" id="submitBtn" class="bg-yellow-500 px-10 py-4 rounded-2xl font-black text-slate-900 uppercase tracking-widest shadow-xl shadow-yellow-200 hover:bg-slate-900 hover:text-yellow-500 transition-all">
@@ -114,7 +119,10 @@
     </main>
 
     <script>
-        const getCsrfToken = () => document.getElementById('csrf_token').value;
+        const accessToken = localStorage.getItem('depot_access');
+        console.log(accessToken)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        
 
         function addRouteField() {
             const container = document.getElementById('routeContainer');
@@ -160,16 +168,15 @@
                 bus_number: document.getElementById('bus_number').value.trim().toUpperCase(),
                 route_name: document.getElementById('route_name').value.trim(),
                 bus_type: document.getElementById('bus_type').value,
-                total_seats: parseInt(document.getElementById('total_seats').value),
-                user: "{{ request.user.id }}"
+                total_seats: parseInt(document.getElementById('total_seats').value)
             };
 
             try {
-                const busResponse = await axios.post('http://127.0.0.1:8000/depot/bus/', busData, {
-                    headers: { 'X-CSRFToken': getCsrfToken() }
-                });
-
+                // Step 1: Create the Bus
+                const busResponse = await axios.post('http://127.0.0.1:8000/depot/bus/', busData);
                 const busId = busResponse.data.id;
+
+                // Step 2: Create All Routes
                 const routeItems = document.querySelectorAll('.route-item');
                 const routePromises = Array.from(routeItems).map(item => {
                     const departureVal = item.querySelector('[name="departure_time"]').value;
@@ -179,18 +186,23 @@
                         arrival_time: item.querySelector('[name="arrival_time"]').value,
                         departure_time: departureVal || null,
                         description: item.querySelector('[name="description"]').value.trim()
-                    }, {
-                        headers: { 'X-CSRFToken': getCsrfToken() }
                     });
                 });
 
                 await Promise.all(routePromises);
-                alert('Success!');
-                window.location.href = '/depot/assignpackage/';
+                
+                alert('Success! Bus and routes have been assigned.');
+                window.location.href = '/depot/assignpackage-template/';
 
             } catch (error) {
                 console.error(error);
-                alert("Already Assign the Bus in this Package");
+                if (error.response && error.response.status === 401) {
+                    alert("Session expired. Please login again.");
+                    localStorage.clear();
+                    window.location.href = '/depot/login/';
+                } else {
+                    alert(error.response?.data?.error || "Error: Ensure this package doesn't already have a bus assigned.");
+                }
             } finally {
                 submitBtn.disabled = false;
                 btnText.innerText = "Save Bus Details";

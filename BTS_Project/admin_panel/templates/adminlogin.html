@@ -60,7 +60,7 @@
                 </div>
 
                 <button type="submit" id="loginBtn"
-                    class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-purple-200 transition-all flex items-center justify-center gap-2 active:scale-95">
+                    class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-purple-200 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
                     <span>SECURE LOGIN</span>
                     <i class="fas fa-shield-alt"></i>
                 </button>
@@ -73,27 +73,6 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        // Allows Axios to send and receive Cookies (Session ID)
-        axios.defaults.withCredentials = true;
-
-        // Function to get CSRF token from Django Cookies
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // --- 2. LOGIN LOGIC ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -103,37 +82,56 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // Loading state
+            // 1. Loading state
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Authenticating...';
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span>Authenticating...</span>';
             errorBox.classList.add('hidden');
 
             try {
-                // Adjust this URL if your server runs on a different port/domain
+                // 2. API Call
                 const response = await axios.post('http://127.0.0.1:8000/admin_site/adminlogin/', {
                     username: username,
                     password: password
-                }, {
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken') // Compulsory for Django POST
-                    }
                 });
 
-                if (response.status === 200) {
-                    window.location.href = '/admin_site/packages/';
+                // 3. Handle Success (Check for response.data not res.data)
+                if (response.data && response.data.access) {
+                    localStorage.setItem('accessToken', response.data.access);
+                    localStorage.setItem('refreshToken', response.data.refresh);
+
+                       console.log("--- Login Data ---");
+
+                    console.log("Access Token:", localStorage.getItem('accessToken'));
+
+                    console.log("Refresh Token:", localStorage.getItem('refreshToken'));
+
+                    // Optional: Update UI to success
+                    btn.innerHTML = '<i class="fas fa-check"></i> <span>Success! Redirecting...</span>';
+                    btn.className = "w-full bg-green-600 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2";
+
+                    
+                    window.location.href = "{% url 'admin_site:dashboard_template' %}";
+                } else {
+                    throw new Error("Login failed: Invalid response from server.");
                 }
+
             } catch (err) {
+                // 5. Handle Error
                 console.error("Login Error:", err);
                 errorBox.classList.remove('hidden');
                 
-                // Show specific error from backend if available
                 if (err.response && err.response.data && err.response.data.error) {
                     errorMessage.innerText = err.response.data.error;
+                } else if (err.response && err.response.status === 401) {
+                    errorMessage.innerText = "Invalid username or password.";
                 } else {
-                    errorMessage.innerText = "Connection failed. Is the server running?";
+                    errorMessage.innerText = "Connection failed. Please ensure the backend is running.";
                 }
                 
+                // Reset Button
                 btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
                 btn.innerHTML = '<span>SECURE LOGIN</span> <i class="fas fa-shield-alt"></i>';
             }
         });
