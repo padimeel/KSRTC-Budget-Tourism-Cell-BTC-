@@ -1,4 +1,6 @@
 from django.db import models
+
+# Create your models here.
 from django.db.models import Sum
 from tourister.models import Package_Booking
 
@@ -51,3 +53,4 @@ class Transaction(models.Model):
             booking_id = f"RM-{self.room_booking.id}"
             
         return f"Booking {booking_id} - {self.status} (₹{self.amount})"
+

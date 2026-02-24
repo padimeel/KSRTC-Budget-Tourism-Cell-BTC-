@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 {% load static %}
+=======
+<<<<<<< HEAD
+=======
+{% load static %}
+>>>>>>> main
+>>>>>>> sreeramDev
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +18,13 @@
 </head>
 <body class="bg-gray-100 min-h-screen font-sans">
     {% include 'components/navbar.html' %}
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    {% csrf_token %}
+=======
+>>>>>>> main
+>>>>>>> sreeramDev
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         <div class="flex items-center gap-4 mb-8">
@@ -32,10 +46,25 @@
     </div>
 
     <script>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        // உங்கள் API URL
+=======
+>>>>>>> main
+>>>>>>> sreeramDev
         const API_URL = '/tourister/hotelmybooking/'; 
 
         async function fetchMyBookings() {
             const container = document.getElementById('bookingsContainer');
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+            const token = localStorage.getItem('access_token');
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+=======
+>>>>>>> sreeramDev
             const token = localStorage.getItem('accessToken');
             
             // Set Authorization header using accessToken
@@ -47,6 +76,10 @@
                 window.location.href = "/tourister/login-template/";
                 return;
             }
+<<<<<<< HEAD
+=======
+>>>>>>> main
+>>>>>>> sreeramDev
 
             try {
                 const response = await axios.get(API_URL, { 
@@ -58,7 +91,15 @@
                 console.error("Fetch Error:", error);
                 container.innerHTML = `
                     <div class="bg-red-50 p-6 rounded-xl border border-red-100 text-center">
+<<<<<<< HEAD
                         <p class="text-red-600 font-bold">Unable to load bookings. Please check your connection or login again.</p>
+=======
+<<<<<<< HEAD
+                        <p class="text-red-600 font-bold">Unable to load bookings. Please check your connection or login.</p>
+=======
+                        <p class="text-red-600 font-bold">Unable to load bookings. Please check your connection or login again.</p>
+>>>>>>> main
+>>>>>>> sreeramDev
                     </div>`;
             }
         }
@@ -72,7 +113,15 @@
                         <i class="fas fa-calendar-times text-gray-300 text-4xl mb-4"></i>
                         <h3 class="text-lg font-bold text-gray-700 uppercase tracking-tight">No Active Stays</h3>
                         <p class="text-sm text-gray-400 mb-6">You haven't booked any rooms yet.</p>
+<<<<<<< HEAD
                         <a href="/tourister/hotels-template/" class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-red-700 transition-all">Start Booking</a>
+=======
+<<<<<<< HEAD
+                        <a href="/tourister/hotels/" class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-red-700 transition-all">Start Booking</a>
+=======
+                        <a href="/tourister/hotels-template/" class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold uppercase tracking-wider hover:bg-red-700 transition-all">Start Booking</a>
+>>>>>>> main
+>>>>>>> sreeramDev
                     </div>`;
                 return;
             }
@@ -112,6 +161,57 @@
             `).join('');
         }
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+   async function cancelBooking(bookingId) {
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+    // 1. டோக்கன் மற்றும் CSRF எடுக்கவும்
+    const token = localStorage.getItem('access_token');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    // 2. ஹெடர் செட் செய்யவும்
+    const headers = { 
+        'X-CSRFToken': csrfToken 
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+        // 3. சரியான URL-க்கு DELETE ரெக்வஸ்ட் அனுப்பவும்
+        // உங்கள் URL path: /tourister/roombook/<int:pk>/
+        const response = await axios.delete(`/tourister/roombook/${bookingId}/`, { 
+            headers: headers,
+            withCredentials: true 
+        });
+        
+        // 4. வெற்றிகரமாக நீக்கப்பட்டால் (Status 204)
+        if (response.status === 204 || response.status === 200) {
+            alert("Booking Cancelled Successfully!");
+            
+            const card = document.getElementById(`booking-card-${bookingId}`);
+            if (card) {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    card.remove();
+                    const container = document.getElementById('bookingsContainer');
+                    if (container && container.children.length === 0) {
+                        location.reload();
+                    }
+                }, 500);
+            }
+        }
+    } catch (error) {
+        console.error("Cancellation Error:", error);
+        // சர்வர் அனுப்பும் பிழையைக் காண்பிக்க
+        const errorMsg = error.response?.data?.error || "Error cancelling booking.";
+        alert(errorMsg);
+    }
+}
+=======
+>>>>>>> sreeramDev
         async function cancelBooking(bookingId) {
             if (!confirm("Are you sure you want to cancel this booking?")) return;
 
@@ -153,6 +253,10 @@
                 alert(errorMsg);
             }
         }
+<<<<<<< HEAD
+=======
+>>>>>>> main
+>>>>>>> sreeramDev
 
         document.addEventListener('DOMContentLoaded', fetchMyBookings);
     </script>
