@@ -1,9 +1,5 @@
 from django.urls import path
-<<<<<<< HEAD
-from .views import Signup,Login,PackageDetails,Index,Navbar,Footer,Packagelist,MyBooking,Logout,PackageBooking,RateReviewAPI,Hotels,BookRoom,HotelMyBooking
-=======
 from .views import *
->>>>>>> main
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
 app_name = "tourister"
@@ -14,11 +10,6 @@ urlpatterns = [
     path('packagedetails/', PackageDetails.as_view(), name='Packagedetails'),
     path('packagedetails/<int:pk>/', PackageDetails.as_view(), name='Packagedetails'),
     path('index/', Index.as_view(), name='index'),
-<<<<<<< HEAD
-    path('navbar/', Navbar.as_view(), name='navbar'),
-    path('footer/', Footer.as_view(), name='footer'),
-=======
->>>>>>> main
     path('packagelist/', Packagelist.as_view(), name='packagelist'),
     path('mybooking/', MyBooking.as_view(), name='mybooking'),
     path('mybooking/<int:pk>/', MyBooking.as_view(), name='mybooking'),
@@ -32,8 +23,6 @@ urlpatterns = [
     path('roombook/', BookRoom.as_view(), name='bookroom'),
     path('roombook/<int:room_id>/', BookRoom.as_view(), name='bookroom'),
     path('hotelmybooking/', HotelMyBooking.as_view(), name='hotelmybooking'),
-<<<<<<< HEAD
-=======
     
     
     # General Page Endpoints
@@ -58,5 +47,4 @@ urlpatterns = [
     # Payment Endpoints
     path('payment-template/', PaymentTemplate.as_view(), name='payment_template'),
     path('payment-success-template/', PaymentSuccessTemplate.as_view(), name='payment_success_template'),
->>>>>>> main
 ]

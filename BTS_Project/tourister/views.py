@@ -1,18 +1,9 @@
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model,login
 from django.core.mail import send_mail
-<<<<<<< HEAD
-from django.http import HttpResponseRedirect
-from django.views.generic import TemplateView
 from django.shortcuts import get_object_or_404,render
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework import permissions, status,renderers
-from rest_framework.authentication import SessionAuthentication
-=======
-from django.shortcuts import get_object_or_404,render
-from rest_framework.permissions import IsAuthenticated,AllowAny
-from rest_framework import permissions, status,renderers
->>>>>>> main
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
@@ -26,22 +17,6 @@ from admin_panel.models import Package_Details
 from .serializers import SignupSerializer, RateReviewSerializer, BookingSerializer,RoomBookingSerializer
 from admin_panel.serializers import PackageSerializer
 from hotel_management.serializers import RoomSerializer
-<<<<<<< HEAD
-
-User = get_user_model()
-
-
-# ------------------------------
-# SIGNUP
-# ------------------------------
-class Signup(APIView):
-    permission_classes = [permissions.AllowAny]
-    renderer_classes = [JSONRenderer, TemplateHTMLRenderer]
-    template_name = "signup.html"
-
-    def get(self, request):
-        return Response({})
-=======
 from django.views.decorators.csrf import csrf_exempt
 import razorpay
 from payment.models import Transaction
@@ -170,31 +145,17 @@ class PackageDetailsTemplate(APIView):
     
 class Signup(APIView):
     permission_classes = [permissions.AllowAny]
->>>>>>> main
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         
         if serializer.is_valid():
-<<<<<<< HEAD
-            # 1. Save the user first
-            user = serializer.save()
-            
-            # 2. Extract data for the email
-            username = user.username
-            email = user.email
-            # Use .get() to avoid KeyErrors if phone_number isn't in validated_data
-            phone_number = request.data.get("phone_number", "Not provided")
-
-            # 3. Prepare Email Content
-=======
             user = serializer.save()
             
             username = user.username
             email = user.email
             phone_number = request.data.get("phone_number", "Not provided")
             
->>>>>>> main
             subject = "Your KSRTC Budget Tourism Account is Successfully Created"
             text_message = f"""
 Hi {username},
@@ -241,22 +202,9 @@ KSRTC Budget Tourism Team
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
-
-class Login(APIView):
-    permission_classes = [permissions.AllowAny]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = 'login.html'
-
-    def get(self, request):
-        if request.accepted_renderer.format == 'html':
-            return Response({})
-        return Response({"detail": "Not allowed"}, status=405)
-=======
 class Login(APIView):
     permission_classes = [permissions.AllowAny]
 
->>>>>>> main
 
     def post(self, request):
         username = request.data.get("username")
@@ -293,17 +241,8 @@ class Login(APIView):
 
 class Index(APIView):
     permission_classes = [permissions.AllowAny]
-<<<<<<< HEAD
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = 'index.html'
 
     def get(self, request):
-        if request.accepted_renderer.format == 'html':
-            return Response({})
-=======
-
-    def get(self, request):
->>>>>>> main
         packages = Package_Details.objects.all().order_by('-id')[:8]
         package_serializer = PackageSerializer(packages, many=True)
         
@@ -319,20 +258,9 @@ class Index(APIView):
 
 class Packagelist(APIView):
     permission_classes = [permissions.AllowAny]
-<<<<<<< HEAD
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = "packagelist.html"
 
     def get(self, request):
        
-        if request.accepted_renderer.format == "html":
-            return Response({})
-
-=======
-
-    def get(self, request):
-       
->>>>>>> main
         destination = request.GET.get("destination", "")
         date = request.GET.get("date", "")
         price = request.GET.get("price", "")
@@ -363,51 +291,22 @@ class Packagelist(APIView):
 
 
 class PackageDetails(APIView):
-<<<<<<< HEAD
-    permission_classes = [permissions.AllowAny]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = "packagedetails.html"
-
-    def get(self, request, pk=None):
-        if request.accepted_renderer.format == 'html':
-            return Response({})
-
-        if not pk:
-            return Response({"message": "Package ID required"}, status=400)
-=======
     permission_classes = [permissions.IsAuthenticated]
     renderer_classes = [JSONRenderer]
 
     def get(self, request, pk=None):
         if not pk:
             return Response({"message": "Package ID required"}, status=status.HTTP_400_BAD_REQUEST)
->>>>>>> main
 
         try:
             package = Package_Details.objects.get(id=pk)
         except Package_Details.DoesNotExist:
-<<<<<<< HEAD
-            return Response({"message": "Package not found"}, status=404)
-
-        serializer = PackageSerializer(package)
-        return Response({"package": serializer.data})
-
-
-class Navbar(TemplateView):
-    template_name = "navbar.html"
-
-
-class Footer(TemplateView):
-    template_name = "footer.html"
-
-=======
             return Response({"message": "Package not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = PackageSerializer(package)
         return Response({"package": serializer.data}, status=status.HTTP_200_OK)
 
 
->>>>>>> main
 
 class MyBooking(APIView):
     authentication_classes = [JWTAuthentication]
@@ -476,12 +375,7 @@ class MyBooking(APIView):
 # PACKAGE BOOKING
 # ------------------------------
 class PackageBooking(APIView):
-<<<<<<< HEAD
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = "packagebooking.html"
-=======
     renderer_classes = [JSONRenderer]
->>>>>>> main
 
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -489,19 +383,9 @@ class PackageBooking(APIView):
         return [permissions.AllowAny()]
 
     def get(self, request):
-<<<<<<< HEAD
-        package_id = request.GET.get('package_id')
-        
-        if request.accepted_renderer.format == 'html':
-            return Response({'package_id': package_id}, template_name=self.template_name)
-        
-        if not package_id:
-            return Response({"error": "Package ID missing"}, status=400)
-=======
         package_id = request.query_params.get('package_id')
         if not package_id:
             return Response({"error": "Package ID missing"}, status=status.HTTP_400_BAD_REQUEST)
->>>>>>> main
             
         try:
             pkg = Package_Details.objects.select_related('bus').get(id=package_id)
@@ -512,26 +396,6 @@ class PackageBooking(APIView):
                 "bus_id": pkg.bus.id if pkg.bus else None,
                 "bus_seats": pkg.bus.total_seats if pkg.bus else 0
             }
-<<<<<<< HEAD
-            return Response(data)
-        except Package_Details.DoesNotExist:
-            return Response({"error": "Package not found"}, status=404)
-
-    @transaction.atomic
-    def post(self, request):
-
-        serializer = BookingSerializer(data=request.data, context={'request': request})
-    
-        if serializer.is_valid():
-            serializer.save() 
-        
-            return Response({
-            "message": "Booking Successful",
-            "details": serializer.data
-        }, status=201)
-    
-        return Response(serializer.errors, status=400)
-=======
             return Response(data, status=status.HTTP_200_OK)
         except Package_Details.DoesNotExist:
             return Response({"error": "Package not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -551,7 +415,6 @@ class PackageBooking(APIView):
             }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
->>>>>>> main
     
     
 class RateReviewAPI(APIView):
@@ -578,60 +441,21 @@ class RateReviewAPI(APIView):
     
     
 class Hotels(APIView):
-<<<<<<< HEAD
-    permission_classes = [permissions.AllowAny]
-    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = 'hotels.html'
-=======
 
     permission_classes = [permissions.AllowAny]
     renderer_classes = [JSONRenderer]
->>>>>>> main
 
     def get(self, request):
         location_query = request.query_params.get('location', '').strip()
         rooms = Room.objects.filter(is_available=True)
-<<<<<<< HEAD
-
-        if location_query:
-            rooms = rooms.filter(hotel__address__icontains=location_query)
-
-        if request.accepted_renderer.format == 'json':
-            
-            serializer = RoomSerializer(rooms, many=True)
-            return Response(serializer.data)
-
-        return Response({
-            'rooms': rooms,
-            'current_location': location_query
-        })
-=======
         if location_query:
             rooms = rooms.filter(hotel__address__icontains=location_query)
         serializer = RoomSerializer(rooms, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
->>>>>>> main
         
         
         
 class BookRoom(APIView):
-<<<<<<< HEAD
-    authentication_classes = [JWTAuthentication, SessionAuthentication]
-    renderer_classes = [renderers.TemplateHTMLRenderer, renderers.JSONRenderer]
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
-
-    def get(self, request, room_id):
-        room = get_object_or_404(Room, id=room_id)
-        if request.accepted_renderer.format == 'html':
-            # HTML பக்கத்திற்கு room_id மட்டும் போதும்
-            return Response({'room_id': room_id}, template_name='roombooking.html')
-        
-        # Axios (JSON) கேட்கும்போது அனைத்து விவரங்களையும் அனுப்பவும்
-=======
     renderer_classes = [renderers.JSONRenderer]
     permission_classes = [permissions.IsAuthenticated]
 
@@ -639,7 +463,6 @@ class BookRoom(APIView):
         """Fetch room details for the booking page"""
         room = get_object_or_404(Room, id=room_id)
         
->>>>>>> main
         return Response({
             "hotel_name": room.hotel.hotel_name,
             "room_type": room.room_type,
@@ -648,13 +471,6 @@ class BookRoom(APIView):
         })
 
     def post(self, request, room_id):
-<<<<<<< HEAD
-        room = get_object_or_404(Room, id=room_id)
-        check_in = request.data.get('check_in_date')
-        check_out = request.data.get('check_out_date')
-
-        
-=======
         """Initialize a room booking and Razorpay order"""
         room = get_object_or_404(Room, id=room_id)
         check_in = request.data.get('check_in_date')
@@ -662,7 +478,6 @@ class BookRoom(APIView):
         total_price = request.data.get('total_price')
 
        
->>>>>>> main
         is_booked = RoomBooking.objects.filter(
             room=room,
             check_out_date__gt=check_in,
@@ -670,23 +485,6 @@ class BookRoom(APIView):
         ).exists()
 
         if is_booked:
-<<<<<<< HEAD
-            return Response(
-                {"error": "This room is already booked for the selected dates. Please choose different dates."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        # -------------------------------------------------------
-
-        serializer = RoomBookingSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user, room=room)
-            return Response({"message": "Booking successful!"}, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, room_id):
-
-=======
             return Response({"error": "This room is already booked for the selected dates."}, status=400)
 
         # 2. Save Booking Instance
@@ -730,29 +528,10 @@ class BookRoom(APIView):
     def delete(self, request, room_id):
         """Cancel a room booking"""
         # Note: Usually, room_id here should refer to the Booking ID, not the Room ID
->>>>>>> main
         booking = RoomBooking.objects.filter(id=room_id, user=request.user).first()
     
         if booking:
             booking.delete()
-<<<<<<< HEAD
-       
-            return Response(status=status.HTTP_204_NO_CONTENT)
-    
-        return Response({"error": "No booking found to delete"}, status=status.HTTP_404_NOT_FOUND)
-
-class HotelMyBooking(APIView):
-    authentication_classes = [JWTAuthentication, SessionAuthentication]
-    renderer_classes = [renderers.TemplateHTMLRenderer, renderers.JSONRenderer]
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        if request.accepted_renderer.format == 'html':
-            return Response({}, template_name='hotel_mybookings.html')
-        
-        
-        bookings = RoomBooking.objects.filter(user=request.user).order_by('-id')
-=======
             return Response({"message": "Booking cancelled successfully"}, status=status.HTTP_200_OK)
     
         return Response({"error": "No booking found to delete"}, status=status.HTTP_404_NOT_FOUND)
@@ -766,7 +545,6 @@ class HotelMyBooking(APIView):
     def get(self, request):
         bookings = RoomBooking.objects.filter(user=request.user).order_by('-id')
         
->>>>>>> main
         data = [{
             "id": b.id,
             "hotel_name": b.room.hotel.hotel_name,
@@ -776,10 +554,7 @@ class HotelMyBooking(APIView):
             "check_out": b.check_out_date.strftime('%d %b %Y'),
             "total_price": str(b.total_price),
         } for b in bookings]
-<<<<<<< HEAD
-=======
         
->>>>>>> main
         return Response(data)
 
 
