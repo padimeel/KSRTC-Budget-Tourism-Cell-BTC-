@@ -49,8 +49,7 @@ class BookingSerializer(serializers.ModelSerializer):
         package_id = data.get("package_id")
         
         try:
-            # select_for_update() locks the row to prevent other processes 
-            # from modifying the package/bus during this transaction.
+            # We use select_for_update() to prevent race conditions during seat booking
             package = Package_Details.objects.select_for_update().select_related('bus').get(id=package_id)
         except Package_Details.DoesNotExist:
             raise serializers.ValidationError({"package_id": "The specified package does not exist."})
@@ -73,7 +72,7 @@ class BookingSerializer(serializers.ModelSerializer):
                 "error": f"Not enough seats available. Remaining: {package.bus.total_seats}"
             })
 
-        # Pass objects to the create method via validated_data
+        # Pass the package object to the create method
         data['package_obj'] = package
         data['total_passengers'] = total_passengers
         return data
