@@ -177,12 +177,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-      // Initialize Lucide Icons
       lucide.createIcons();
 
-      const pathSegments = window.location.pathname
-        .split("/")
-        .filter((s) => s !== "");
+      const pathSegments = window.location.pathname.split("/").filter((s) => s !== "");
       const packageId = pathSegments[pathSegments.length - 1];
       const accessToken = localStorage.getItem("accessToken");
       let packagePrice = 0;
@@ -196,39 +193,25 @@
         try {
           const res = await axios.get(
             `http://127.0.0.1:8000/tourister/packagebooking/?package_id=${packageId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                Accept: "application/json",
-              },
-            },
+            { headers: { Authorization: `Bearer ${accessToken}`, Accept: "application/json" } }
           );
           const data = res.data;
-          // Ensure packagePrice is a number
           packagePrice = parseFloat(data.price) || 0;
           document.getElementById("package_name").innerText = data.package_name;
-          document.getElementById("available_seats").innerText =
-            data.bus_seats + " seats";
+          document.getElementById("available_seats").innerText = data.bus_seats + " seats";
 
-          const routeRes = await axios.get(
-            `http://127.0.0.1:8000/depot/route/`,
-            {
-              headers: { Authorization: `Bearer ${accessToken}` },
-            },
-          );
+          const routeRes = await axios.get(`http://127.0.0.1:8000/depot/route/`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
           const dropdown = document.getElementById("boardingDropdown");
-          dropdown.innerHTML =
-            '<option value="">-- Choose Location --</option>';
-          const filteredRoutes = routeRes.data.filter(
-            (r) => r.bus === data.bus_id,
-          );
+          dropdown.innerHTML = '<option value="">-- Choose Location --</option>';
+          const filteredRoutes = routeRes.data.filter((r) => r.bus === data.bus_id);
           if (filteredRoutes.length > 0) {
             filteredRoutes.forEach((r) => {
               dropdown.innerHTML += `<option value="${r.location}">${r.location}</option>`;
             });
           } else {
-            dropdown.innerHTML =
-              '<option value="Default">Default (Main Station)</option>';
+            dropdown.innerHTML = '<option value="Default">Default (Main Station)</option>';
           }
           updatePrice();
         } catch (err) {
@@ -239,114 +222,110 @@
       function updatePrice() {
         const a = parseInt(document.getElementById("adults").value) || 0;
         const c = parseInt(document.getElementById("children").value) || 0;
-        
-        // Final total calculation: Adults full price, Children 50%
         const total = (a * packagePrice) + (c * packagePrice * 0.5);
-        
-        document.getElementById("est_price").innerText =
-          total.toLocaleString("en-IN");
+        document.getElementById("est_price").innerText = total.toLocaleString("en-IN");
         return total;
       }
 
       document.getElementById("adults").addEventListener("input", updatePrice);
       document.getElementById("children").addEventListener("input", updatePrice);
 
-      // --- PAYMENT LOGIC ---
-      document
-        .getElementById("bookingForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const btn = document.getElementById("confirmBtn");
-          const boarding = document.getElementById("boardingDropdown").value;
-          const totalAmount = updatePrice();
+      document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("confirmBtn");
+        const boarding = document.getElementById("boardingDropdown").value;
+        const totalAmount = updatePrice();
+        
+        // Input values for backend verification/booking
+        const adultsCount = parseInt(document.getElementById("adults").value);
+        const childrenCount = parseInt(document.getElementById("children").value);
+        const phoneNumber = document.getElementById("phone_number").value;
 
-          if (!boarding) {
-            alert("Please select a boarding point");
-            return;
-          }
+        if (!boarding) {
+          alert("Please select a boarding point");
+          return;
+        }
 
-          btn.disabled = true;
-          btn.innerText = "Initiating...";
+        btn.disabled = true;
+        btn.innerText = "Initiating...";
 
-          try {
-            // 1. Create Order in Backend
-            const orderRes = await axios.post(
-              "http://127.0.0.1:8000/payment/create-order/",
-              {
-                package_id: parseInt(packageId),
-                adults: parseInt(document.getElementById("adults").value),
-                children: parseInt(document.getElementById("children").value),
-                phone_number: document.getElementById("phone_number").value,
-                boarding_point: boarding,
-                total_price: totalAmount,
+        try {
+          // 1. Create Order
+          const orderRes = await axios.post(
+            "http://127.0.0.1:8000/payment/create-order/",
+            {
+              package_id: parseInt(packageId),
+              adults: adultsCount,
+              children: childrenCount,
+              phone_number: phoneNumber,
+              boarding_point: boarding,
+              total_price: totalAmount,
+            },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+
+          const orderData = orderRes.data;
+
+          // 2. Razorpay Popup
+          const options = {
+            key: orderData.key,
+            amount: orderData.amount * 100,
+            currency: "INR",
+            name: "KSRTC BTC",
+            description: "Package Booking Payment",
+            order_id: orderData.razorpay_order_id,
+            handler: async function (response) {
+              try {
+                // 3. Verify Payment + Send Booking Data for Serializer
+                // Backend-இல் உள்ள VerifyPaymentView இப்போது இந்த தரவுகளைக் கொண்டு சீரியலைசரை இயக்கும்
+                await axios.post(
+                  "http://127.0.0.1:8000/payment/verify-payment/",
+                  {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    // மிக முக்கியம்: சீரியலைசர் இந்த டேட்டாவைப் பயன்படுத்திதான் சீட்டை குறைக்கும்
+                    package_id: parseInt(packageId),
+                    adults: adultsCount,
+                    children: childrenCount,
+                    phone_number: phoneNumber,
+                    boarding_point: boarding
+                  },
+                  { headers: { Authorization: `Bearer ${accessToken}` } }
+                );
+                showSuccess(totalAmount);
+              } catch (err) {
+                alert("Verification or Seat Booking Failed: " + (err.response?.data?.details || "Error"));
+                btn.disabled = false;
+                btn.innerText = "Pay & Confirm";
+              }
+            },
+            theme: { color: "#e11d48" },
+            modal: {
+              ondismiss: function () {
+                btn.disabled = false;
+                btn.innerText = "Pay & Confirm";
               },
-              {
-                headers: { Authorization: `Bearer ${accessToken}` },
-              },
-            );
-
-            const orderData = orderRes.data;
-
-            // 2. Open Razorpay Popup
-            const options = {
-              key: orderData.key,
-              amount: orderData.amount * 100, // backend amount to paise
-              currency: "INR",
-              name: "KSRTC BTC",
-              description: "Package Booking Payment",
-              order_id: orderData.razorpay_order_id,
-              handler: async function (response) {
-                // 3. Verify Payment in Backend
-                try {
-                  await axios.post(
-                    "http://127.0.0.1:8000/payment/verify-payment/",
-                    {
-                      razorpay_order_id: response.razorpay_order_id,
-                      razorpay_payment_id: response.razorpay_payment_id,
-                      razorpay_signature: response.razorpay_signature,
-                    },
-                    {
-                      headers: { Authorization: `Bearer ${accessToken}` },
-                    },
-                  );
-                  showSuccess(totalAmount);
-                } catch (err) {
-                  alert("Verification Failed!");
-                  btn.disabled = false;
-                  btn.innerText = "Pay & Confirm";
-                }
-              },
-              theme: { color: "#e11d48" },
-              modal: {
-                ondismiss: function () {
-                  btn.disabled = false;
-                  btn.innerText = "Pay & Confirm";
-                },
-              },
-            };
-            const rzp = new Razorpay(options);
-            rzp.open();
-          } catch (err) {
-            alert(err.response?.data?.error || "Booking Failed");
-            btn.disabled = false;
-            btn.innerText = "Pay & Confirm";
-          }
-        });
+            },
+          };
+          const rzp = new Razorpay(options);
+          rzp.open();
+        } catch (err) {
+          alert(err.response?.data?.error || "Booking Failed");
+          btn.disabled = false;
+          btn.innerText = "Pay & Confirm";
+        }
+      });
 
       function showSuccess(amt) {
-        document.getElementById("finalPaidAmount").innerText =
-          amt.toLocaleString("en-IN");
+        document.getElementById("finalPaidAmount").innerText = amt.toLocaleString("en-IN");
         document.getElementById("successModal").classList.remove("hidden");
-
-        // Sky Crackers Effect
         confetti({
           particleCount: 150,
           spread: 70,
           origin: { y: 0.6 },
           colors: ["#e11d48", "#fb7185", "#ffffff"],
         });
-        
-        // Refresh icons for the modal
         lucide.createIcons();
       }
 

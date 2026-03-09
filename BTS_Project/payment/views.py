@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Transaction
 from tourister.models import Package_Booking, Package_Details
+from .serializers import BookingSerializer
+from django.db import transaction as db_transaction
 
 # Razorpay Client Setup
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -71,28 +73,56 @@ class VerifyPaymentView(APIView):
         }
 
         try:
-            # Verify the signature
+            
             client.utility.verify_payment_signature(params_dict)
 
-            # Update Transaction status
-            transaction = Transaction.objects.get(razorpay_order_id=res_data.get('razorpay_order_id'))
-            transaction.razorpay_payment_id = res_data.get('razorpay_payment_id')
-            transaction.razorpay_signature = res_data.get('razorpay_signature')
-            transaction.status = "Success"
-            transaction.save()
+            # 2. Database atomic transaction
+            with db_transaction.atomic():
+                # Transaction விவரங்களை எடுத்தல்
+                try:
+                    transaction_obj = Transaction.objects.select_for_update().get(
+                        razorpay_order_id=res_data.get('razorpay_order_id')
+                    )
+                except Transaction.DoesNotExist:
+                    return Response({"message": "Transaction record not found"}, status=status.HTTP_404_NOT_FOUND)
 
-            # Optional: If your Package_Booking has a payment_status field, update it here:
-            # if transaction.booking:
-            #     transaction.booking.payment_status = "Paid"
-            #     transaction.booking.save()
+                # ஸ்டேட்டஸை அப்டேட் செய்தல்
+                transaction_obj.razorpay_payment_id = res_data.get('razorpay_payment_id')
+                transaction_obj.razorpay_signature = res_data.get('razorpay_signature')
+                transaction_obj.status = "Success"
+                transaction_obj.save()
 
-            return Response({"message": "Payment Successful"}, status=status.HTTP_200_OK)
+                # 3. Serializer-ஐ இயக்குதல்
+                # ஜாவாஸ்கிரிப்ட்டில் இருந்து வரும் டேட்டாவைப் பயன்படுத்துகிறோம்
+                serializer = BookingSerializer(data=request.data, context={'request': request})
+                
+                if serializer.is_valid():
+                    # Serializer-ன் create() மெத்தட் இயங்கி சீட்டைக் குறைக்கும்
+                    booking = serializer.save() 
+                    
+                    # F() எக்ஸ்பிரஷனுக்குப் பிறகு சரியான எண்ணிக்கையை எடுக்க
+                    booking.package.bus.refresh_from_db()
+                    
+                    return Response({
+                        "message": "Payment Successful and Booking Confirmed",
+                        "booking_details": serializer.data,
+                        "remaining_seats": booking.package.bus.total_seats
+                    }, status=status.HTTP_200_OK)
+                else:
+                    # Serializer தவறாக இருந்தால் பிழையைத் தூக்கி எறியவும் (Rollback நடக்கும்)
+                    raise Exception(serializer.errors)
+
         except Exception as e:
-            # Update status to Failure if verification fails
+            # தோல்வியுற்றால் ஸ்டேட்டஸை 'Failure' என மாற்றுதல்
             try:
-                transaction = Transaction.objects.get(razorpay_order_id=res_data.get('razorpay_order_id'))
-                transaction.status = "Failure"
-                transaction.save()
+                transaction_obj = Transaction.objects.get(razorpay_order_id=res_data.get('razorpay_order_id'))
+                if transaction_obj.status != "Success": # ஏற்கனவே சக்சஸ் ஆகவில்லை என்றால்
+                    transaction_obj.status = "Failure"
+                    transaction_obj.save()
             except:
                 pass
-            return Response({"message": "Payment Verification Failed", "details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({
+                "message": "Verification or Booking Failed",
+                "details": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)

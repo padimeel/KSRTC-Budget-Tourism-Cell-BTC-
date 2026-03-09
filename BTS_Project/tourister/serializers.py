@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import User, RateReview, Package_Booking, Package_Details,RoomBooking
 from django.db.models import F
+from django.db import transaction
 
 User = get_user_model()
 
@@ -24,11 +25,14 @@ class SignupSerializer(serializers.ModelSerializer):
         )
         return user
 
-
 class BookingSerializer(serializers.ModelSerializer):
+    """
+    Serializer to handle Package Bookings with seat validation 
+    and atomic seat count updates.
+    """
     user = serializers.StringRelatedField(read_only=True)
     package = serializers.StringRelatedField(read_only=True)
-    bus = serializers.StringRelatedField(source='package.bus', read_only=True) 
+    bus = serializers.StringRelatedField(source='package.bus', read_only=True)
     package_id = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -45,51 +49,61 @@ class BookingSerializer(serializers.ModelSerializer):
         package_id = data.get("package_id")
         
         try:
-            # We use select_for_update() to prevent race conditions during seat booking
+            # select_for_update() locks the row to prevent other processes 
+            # from modifying the package/bus during this transaction.
             package = Package_Details.objects.select_for_update().select_related('bus').get(id=package_id)
         except Package_Details.DoesNotExist:
-            raise serializers.ValidationError({"package_id": "Package does not exist"})
+            raise serializers.ValidationError({"package_id": "The specified package does not exist."})
 
+        # Ensure a bus is assigned to the package
         if not package.bus:
-            raise serializers.ValidationError({"error": "No bus assigned to this package yet."})
+            raise serializers.ValidationError({"error": "No bus has been assigned to this package yet."})
 
         adults = data.get("adults", 0)
         children = data.get("children", 0)
         total_passengers = adults + children
 
+        # Passenger count validation
         if total_passengers <= 0:
-            raise serializers.ValidationError({"error": "At least one passenger is required."})
+            raise serializers.ValidationError({"error": "At least one passenger (adult or child) is required."})
 
+        # Seat availability validation
         if package.bus.total_seats < total_passengers:
             raise serializers.ValidationError({
-                "error": f"Not enough seats. Available: {package.bus.total_seats}"
+                "error": f"Not enough seats available. Remaining: {package.bus.total_seats}"
             })
 
-        # Pass the package object to the create method
+        # Pass objects to the create method via validated_data
         data['package_obj'] = package
         data['total_passengers'] = total_passengers
         return data
 
+    @transaction.atomic
     def create(self, validated_data):
+        """
+        Calculates price, updates bus seats using F expressions, 
+        and creates the booking record.
+        """
         package = validated_data.pop('package_obj')
         total_passengers = validated_data.pop('total_passengers')
         user = self.context['request'].user
 
-        # 1. Price Calculation (Package Price * Number of People)
+        # Business Logic: Calculate total price
         calculated_price = package.price * total_passengers
 
-        # 2. Decrease Seats in Bus model
+        # Atomic seat update to prevent race conditions
         bus = package.bus
-        bus.total_seats -= total_passengers
+        bus.total_seats = F('total_seats') - total_passengers
         bus.save()
 
-        # 3. Create Booking Record
+        # Create the booking instance
         booking = Package_Booking.objects.create(
             user=user,
             package=package,
             total_price=calculated_price,
             **validated_data
         )
+        
         return booking
     
         

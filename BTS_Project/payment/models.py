@@ -37,7 +37,6 @@ class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # Automatically set the amount from the booking if not already set
         if not self.amount or self.amount == 0:
             if self.booking:
                 self.amount = self.booking.total_price

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | KSRTC BTC</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans selection:bg-rose-200">
+{% include 'components/navbar.html' %}
+
+    <header class="relative h-[50vh] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-rose-600 to-[#fbbf24] opacity-90 z-10"></div>
+        <img src="Kerala.jpeg" alt="KSRTC" class="absolute inset-0 w-full h-full object-cover">
+        <div class="relative z-20 text-center px-6">
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 uppercase tracking-tighter drop-shadow-md" style="font-family: serif;">
+                Contact Our Team
+            </h1>
+            <p class="text-white text-lg md:text-xl font-medium opacity-90 tracking-wide">
+                KSRTC Budget Tourism Cell Helpline
+            </p>
+        </div>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-6 -mt-20 relative z-30">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2rem] text-center shadow-2xl border-b-4 border-[#fbbf24] hover:-translate-y-2 transition-transform duration-300">
+                <div class="w-14 h-14 bg-rose-600 rounded-2xl flex items-center justify-center text-white text-xl mx-auto mb-4 shadow-lg shadow-rose-100">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-[0.2em]">Call Us</h3>
+                <p class="text-rose-600 font-bold mt-2 text-lg">+91 9946972999</p>
+            </div>
+            
+            <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2rem] text-center shadow-2xl border-b-4 border-rose-600 hover:-translate-y-2 transition-transform duration-300">
+                <div class="w-14 h-14 bg-[#fbbf24] rounded-2xl flex items-center justify-center text-white text-xl mx-auto mb-4 shadow-lg shadow-amber-200">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-[0.2em]">Office</h3>
+                <p class="text-slate-600 text-xs mt-2 leading-relaxed">Vanalakshmi, Vazhuthacaud,<br>Thiruvananthapuram</p>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2rem] text-center shadow-2xl border-b-4 border-[#fbbf24] hover:-translate-y-2 transition-transform duration-300">
+                <div class="w-14 h-14 bg-rose-600 rounded-2xl flex items-center justify-center text-white text-xl mx-auto mb-4 shadow-lg shadow-rose-100">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-[0.2em]">Email</h3>
+                <p class="text-rose-600 font-bold mt-2 text-xs truncate">keralaforest@gmail.com</p>
+            </div>
+
+            <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2rem] text-center shadow-2xl border-b-4 border-rose-600 hover:-translate-y-2 transition-transform duration-300">
+                <div class="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center text-white text-xl mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-[0.2em]">24/7 Help</h3>
+                <p class="text-slate-600 font-bold mt-2">1800-425-001</p>
+            </div>
+        </div>
+    </section>
+
+   <section class="max-w-6xl mx-auto py-10 px-6">
+    <div class="bg-white rounded-[3rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row border border-slate-100">
+        
+        <div class="lg:w-1/2 relative hidden lg:block">
+            <img src="Kerala1.jpeg" alt="Travel" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-rose-600/20 mix-blend-multiply"></div>
+            <div class="absolute bottom-10 left-10 p-8 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 text-white">
+                <p class="font-bold text-lg italic">"Exploring the soul of Kerala."</p>
+                <p class="text-xs uppercase tracking-widest mt-2 font-black">KSRTC Budget Tourism</p>
+            </div>
+        </div>
+
+        <div class="lg:w-1/2 p-10 md:p-16">
+            <h2 class="text-4xl font-bold text-slate-800 mb-2 uppercase tracking-tighter" style="font-family: serif;">Send a Message</h2>
+            <p class="text-rose-600 font-bold text-[10px] tracking-[0.3em] uppercase mb-10 italic">Your Journey starts with a query</p>
+            
+            <form action="https://formspree.io/f/xpqjlnzk" method="POST" class="space-y-6">
+                
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Full Name</label>
+                    <input type="text" name="name" required placeholder="John Doe"
+                        class="w-full bg-slate-50 border-none rounded-2xl p-4 ring-1 ring-slate-200 focus:ring-2 focus:ring-[#fbbf24] outline-none transition-all">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Email Address</label>
+                        <input type="email" name="email" required placeholder="john@email.com"
+                            class="w-full bg-slate-50 border-none rounded-2xl p-4 ring-1 ring-slate-200 focus:ring-2 focus:ring-[#fbbf24] outline-none transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Phone Number</label>
+                        <input type="text" name="phone" required placeholder="+91 00000 00000"
+                            class="w-full bg-slate-50 border-none rounded-2xl p-4 ring-1 ring-slate-200 focus:ring-2 focus:ring-[#fbbf24] outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">How can we help?</label>
+                    <textarea name="message" rows="4" required placeholder="Type your message here..."
+                        class="w-full bg-slate-50 border-none rounded-2xl p-4 ring-1 ring-slate-200 focus:ring-2 focus:ring-[#fbbf24] outline-none transition-all"></textarea>
+                </div>
+
+                <button type="submit"
+                    class="bg-rose-600 w-full text-white font-black py-5 rounded-2xl shadow-xl shadow-rose-100 hover:bg-rose-700 hover:scale-[1.01] active:scale-95 transition-all uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3">
+                    <span>Send Message</span>
+                    <i class="fas fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+        {% include 'components/footer.html' %}
+</body>
+</html>

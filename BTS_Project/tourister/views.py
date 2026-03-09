@@ -100,18 +100,18 @@ class PackageBookingTemplate(APIView):
         # We pass pk to context just in case, but JS will pull it from the URL path
         return Response({'package_id': pk}, template_name=self.template_name)
 
-class PaymentTemplate(APIView):
+class ContactTemplate(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = "payment.html"
+    template_name = "contact.html"
 
     def get(self, request):
         return Response({}, template_name=self.template_name)
 
-class PaymentSuccessTemplate(APIView):
+class AboutTemplate(APIView):
     permission_classes = [permissions.AllowAny]
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
-    template_name = "payment_success.html"
+    template_name = "aboutus.html"
 
     def get(self, request):
         return Response({}, template_name=self.template_name)
@@ -374,6 +374,7 @@ class MyBooking(APIView):
 # ------------------------------
 # PACKAGE BOOKING
 # ------------------------------
+# View Correction
 class PackageBooking(APIView):
     renderer_classes = [JSONRenderer]
 
@@ -385,7 +386,7 @@ class PackageBooking(APIView):
     def get(self, request):
         package_id = request.query_params.get('package_id')
         if not package_id:
-            return Response({"error": "Package ID missing"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Package does not exist"}, status=status.HTTP_400_BAD_REQUEST)
             
         try:
             pkg = Package_Details.objects.select_related('bus').get(id=package_id)
@@ -398,19 +399,19 @@ class PackageBooking(APIView):
             }
             return Response(data, status=status.HTTP_200_OK)
         except Package_Details.DoesNotExist:
-            return Response({"error": "Package not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Package does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
     @transaction.atomic
     def post(self, request):
         serializer = BookingSerializer(data=request.data, context={'request': request})
     
         if serializer.is_valid():
-            
             booking = serializer.save() 
+            remaining = booking.package.bus.total_seats
         
             return Response({
                 "message": "Booking Successful",
-                "remaining_seats": booking.package.bus.total_seats,
+                "remaining_seats": remaining,
                 "details": serializer.data
             }, status=status.HTTP_201_CREATED)
 

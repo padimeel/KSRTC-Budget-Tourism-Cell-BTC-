@@ -44,7 +44,6 @@ urlpatterns = [
     path('packagebooking-template/', PackageBookingTemplate.as_view(), name='packagebooking_template'),
     path('packagebooking-template/<int:pk>/', PackageBookingTemplate.as_view(), name='packagebooking_template'),
 
-    # Payment Endpoints
-    path('payment-template/', PaymentTemplate.as_view(), name='payment_template'),
-    path('payment-success-template/', PaymentSuccessTemplate.as_view(), name='payment_success_template'),
+    path('contact-template/', ContactTemplate.as_view(), name='contact_template'),
+    path('about-template/', AboutTemplate.as_view(), name='about_template'),
 ]

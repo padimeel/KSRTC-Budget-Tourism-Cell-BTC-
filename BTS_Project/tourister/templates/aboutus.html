@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | KSRTC BTC Official</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-[#fcfcfc] text-slate-900 font-sans selection:bg-rose-100">
+{% include 'components/navbar.html' %}
+
+    <header class="relative h-[85vh] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-rose-600/80 via-rose-600/40 to-[#fcfcfc] z-10"></div>
+        <img src="Kerala.jpeg" alt="Kerala Tourism" class="absolute inset-0 w-full h-full object-cover scale-110 animate-[pulse_10s_infinite]">
+        
+        <div class="relative z-20 text-center px-6 mt-20">
+            <span class="bg-white/20 backdrop-blur-md text-white border border-white/30 px-6 py-2 rounded-full font-black uppercase tracking-[0.4em] text-[10px] mb-6 inline-block">Established 2021</span>
+            <h1 class="text-6xl md:text-9xl font-bold text-white mb-6 uppercase tracking-tighter leading-none" style="font-family: serif;">
+                Beyond <br><span class="text-[#fbbf24]">The Wheels</span>
+            </h1>
+            <p class="text-white/90 text-lg md:text-xl max-w-2xl mx-auto font-light italic leading-relaxed">
+                "Connecting hearts, exploring heritage, and redefining affordable travel for every common man in God's Own Country."
+            </p>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 opacity-50">
+            <div class="w-6 h-10 border-2 border-white rounded-full flex justify-center p-1">
+                <div class="w-1 h-2 bg-white rounded-full animate-bounce"></div>
+            </div>
+        </div>
+    </header>
+
+    <section class="max-w-7xl mx-auto px-6 py-32">
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+            <div class="relative group">
+                <div class="absolute -inset-6 bg-gradient-to-tr from-rose-600 to-[#fbbf24] rounded-[4rem] opacity-10 blur-3xl group-hover:opacity-20 transition-opacity"></div>
+                <div class="relative rounded-[4rem] overflow-hidden shadow-2xl border-[12px] border-white">
+                    <img src="Kerala1.jpeg" alt="Bus Journey" class="w-full h-[600px] object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-12">
+                        <p class="text-white text-2xl font-serif italic">"Travel is the only thing you buy that makes you richer."</p>
+                    </div>
+                </div>
+                <div class="absolute -top-10 -left-10 bg-white p-8 rounded-full shadow-2xl border border-slate-50 hidden xl:block">
+                    <div class="text-rose-600 font-black text-3xl">05+</div>
+                    <div class="text-slate-400 font-bold uppercase text-[8px] tracking-[0.2em]">Years of Smiles</div>
+                </div>
+            </div>
+
+            <div class="space-y-10">
+                <div class="inline-flex items-center gap-4 text-rose-600">
+                    <div class="w-12 h-[2px] bg-rose-600"></div>
+                    <span class="font-black uppercase tracking-[0.3em] text-xs">Our Purpose</span>
+                </div>
+                <h2 class="text-5xl md:text-6xl font-bold text-slate-800 tracking-tighter leading-tight" style="font-family: serif;">
+                    Pioneering the <br><span class="text-rose-600">People's Tourism</span>
+                </h2>
+                <p class="text-xl text-slate-500 leading-relaxed font-light">
+                    The KSRTC Budget Tourism Cell (BTC) was born from a simple vision: **No destination in Kerala should be too expensive for its citizens.** We turned our iconic red-and-yellow buses into vessels of discovery.
+                </p>
+                
+                <div class="grid grid-cols-2 gap-6 pt-6">
+                    <div class="p-8 rounded-3xl bg-rose-50 border border-rose-100 group hover:bg-rose-600 transition-all duration-500">
+                        <i class="fas fa-route text-3xl text-rose-600 mb-4 group-hover:text-white"></i>
+                        <h4 class="font-bold text-slate-800 group-hover:text-white uppercase text-xs tracking-widest mb-2">Unmapped Paths</h4>
+                        <p class="text-slate-500 group-hover:text-rose-100 text-xs leading-relaxed">Reaching villages and forest trails where private operators don't go.</p>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-amber-50 border border-amber-100 group hover:bg-[#fbbf24] transition-all duration-500">
+                        <i class="fas fa-users-viewfinder text-3xl text-[#fbbf24] mb-4 group-hover:text-white"></i>
+                        <h4 class="font-bold text-slate-800 group-hover:text-white uppercase text-xs tracking-widest mb-2">Inclusivity</h4>
+                        <p class="text-slate-500 group-hover:text-amber-50 text-xs leading-relaxed">Specially curated trips for senior citizens, students, and low-income families.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-slate-50 py-32 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-bold text-slate-800 mb-4" style="font-family: serif;">Our Journey So Far</h2>
+                <div class="w-20 h-1.5 bg-[#fbbf24] mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="relative">
+                <div class="absolute left-1/2 -translate-x-1/2 h-full w-[1px] bg-slate-200 hidden md:block"></div>
+                
+                <div class="space-y-16">
+                    <div class="relative flex flex-col md:flex-row items-center justify-between">
+                        <div class="md:w-[45%] text-center md:text-right">
+                            <h3 class="text-2xl font-bold text-rose-600 mb-2">Nov 2021</h3>
+                            <h4 class="text-lg font-black uppercase tracking-widest mb-3">The First Gear</h4>
+                            <p class="text-slate-500 text-sm">Launched our first budget trip from Thiruvananthapuram with just 50 travelers.</p>
+                        </div>
+                        <div class="w-10 h-10 bg-[#fbbf24] rounded-full border-4 border-white shadow-lg z-10 my-4 md:my-0"></div>
+                        <div class="md:w-[45%]"></div>
+                    </div>
+                    
+                    <div class="relative flex flex-col md:flex-row-reverse items-center justify-between">
+                        <div class="md:w-[45%] text-center md:text-left">
+                            <h3 class="text-2xl font-bold text-rose-600 mb-2">Aug 2023</h3>
+                            <h4 class="text-lg font-black uppercase tracking-widest mb-3">One Lakh Smiles</h4>
+                            <p class="text-slate-500 text-sm">Crossed the historic milestone of 100,000 satisfied tourists within 2 years.</p>
+                        </div>
+                        <div class="w-10 h-10 bg-rose-600 rounded-full border-4 border-white shadow-lg z-10 my-4 md:my-0"></div>
+                        <div class="md:w-[45%]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 py-10">
+        <div class="bg-slate-900 rounded-[4rem] p-12 md:p-24 overflow-hidden relative shadow-3xl">
+            <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-rose-600/20 to-transparent"></div>
+            
+            <div class="relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-white text-5xl font-bold mb-8 leading-tight" style="font-family: serif;">Why we are <br><span class="text-[#fbbf24]">Different</span></h2>
+                    <div class="space-y-8">
+                        <div class="flex items-start gap-6">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-[#fbbf24] shrink-0 border border-white/20"><i class="fas fa-leaf"></i></div>
+                            <div>
+                                <h4 class="text-white font-bold mb-1">Eco-Conscious Travel</h4>
+                                <p class="text-slate-400 text-sm">By using high-occupancy buses, we remove 15+ private cars from the road per trip.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-6">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-[#fbbf24] shrink-0 border border-white/20"><i class="fas fa-handshake-angle"></i></div>
+                            <div>
+                                <h4 class="text-white font-bold mb-1">Government Assurance</h4>
+                                <p class="text-slate-400 text-sm">Security of a 100% government-backed entity with 24/7 technical and medical support.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="aspect-square bg-white/5 rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center group hover:bg-white hover:text-slate-900 transition-all duration-500 cursor-default">
+                        <span class="text-3xl font-black mb-2 text-rose-600">500+</span>
+                        <span class="text-[9px] uppercase tracking-widest font-black opacity-60">Hotels Joined</span>
+                    </div>
+                    <div class="aspect-square bg-white/5 rounded-3xl border border-white/10 flex flex-col items-center justify-center p-6 text-center group hover:bg-[#fbbf24] hover:text-slate-900 transition-all duration-500 cursor-default">
+                        <span class="text-3xl font-black mb-2">90</span>
+                        <span class="text-[9px] uppercase tracking-widest font-black opacity-60">Active Depots</span>
+                    </div>
+                    <div class="col-span-2 p-8 bg-gradient-to-r from-rose-600 to-rose-700 rounded-3xl text-white">
+                        <p class="text-xs uppercase tracking-[0.3em] font-black mb-2 opacity-80 italic">The BTC Motto</p>
+                        <p class="text-2xl font-serif">"Travel for All, Memories for Life"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% include 'components/footer.html' %}
+</body>
+</html>
