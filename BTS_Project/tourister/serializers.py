@@ -1,9 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-<<<<<<< HEAD
-from django.db import transaction
-=======
->>>>>>> main
 from .models import User, RateReview, Package_Booking, Package_Details,RoomBooking
 from django.db.models import F
 
@@ -49,12 +45,8 @@ class BookingSerializer(serializers.ModelSerializer):
         package_id = data.get("package_id")
         
         try:
-<<<<<<< HEAD
-            package = Package_Details.objects.select_related('bus').get(id=package_id)
-=======
             # We use select_for_update() to prevent race conditions during seat booking
             package = Package_Details.objects.select_for_update().select_related('bus').get(id=package_id)
->>>>>>> main
         except Package_Details.DoesNotExist:
             raise serializers.ValidationError({"package_id": "Package does not exist"})
 
@@ -73,37 +65,6 @@ class BookingSerializer(serializers.ModelSerializer):
                 "error": f"Not enough seats. Available: {package.bus.total_seats}"
             })
 
-<<<<<<< HEAD
-        data['package_obj'] = package
-        return data
-
-    @transaction.atomic
-    def create(self, validated_data):
-        request = self.context.get("request")
-        user = request.user if request and request.user.is_authenticated else None
-
-        package = validated_data.pop('package_obj')
-        if "package_id" in validated_data:
-            validated_data.pop("package_id")
-        
-        adults = validated_data.get("adults", 0)
-        children = validated_data.get("children", 0)
-        total_passengers = adults + children
-
-        validated_data["total_price"] = (
-            adults * package.price + (children * package.price * 0.5)
-        )
-
-        bus = package.bus
-        bus.total_seats = F('total_seats') - total_passengers
-        bus.save(update_fields=['total_seats'])
-
-        return Package_Booking.objects.create(
-            user=user,
-            package=package,
-            **validated_data
-        )
-=======
         # Pass the package object to the create method
         data['package_obj'] = package
         data['total_passengers'] = total_passengers
@@ -131,7 +92,6 @@ class BookingSerializer(serializers.ModelSerializer):
         )
         return booking
     
->>>>>>> main
         
         
         
